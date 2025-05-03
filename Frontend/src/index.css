@@ -1,68 +1,87 @@
+/* ===================== Variables CSS de Cheepers ===================== */
+/*
+  ¡IMPORTANTE!
+  Reemplaza los valores hexadecimales (#...) y otros valores
+  para que coincidan exactamente con la paleta de colores,
+  tipografía y espaciado de la marca Cheepers.
+*/
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Colores de Marca Cheepers */
+  --color-primary: #D32F2F; /* Rojo: para botones, acentos, precios */
+  --color-secondary: #FFC107; /* Amarillo/Ámbar: para elementos secundarios, fondos suaves */
+  --color-tertiary: #4E342E; /* Marrón oscuro: para texto principal, fondos oscuros */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Colores de Fondo */
+  --color-background-light: #FFF8E1; /* Beige/Crema suave: para fondos de sección claros */
+  --color-background-medium: #FFECB3; /* Amarillo pastel: para destacar bloques (ej. info contacto) */
+  --color-background-dark: #A13B3B; /* Rojo oscuro o marrón rojizo: para secciones oscuras (opcional) */
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Colores de Texto */
+  --color-text-dark: var(--color-tertiary); /* Texto oscuro principal */
+  --color-text-medium: #555555; /* Gris medio para descripciones, etc. */
+  --color-text-light: #FFFFFF; /* Blanco para texto sobre fondos oscuros */
+
+  /* Sombras */
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+  /* Border Radius */
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;
+  --border-radius-large: 50%; /* Para elementos circulares (ej. botones de acción) */
+
+  /* Espaciado (Margen y Padding) */
+  --space-small: 8px;
+  --space-medium: 15px;
+  --space-large: 30px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* ===================== General / Layout Base (Resets y Estilos Globales) ===================== */
+/*
+Estos estilos se aplican a elementos HTML básicos y al contenedor principal de la app.
+Proporcionan una base consistente para toda la aplicación.
+*/
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
+  /*
+    Define la fuente principal. Si usaste Google Fonts en index.html, úsala aquí.
+    Ejemplo: font-family: 'Roboto', sans-serif;
+  */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-osx-smoothing: grayscale;
+  background-color: #ffffff; /* Fondo blanco por defecto de la página */
+  color: var(--color-text-dark); /* Color de texto oscuro principal por defecto */
+  box-sizing: border-box; /* Facilita el cálculo de tamaños con padding y bordes */
+  line-height: 1.5; /* Altura de línea por defecto para legibilidad */
+}
+
+/* Asegura que padding y borde se incluyan en el tamaño de todos los elementos */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Contenedor donde React monta la app. Asegura que ocupe al menos toda la altura visible. */
+#root {
   min-height: 100vh;
+  display: flex; /* Lo hacemos flex para que .app pueda crecer */
+  flex-direction: column;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Contenedor principal de la aplicación dentro de #root. */
+.app {
+  display: flex;
+  flex-direction: column; /* Los elementos hijos (header, main, footer) se apilarán */
+  min-height: 100vh; /* Ocupa al menos toda la altura */
+  width: 100%;
+  overflow-x: hidden; /* Evita el scroll horizontal no deseado */
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
+/*
+Estilos de ejemplo para enlaces por defecto (opcional)
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+*/
