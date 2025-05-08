@@ -31,8 +31,8 @@ const Header: React.FC<HeaderProps> = () => {
       {/* Contenedor para la navegación, se mostrará/ocultará en móviles */}
       <nav className={`nav ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
         <Link to="/" className="navLink">Inicio</Link>
-        <Link to="/menu" className="navLink">Menú</Link>
-        <Link to="/contacto" className="navLink">Contacto</Link>
+        <Link to="/catalogo" className="navLink">Menú</Link>
+        <Link to="/promos" className="navLink">Promos</Link>
         <Link to="/sobre-nosotros" className="navLink">Sobre Nosotros</Link>
       </nav>
 
