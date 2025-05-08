@@ -39,11 +39,11 @@ function CheckoutPage() {
   );
 }
 
-function ContactPage() {
+function PromosPage() { 
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h2>Página de Contacto (WIP)</h2>
-      <p>Info de contacto y mapa.</p>
+      <h2>Página de Promos (WIP)</h2> {/* Y el título */}
+      <p>Info de promos y descuentos.</p>
     </div>
   );
 }
@@ -103,7 +103,7 @@ function App() {
           {/* Rutas para las otras páginas de la aplicación */}
           <Route path="/catalogo" element={<CatalogPage />} /> {/* Usando el Placeholder CatalogPage */}
           <Route path="/checkout" element={<CheckoutPage />} /> {/* Usando el Placeholder CheckoutPage */}
-          <Route path="/contacto" element={<ContactPage />} /> {/* Usando el Placeholder ContactPage */}
+          <Route path="/promos" element={<PromosPage />} /> {/* Usando el Placeholder PromosPage */}
 
           {/* Rutas de la sección de Administración */}
           <Route path="/admin/login" element={<AdminLoginPage />} /> {/* Usando el Placeholder AdminLoginPage */}
