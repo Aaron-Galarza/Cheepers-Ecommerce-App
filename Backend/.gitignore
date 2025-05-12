@@ -1,0 +1,14 @@
+# Ignorar el directorio de dependencias de Node.js
+node_modules/
+
+# Ignorar el archivo de variables de entorno sensibles
+.env
+
+# Ignorar el directorio de salida del código compilado por TypeScript
+dist/
+
+# Opcional: Archivos de log u otros archivos temporales que no quieras versionar
+npm-debug.log
+yarn-error.log
+build/ 
+# Si en algún momento usas otra carpeta de build
