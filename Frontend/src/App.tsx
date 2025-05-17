@@ -6,13 +6,16 @@ import { Routes, Route } from 'react-router-dom'; // Importamos Routes y Route p
 import './App.css';
 
 // !!! IMPORTA EL COMPONENTE HEADER DESDE SU UBICACIÓN CORRECTA !!!
-// Asegúrate de que la ruta './components/Layout/Header' sea correcta desde src/
+// Asegúrate de que la ruta './components/layout/header' sea correcta desde src/
 import Header from './components/layout/header';
+
+// Importa el componente HomePage desde su ubicación
+import HomePage from './pages/inicio';
 
 // --- Componentes Placeholder (ELIMINA ESTOS CUANDO CREES LOS ARCHIVOS Y COMPONENTES REALES) ---
 // Si ya creaste el archivo HomePage.tsx, descomenta la línea de importación arriba
 // y elimina esta función placeholder. Haz lo mismo para las demás páginas.
-function HomePage() {
+function InicioPage() {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <h2>Página Principal (WIP)</h2>
@@ -21,10 +24,10 @@ function HomePage() {
   );
 }
 
-function CatalogPage() {
+function MenuPage() {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h2>Página de Catálogo (WIP)</h2>
+      <h2>Menú (WIP)</h2>
       <p>Lista completa de productos.</p>
     </div>
   );
@@ -39,10 +42,10 @@ function CheckoutPage() {
   );
 }
 
-function PromosPage() { 
+function PromosPage() {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h2>Página de Promos (WIP)</h2> {/* Y el título */}
+      <h2>Página de Promos (WIP)</h2>
       <p>Info de promos y descuentos.</p>
     </div>
   );
@@ -98,15 +101,15 @@ function App() {
             element: el componente React que se debe renderizar para esa URL.
           */}
           {/* Ruta para la página principal */}
-          <Route path="/" element={<HomePage />} /> {/* Usando el Placeholder HomePage */}
+          <Route path="/" element={<HomePage />} /> {/* Usando el componente HomePage */}
 
           {/* Rutas para las otras páginas de la aplicación */}
-          <Route path="/catalogo" element={<CatalogPage />} /> {/* Usando el Placeholder CatalogPage */}
-          <Route path="/checkout" element={<CheckoutPage />} /> {/* Usando el Placeholder CheckoutPage */}
-          <Route path="/promos" element={<PromosPage />} /> {/* Usando el Placeholder PromosPage */}
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/promos" element={<PromosPage />} />
 
           {/* Rutas de la sección de Administración */}
-          <Route path="/admin/login" element={<AdminLoginPage />} /> {/* Usando el Placeholder AdminLoginPage */}
+          <Route path="/admin/login" element={<AdminLoginPage />} />
           {/* !!! Agrega rutas para Admin Products, Admin Orders, etc. aquí cuando crees esas páginas !!! */}
           {/* <Route path="/admin/productos" element={<AdminProductsPage />} /> */}
           {/* <Route path="/admin/pedidos" element={<AdminOrdersPage />} /> */}
