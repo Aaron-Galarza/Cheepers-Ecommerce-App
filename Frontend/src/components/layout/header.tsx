@@ -31,16 +31,16 @@ const Header: React.FC<HeaderProps> = () => {
       {/* Contenedor para la navegación, se mostrará/ocultará en móviles */}
       <nav className={`nav ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
         <Link to="/" className="navLink">Inicio</Link>
-        <Link to="/catalogo" className="navLink">Menú</Link>
+        <Link to="/menu" className="navLink">Menú</Link>
         <Link to="/promos" className="navLink">Promos</Link>
         <Link to="/sobre-nosotros" className="navLink">Sobre Nosotros</Link>
       </nav>
 
       <div className="navActions">
-        <Link to="/carrito" className="actionButton">
+        <Link to="/checkout" className="actionButton">
           <FaShoppingCart />
         </Link>
-        <Link to="/cuenta" className="actionButton">
+        <Link to="/admin/login" className="actionButton">
           <FaUser />
         </Link>
       </div>

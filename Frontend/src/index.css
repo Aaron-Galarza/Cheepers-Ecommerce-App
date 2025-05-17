@@ -44,18 +44,15 @@ Proporcionan una base consistente para toda la aplicación.
 body {
   margin: 0;
   padding: 0;
-  /*
-    Define la fuente principal. Si usaste Google Fonts en index.html, úsala aquí.
-    Ejemplo: font-family: 'Roboto', sans-serif;
-  */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-osx-smoothing: grayscale;
-  background-color: #ffffff; /* Fondo blanco por defecto de la página */
-  color: var(--color-text-dark); /* Color de texto oscuro principal por defecto */
-  box-sizing: border-box; /* Facilita el cálculo de tamaños con padding y bordes */
-  line-height: 1.5; /* Altura de línea por defecto para legibilidad */
+  background-color: var(--color-background-light); /* Ahora toma el valor de la variable global */
+  color: var(--color-text-dark); 
+  box-sizing: border-box; 
+  line-height: 1.5; 
 }
+
 
 /* Asegura que padding y borde se incluyan en el tamaño de todos los elementos */
 *,
