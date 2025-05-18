@@ -13,7 +13,6 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-  border-bottom: 2px solid #bec4c4; /* un gris muy claro (Tailwind gray-200) */
 
     }
     
@@ -81,91 +80,7 @@
     background-color: var(--color-background-dark);
     }
     
-    .hero {
-    min-height: 85vh;
-    background-image: url('/assets/images/cheepers-hero-background.jpg');
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    padding: 60px 5%;
-    position: relative;
-    background-color: var(--color-background-light);
-    }
-    
  
-
-    .sectionText {
-    font-size: 1.15rem;
-    line-height: 1.7;
-    margin-bottom: var(--space-medium);
-    color: var(--color-text-medium);
-    }
-    
-    .aboutUsSection {
-    padding: 60px 0;
-    background-color: var(--color-background-light);
-    color: var(--color-text-dark);
-    }
-    
-    .aboutUsContentColumns {
-    display: grid;
-    gap: var(--space-large);
-    }
-    
-    @media (min-width: 768px) {
-    .aboutUsContentColumns {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-    }
-    }
-    
-  
-    
-
-    
-
-    .contactItem {
-    display: flex;
-    align-items: center;
-    gap: var(--space-medium);
-    }
-    
-    .contactIconContainer {
-    width: 40px;
-    height: 40px;
-    background-color: var(--color-secondary);
-    border-radius: var(--border-radius-large);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    }
-    
-    .contactIcon {
-    font-size: 1.4rem;
-    color: var(--color-text-light);
-    }
-    
-    .contactText {
-    font-size: 1.1rem;
-    font-weight: 400;
-    margin: 0;
-    color: var(--color-text-dark);
-    flex-grow: 1;
-    }
-    
-    .contactText a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color .2s ease-in-out;
-    }
-    
-    .contactText a:hover {
-    color: var(--color-background-dark);
-    text-decoration: underline;
-    }
-    
     .mapContainer {
     border-radius: var(--border-radius-medium);
     overflow: hidden;
@@ -567,4 +482,21 @@ text-decoration: none;
 .carousel-button.right {
   right: 10px;
   border-radius: 50%;
+}
+
+
+
+.navLink.active-nav-link {
+  color: #c72a03; /* <-- El color que quieres para el texto del enlace activo */
+  font-weight: bold; /* Opcional: Texto en negrita */
+  /* border-bottom: 2px solid #c72a03; */
+}
+
+/* Si el logo es un NavLink y quieres un estilo activo (mantenlo si lo usas) */
+.logo-link.active-logo-link {
+   /* Define estilos para el logo activo si es un enlace */
+}
+
+.actionButton.active-action-button {
+  background-color: #f51109; /* <-- SOLO cambia el color de fondo del BOTÓN */
 }
