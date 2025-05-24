@@ -1,13 +1,15 @@
+/* inicio.module.css */
+
 .inicioContainer {
-  padding: 20px;
+  padding: 10px;
 }
 
 .heroSection {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background-color: #ffffff;
-  padding: 40px;
+  background-color: #f3f3f3be;
+  padding: 43px;
   border-radius: 70px;
   margin-bottom: 30px;
   flex-wrap: wrap;
@@ -15,24 +17,31 @@
   position: relative;
 }
 
+/* ✨ Modificado para usar Flexbox en el texto y centrar solo el CTA */
 .heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   max-width: 500px;
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   z-index: 1;
   color: var(--color-text-dark);
 }
 
 .heroTitle {
-  font-size: 2.5em;
-  margin-bottom: 10px;
+  font-size: 60px;
   color: var(--color-tertiary);
+  margin-left: 15px;
 }
 
 .heroText {
-  font-size: 1.2em;
-  margin-bottom: 5px;
+  font-size: 50px;
+  margin-bottom: -5px;
   color: var(--color-text-medium);
+  margin-left: 15px;
+  position: relative;
+  bottom: 30px;
 }
 
 .heroCallToAction {
@@ -40,6 +49,10 @@
   color: var(--color-primary);
   margin-top: 20px;
   font-weight: bold;
+
+  /* Eliminado margin-left anterior y centrado solo este elemento */
+  margin-left: -25px;
+  align-self: center;
 }
 
 .heroImageContainer {
@@ -85,11 +98,11 @@
 }
 
 .bannerButtonLeft {
-  left: 20px;
+  left: 0px;
 }
 
 .bannerButtonRight {
-  right: 20px;
+  right: 0px;
 }
 
 .aboutContactSection {
@@ -104,127 +117,120 @@
 }
 
 .aboutContent {
-   flex: 1;
-   max-width: 600px;
-   width: 100%;
-   text-align: center;
+  flex: 1;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
 }
 
 .aboutMainTitle {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: var(--color-tertiary);
-    margin-top: 0;
-    margin-bottom: var(--space-large);
-    text-align: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: var(--color-tertiary);
+  margin-top: 0;
+  margin-bottom: var(--space-large);
+  text-align: center;
 }
 
 .aboutParagraph {
-    font-size: 1.1rem;
-    color: var(--color-text-dark);
-    line-height: 1.6;
-    margin-bottom: var(--space-medium);
-    text-align: left;
+  font-size: 1.1rem;
+  color: var(--color-text-dark);
+  line-height: 1.6;
+  margin-bottom: var(--space-medium);
+  text-align: left;
 }
 
 .contactInfoBlock {
-    /* Margin top eliminado aquí, el gap en mapEmbedContainer lo manejará */
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-medium);
-    /* Fondo o borde para este bloque si es necesario: */
-    /* background-color: #fff; */
-    /* padding: var(--space-medium); */
-    /* border-radius: 8px; */
-    /* box-shadow: var(--shadow-light); */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-medium);
 }
 
 .contactTitle {
-    font-size: 1.5em;
-    color: var(--color-tertiary);
-    margin-bottom: var(--space-medium);
-    text-align: center;
+  font-size: 1.5em;
+  color: var(--color-tertiary);
+  margin-bottom: var(--space-medium);
+  text-align: center;
 }
 
 .contactItem {
-    display: flex;
-    align-items: center;
-    gap: var(--space-small);
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: var(--space-small);
+  justify-content: center;
 }
 
 .contactIconWrapper {
-   font-size: 1.5em;
-   color: white;
-   background-color: var(--color-primary);
-   border-radius: 50%;
-   width: 40px;
-   height: 40px;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   flex-shrink: 0;
+  font-size: 1.5em;
+  color: white;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .contactText {
-   font-size: 1.1rem;
-   color: var(--color-text-dark);
-   text-align: left;
+  font-size: 1.1rem;
+  color: var(--color-text-dark);
+  text-align: left;
 }
 
 .contactText a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
 }
 
 .contactText a:hover {
-    color: var(--color-tertiary);
-    text-decoration: underline;
+  color: var(--color-tertiary);
+  text-decoration: underline;
 }
 
 .whatsappLink {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-small);
-    background-color: #25D366;
-    color: white;
-    padding: 12px 25px;
-    border-radius: var(--border-radius-medium);
-    text-decoration: none;
-    font-weight: 600;
-    transition: background-color 0.2s ease-in-out;
-    white-space: nowrap;
-    justify-content: center;
-    width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-small);
+  background-color: #25D366;
+  color: white;
+  padding: 12px 25px;
+  border-radius: var(--border-radius-medium);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+  white-space: nowrap;
+  justify-content: center;
+  width: auto;
 }
 
 .whatsappLink:hover {
-    background-color: #128C7E;
+  background-color: #128C7E;
 }
 
-/* Contenedor del Mapa Embebido y el Botón "Abrir en Maps" (AHORA INCLUYE INFO DE CONTACTO) */
 .mapEmbedContainer {
-   flex: 1;
-   max-width: 700px;
-   width: 100%;
-   border-radius: 8px;
-   overflow: hidden;
-   box-shadow: var(--shadow-medium);
-   min-height: 300px; /* Altura mínima del contenedor total */
-   display: flex;
-   flex-direction: column; /* Apila verticalmente contacto, iframe y botón */
-   gap: var(--space-medium); /* Espacio entre los hijos directos (contacto, iframe, botón) */
-   margin: 0 auto;
-   padding: var(--space-medium); /* Añadir padding interno para separar el contenido de los bordes del contenedor */
-   background-color: #ffffff; /* Un fondo blanco o claro para el bloque del mapa y contacto */
+  flex: 1;
+  max-width: 700px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-medium);
+  margin: 0 auto;
+  padding: var(--space-medium);
+  background-color: #ffffff;
 }
 
 .mapEmbedContainer iframe {
-   width: 100%;
-   height: 400px; /* Altura fija del mapa */
-   display: block;
-   border: 0;
+  width: 100%;
+  height: 400px;
+  display: block;
+  border: 0;
 }
 
 .openInMapsButton {
@@ -263,7 +269,7 @@
   }
 
   .heroTitle {
-     font-size: 2em;
+    font-size: 2em;
   }
 
   .heroCallToAction {
@@ -271,20 +277,20 @@
   }
 
   .heroImageContainer {
-     width: 80%;
-     height: auto;
-     max-width: 100%;
-     margin-top: 20px;
-     margin-left: auto;
-     margin-right: auto;
+    width: 80%;
+    height: auto;
+    max-width: 100%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .bannerButton {
-     padding: 8px;
-     font-size: 1.2em;
-     width: 35px;
-     height: 35px;
-     position: absolute;
+    padding: 8px;
+    font-size: 1.2em;
+    width: 35px;
+    height: 35px;
+    position: absolute;
   }
 
   .bannerButtonLeft {
@@ -303,79 +309,104 @@
   }
 
   .aboutContent {
-     max-width: 100%;
-     text-align: center;
+    max-width: 100%;
+    text-align: center;
   }
 
-  .aboutMainTitle { font-size: 2em; text-align: center; margin-bottom: var(--space-medium); }
-  .aboutParagraph { font-size: 1rem; text-align: center; margin-bottom: var(--space-small); }
-  .contactTitle { font-size: 1.3em; text-align: center; margin-bottom: var(--space-medium); }
-  .aboutSubTitle { font-size: 1.5em; text-align: center; margin-top: var(--space-large); margin-bottom: var(--space-medium); }
+  .aboutMainTitle {
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: var(--space-medium);
+  }
+
+  .aboutParagraph {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: var(--space-small);
+  }
+
+  .contactTitle {
+    font-size: 1.3em;
+    text-align: center;
+    margin-bottom: var(--space-medium);
+  }
+
+  .aboutSubTitle {
+    font-size: 1.5em;
+    text-align: center;
+    margin-top: var(--space-large);
+    margin-bottom: var(--space-medium);
+  }
 
   .contactInfoBlock {
-       gap: var(--space-medium);
-   }
+    gap: var(--space-medium);
+  }
 
   .contactItem {
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-small);
-      justify-content: center;
-      text-align: center;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-small);
+    justify-content: center;
+    text-align: center;
   }
 
   .contactIconWrapper {
-     font-size: 1.2em;
-     width: 35px;
-     height: 35px;
+    font-size: 1.2em;
+    width: 35px;
+    height: 35px;
   }
 
-  .contactText { text-align: center; font-size: 1rem; }
-  .contactText a { font-size: 1rem; }
+  .contactText {
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .contactText a {
+    font-size: 1rem;
+  }
 
   .whatsappLink {
-     padding: 10px 20px;
-     font-size: 0.9rem;
-     justify-content: center;
-     width: auto;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    justify-content: center;
+    width: auto;
   }
 
   .mapEmbedContainer {
-     max-width: 95%;
-     height: auto; /* Altura automática para acomodar el contacto */
-     min-height: 350px; /* Ajustar altura mínima si es necesario */
-     gap: var(--space-small);
-     margin: 0 auto;
-     padding: var(--space-medium); /* Mantener padding interno */
-   }
+    max-width: 95%;
+    height: auto;
+    min-height: 350px;
+    gap: var(--space-small);
+    margin: 0 auto;
+    padding: var(--space-medium);
+  }
 
-   .mapEmbedContainer iframe {
-       height: 300px; /* Altura fija del iframe en móvil */
-   }
+  .mapEmbedContainer iframe {
+    height: 300px;
+  }
 
-   .openInMapsButton {
-      font-size: 0.9rem;
-      padding: 10px 20px;
-   }
-
+  .openInMapsButton {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+  }
 }
 
 @media (min-width: 769px) {
   .heroSection {
-      flex-direction: row;
-      text-align: left;
+    flex-direction: row;
+    text-align: left;
   }
 
   .heroContent {
-      margin-bottom: 0;
-      margin-right: 40px;
+    margin-bottom: 0;
+    margin-right: 40px;
   }
 
   .heroImageContainer {
-      margin-top: 0;
-      margin-left: auto;
-      max-width: 500px;
-      width: auto;
+    margin-top: 0;
+    margin-left: auto;
+    max-width: 500px;
+    width: auto;
   }
 
   .aboutContactSection {
@@ -385,40 +416,54 @@
     gap: 60px;
   }
 
-   .aboutContent {
-      width: auto;
-      max-width: 600px;
-      text-align: left;
-   }
+  .aboutContent {
+    width: auto;
+    max-width: 600px;
+    text-align: left;
+  }
 
-   .aboutMainTitle { text-align: left; }
-   .aboutParagraph { text-align: left; }
-   .contactTitle { text-align: left; }
-   .aboutSubTitle { text-align: left; margin-top: var(--space-large); }
+  .aboutMainTitle {
+    text-align: left;
+  }
 
-   .contactItem {
-       justify-content: flex-start;
-       text-align: left;
-   }
+  .aboutParagraph {
+    text-align: left;
+  }
 
-  .contactText { text-align: left; }
+  .contactTitle {
+    text-align: left;
+  }
 
-   .mapEmbedContainer {
-      width: auto;
-      max-width: 700px;
-      height: auto; /* Altura automática para acomodar el contacto */
-      min-height: 400px; /* Ajustar altura mínima si es necesario */
-      gap: var(--space-medium);
-      margin: 0;
-      padding: var(--space-medium); /* Mantener padding interno */
-   }
+  .aboutSubTitle {
+    text-align: left;
+    margin-top: var(--space-large);
+  }
 
-    .mapEmbedContainer iframe {
-       height: 400px; /* Altura fija del iframe en desktop */
-    }
+  .contactItem {
+    justify-content: flex-start;
+    text-align: left;
+  }
 
-    .openInMapsButton {
-       justify-content: flex-start;
-       width: auto;
-    }
+  .contactText {
+    text-align: left;
+  }
+
+  .mapEmbedContainer {
+    width: auto;
+    max-width: 700px;
+    height: auto;
+    min-height: 400px;
+    gap: var(--space-medium);
+    margin: 0;
+    padding: var(--space-medium);
+  }
+
+  .mapEmbedContainer iframe {
+    height: 400px;
+  }
+
+  .openInMapsButton {
+    justify-content: flex-start;
+    width: auto;
+  }
 }
