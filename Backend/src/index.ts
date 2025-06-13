@@ -1,41 +1,42 @@
-import express from 'express';
+import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import connectDB from './config/db'; // Importamos la función de conexión a la DB
-import productRoutes from './routes/productRoutes'; // Importamos las rutas de productos
+import cors from 'cors';
 
-// Cargar variables de entorno
-// Asegúrate de que el archivo .env esté en la raíz de la carpeta Backend
 dotenv.config();
 
-// Conectar a la base de datos
-connectDB();
-
-const app = express(); // Inicializar la aplicación Express
+const app: Application = express();
 
 // Middlewares
-app.use(express.json()); // Middleware para parsear cuerpos de petición JSON
+app.use(express.json());
+app.use(cors());
 
-// Rutas
-// Montamos las rutas de productos en el path /api/productos
-app.use('/api/productos', productRoutes);
+// Importar la conexión a la base de datos
+import connectDB from './config/db';
+connectDB();
 
-// Definir el puerto
-// Usamos el puerto definido en las variables de entorno (ej. PORT=5000 en .env)
-// o por defecto el puerto 5000 si no está definido
+// --- Importar y usar Rutas ---
+import orderRoutes from './routes/orderRoutes';
+import productRoutes from './routes/productRoutes';
+import adminRoutes from './routes/adminRoutes'; // <-- A\u00F1adir esta importaci\u00F3n
+
+// Usar las rutas con un prefijo '/api'
+app.use('/api', orderRoutes);
+app.use('/api', productRoutes);
+app.use('/api/negocio', adminRoutes); // <-- A\u00F1adir esta l\u00EDnea, con prefijo '/api/negocio'
+
+// Ruta de prueba
+app.get('/', (req: Request, res: Response) => {
+  res.send('La API de Cheepers est\u00E1 funcionando...');
+});
+
 const PORT = process.env.PORT || 5000;
-
-// Iniciar el servidor
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en modo ${process.env.NODE_ENV || 'desarrollo'} en el puerto ${PORT}`);
+  console.log(`Servidor de Backend Cheepers corriendo en http://localhost:${PORT}`);
 });
 
-// Middleware básico para manejar rutas no encontradas (opcional pero recomendado)
-app.use((req, res, next) => {
-  res.status(404).send('Ruta no encontrada');
-});
-
-// Middleware básico para manejar errores (opcional pero recomendado)
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err.stack); // Loggear el stack del error en la consola del servidor
-    res.status(500).send('Algo salió mal!'); // Enviar una respuesta de error genérica al cliente
+// Middleware de manejo de errores (opcional, pero buena pr\u00E1ctica con asyncHandler)
+// Puedes añadirlo aqu\u00ED al final de tus rutas
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+    console.error(err.stack); // Registra el stack trace del error
+    res.status(500).json({ message: 'Algo sali\u00F3 mal en el servidor!', error: err.message });
 });

@@ -1,24 +1,28 @@
 import { Request, Response } from 'express';
-import Product from '../models/Product'; // Importamos el modelo de Producto
+import Product from '../models/Product';
 
-// @desc    Obtener todos los productos
-// @route   GET /api/productos
-// @access  Public
-const getProducts = async (req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Usamos el método find() del modelo Product para obtener todos los documentos
-    // .find({}) sin argumentos encuentra todos los documentos en la colección
-    const products = await Product.find({});
-
-    // Enviamos la respuesta con estado 200 (OK) y los productos en formato JSON
+    const products = await Product.find();
     res.status(200).json(products);
-
   } catch (error: any) {
-    // Si hay un error, enviamos una respuesta con estado 500 (Server Error)
-    // y un mensaje de error
-    console.error('Error al obtener productos:', error); // Opcional: loggear el error en consola del backend
-    res.status(500).json({ message: 'Error interno del servidor al obtener productos' }); // Mensaje genérico para el cliente
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-export { getProducts };
+export const createProduct = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, description, price, category, imageUrl } = req.body;
+    if (!name || typeof price !== 'number' || price < 0 || !category) {
+      res.status(400).json({ message: 'Product name, valid price, and category are required.' });
+      return;
+    }
+    const newProduct = new Product({ name, description, price, category, imageUrl });
+    await newProduct.save();
+    res.status(201).json({ message: 'Product created successfully', product: newProduct });
+  } catch (error: any) {
+    console.error('Error creating product:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
