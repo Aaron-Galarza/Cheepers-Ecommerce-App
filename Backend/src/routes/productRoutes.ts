@@ -1,10 +1,11 @@
-import express from 'express';
-import { getProducts } from '../controllers/productController'; // Importamos la función controladora
+import { Router } from 'express';
+import { getProducts, createProduct } from '../controllers/productController';
+import asyncHandler from 'express-async-handler'; // <-- IMPORTANTE: Importa asyncHandler
 
-const router = express.Router();
+const router = Router();
 
-// @desc    Obtener todos los productos
-// @route   GET /
-router.get('/', getProducts);
+// Usa asyncHandler para envolver tus funciones de controlador
+router.get('/products', asyncHandler(getProducts));
+router.post('/products', asyncHandler(createProduct));
 
 export default router;
