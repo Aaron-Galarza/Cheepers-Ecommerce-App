@@ -9,8 +9,8 @@ import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight } from 'react-icons/f
 
 const bannerItems = [
   { image: baconcheep, title: 'BACON CHEEP', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Pruébala ahora!', altText: 'Hamburguesa Bacon Cheep' },
-  { image: barbacue, title: 'BARBACUE DELUXE', descriptionLine1: 'Con nuestra salsa', descriptionLine2: 'barbacoa casera.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Barbacue Deluxe' },
-  { image: cheddar, title: 'CHEDDAR EXPLOSION', descriptionLine1: 'Doble carne y', descriptionLine2: 'extra queso cheddar.', callToAction: '¿Te animas a tanto queso?', altText: 'Hamburguesa Cheddar Explosion' },
+  { image: barbacue, title: 'BARBACUE', descriptionLine1: 'Con nuestra salsa', descriptionLine2: 'barbacoa casera.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Barbacue Deluxe' },
+  { image: cheddar, title: 'LA CHEDDAR', descriptionLine1: ' Doble Carne y', descriptionLine2: 'queso cheddar.', callToAction: '¡Con Mucho queso!', altText: 'Hamburguesa Cheddar Explosion' },
 ];
 
 const Inicio: React.FC = () => {

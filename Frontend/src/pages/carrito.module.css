@@ -1,0 +1,144 @@
+.container {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #ffffffd0;
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border: solid 1px;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #222;
+  text-align: center;
+  font-weight: bold;
+}
+
+.empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.info p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.remove {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.remove:hover {
+  background-color: #d9363e;
+}
+
+.footer {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.total {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #222;
+}
+
+.checkout {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkout:hover {
+  background-color: #218838;
+}
+
+.clear {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clear:hover {
+  background-color: #5a6268;
+}
+
+@media (max-width: 600px) {
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .image {
+    width: 100%;
+    height: auto;
+  }
+
+  .info {
+    width: 100%;
+  }
+
+  .footer {
+    align-items: stretch;
+  }
+
+  .checkout,
+  .clear {
+    width: 100%;
+  }
+}
