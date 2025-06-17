@@ -8,7 +8,7 @@ dotenv.config();
 
 // Verifica que JWT_SECRET est\u00E9 definido (esto es crucial ahora que usas JWT)
 if (!process.env.JWT_SECRET) {
-  console.error('ERROR: La variable de entorno JWT_SECRET no est\u00E1 definida. Por favor, a\u00F1adela a tu archivo .env');
+  console.error('ERROR: La variable de entorno JWT_SECRET no esta definida. Por favor, añadela a tu archivo .env');
   process.exit(1); // Sale de la aplicaci\u00F3n si no est\u00E1 definida
 }
 
@@ -37,7 +37,7 @@ app.use('/api/negocio', adminRoutes); // Si adminRoutes maneja rutas espec\u00ED
 
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {
-  res.send('La API de Cheepers est\u00E1 funcionando...');
+  res.send('La API de Cheepers está funcionando...');
 });
 
 const PORT = process.env.PORT || 5000;
@@ -51,5 +51,5 @@ app.listen(PORT, () => {
 // Puedes a\u00F1adirlo aqu\u00ED al final de tus rutas
 app.use((err: Error, req: Request, res: Response, next: Function) => {
     console.error(err.stack); // Registra el stack trace del error
-    res.status(500).json({ message: 'Algo sali\u00F3 mal en el servidor!', error: err.message });
+    res.status(500).json({ message: 'Algo salio mal en el servidor!', error: err.message });
 });
