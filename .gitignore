@@ -1,4 +1,5 @@
 # Ignorar el directorio de dependencias de Node.js
 node_modules/
 
+# Ignorar el archivo de variables de entorno sensibles
 .env
