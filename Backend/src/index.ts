@@ -40,6 +40,12 @@ app.get('/', (req: Request, res: Response) => {
   res.send('La API de Cheepers está funcionando...');
 });
 
+// --- RUTA DE HEALTH CHECK (A\u00F1ade esta secci\u00F3n) ---
+app.get('/health', (req: Request, res: Response) => {
+    res.status(200).send('OK');
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor de Backend Cheepers corriendo en http://localhost:${PORT}`);
