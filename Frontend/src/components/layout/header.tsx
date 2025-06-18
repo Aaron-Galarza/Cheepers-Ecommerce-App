@@ -65,14 +65,6 @@ const Header: React.FC<HeaderProps> = () => {
           Promos
         </NavLink>
 
-        <NavLink
-          to="/sobre-nosotros"
-          className={({ isActive }) =>
-            isActive ? "navLink active-nav-link" : "navLink"
-          }
-        >
-          Sobre Nosotros
-        </NavLink>
       </nav>
 
       <div className="navActions">

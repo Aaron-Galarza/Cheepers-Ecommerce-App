@@ -15,15 +15,15 @@ const CarritoPage: React.FC = () => {
         <>
           <ul className={styles.list}>
             {cart.map(item => (
-              <li key={item.id} className={styles.item}>
-                <img src={item.image} alt={item.name} className={styles.image} />
+              <li key={item._id} className={styles.item}>
+                <img src={item.imageUrl} alt={item.name} className={styles.image} />
                 <div className={styles.info}>
                   <h2>{item.name}</h2>
                   <p>Cantidad: {item.quantity}</p>
                   <p>Subtotal: ${(item.price * item.quantity).toFixed(2)}</p>
                   <button
                     className={styles.remove}
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeFromCart(item._id)}
                   >
                     Eliminar
                   </button>
