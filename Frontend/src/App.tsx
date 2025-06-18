@@ -7,8 +7,8 @@ import HomePage from './pages/inicio';
 import MenuPage from './pages/menu';
 import CarritoPage from './pages/carrito';
 import PromosPage from './pages/promos';
-import SobreNosotrosPage from './pages/sobrenosotros';
 import AdminLoginPage from './pages/login';
+import Dashboard from './components/layout/dashboard';
 
 function Footer() {
   return (
@@ -36,8 +36,8 @@ function App() {
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/promos" element={<PromosPage />} />
-          <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
         </Routes>
       </main>
       <Footer />
