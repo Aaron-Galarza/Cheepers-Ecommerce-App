@@ -1,84 +1,94 @@
 // Backend/src/controllers/authController.ts
 
 import { Request, Response } from 'express';
-import User, { IUser } from '../models/User';
+import asyncHandler from 'express-async-handler';
+import User from '../models/User'; // Aseg\u00FArate que la ruta a tu modelo User es correcta
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// Funci\u00F3n auxiliar para generar JWT (lo usaremos en login y quiz\u00E1 en registro)
-const generateToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET!, {
-    expiresIn: '1h', // El token expirar\u00E1 en 1 hora
-  });
+// Helper para generar el token JWT (si no lo tienes, a\u00F1adelo)
+const generateToken = (id: string, email: string, isAdmin: boolean) => {
+    return jwt.sign(
+        { id, email, isAdmin }, // Incluimos isAdmin en el payload del token
+        process.env.JWT_SECRET as string,
+        { expiresIn: '1h' } // El token expirar\u00E1 en 1 hora
+    );
 };
 
-// @desc    Registrar un nuevo usuario/negocio
-// @route   POST /api/negocio/register
-// @access  Public
-export const registerUser = async (req: Request, res: Response) => {
-  const { username, email, password, isAdmin } = req.body;
+// Funci\u00F3n para registrar un nuevo usuario/negocio
+export const registerUser = asyncHandler(async (req: Request, res: Response) => {
+    const { username, email, password, isAdmin } = req.body;
 
-  try {
-    // 1. Verificar si el usuario ya existe
+    // Validaci\u00F3n b\u00E1sica
+    if (!username || !email || !password) {
+        res.status(400).json({ message: 'Por favor, completa todos los campos' });
+        return; // Importante para detener la ejecuci\u00F3n
+    }
+
+    // Verificar si el usuario ya existe
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'El usuario ya existe con ese email.' });
+        res.status(400).json({ message: 'El usuario ya existe con este email' });
+        return;
     }
 
-    // 2. Crear el nuevo usuario
+    // Crear el nuevo usuario
     const user = await User.create({
-      username,
-      email,
-      password, // La contrase\u00F1a se hashear\u00E1 autom\u00E1ticamente por el pre-hook del modelo
-      isAdmin: isAdmin || false // Asegurarse que isAdmin tenga un valor, por defecto false
+        username,
+        email,
+        password, // El pre-hook en el modelo hashear\u00E1 la contrase\u00F1a
+        isAdmin: isAdmin || false // Aseg\u00FArate de que isAdmin sea booleano
     });
 
-    // 3. Respuesta exitosa y generar JWT
     if (user) {
-      res.status(201).json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id), // Generar JWT para el nuevo usuario
-      });
+        res.status(201).json({
+            success: true,
+            message: 'Usuario registrado exitosamente',
+            token: generateToken(user._id, user.email, user.isAdmin), // Genera el token con isAdmin
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin
+            }
+        });
     } else {
-      res.status(400).json({ message: 'Datos de usuario inv\u00E1lidos.' });
+        res.status(400).json({ message: 'Datos de usuario inv\u00E1lidos' });
     }
-  } catch (error: any) {
-    console.error('Error en el registro:', error);
-    if (error.code === 11000) { // C\u00F3digo de error de MongoDB para duplicados (username o email)
-        res.status(400).json({ message: 'El nombre de usuario o email ya est\u00E1 registrado.' });
-    } else {
-        res.status(500).json({ message: 'Error en el servidor al registrar el usuario.', error: error.message });
+});
+
+// Funci\u00F3n para el login de usuario (incluye administradores)
+export const loginUser = asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    // 1. Validaci\u00F3n b\u00E1sica
+    if (!email || !password) {
+        res.status(400).json({ success: false, message: 'Por favor, ingresa email y contrase\u00F1a' });
+        return;
     }
-  }
-};
 
-// @desc    Autenticar un usuario/negocio y obtener token
-// @route   POST /api/negocio/login
-// @access  Public
-export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body; // Ahora usaremos email para el login
-
-  try {
-    // 1. Verificar si el usuario existe por email
+    // 2. Buscar usuario por email
     const user = await User.findOne({ email });
 
-    // 2. Verificar la contrase\u00F1a
+    // 3. Verificar si el usuario existe y si la contrase\u00F1a es correcta
     if (user && (await user.comparePassword(password))) {
-      // 3. Si las credenciales son correctas, enviar datos de usuario y un token
-      res.status(200).json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id), // Generar JWT
-      });
+        // 4. Si las credenciales son v\u00E1lidas, generar JWT (incluyendo isAdmin)
+        const token = generateToken(user._id, user.email, user.isAdmin);
+
+        // 5. Enviar respuesta de \u00E9xito
+        res.status(200).json({
+            success: true,
+            message: 'Inicio de sesi\u00F3n exitoso',
+            token,
+            user: { // Puedes devolver datos del usuario (sin la contrase\u00F1a)
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin // \u00A1Importante: Enviamos isAdmin aqu\u00ED!
+            }
+        });
     } else {
-      res.status(401).json({ message: 'Email o contrase\u00F1a incorrectos.' });
+        // Credenciales inv\u00E1lidas
+        res.status(401).json({ success: false, message: 'Credenciales inv\u00E1lidas' });
     }
-  } catch (error: any) {
-    console.error('Error en el login:', error);
-    res.status(500).json({ message: 'Error en el servidor al iniciar sesi\u00F3n.', error: error.message });
-  }
-};
+});
