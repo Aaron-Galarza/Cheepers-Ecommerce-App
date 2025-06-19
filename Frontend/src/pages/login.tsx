@@ -2,19 +2,36 @@
 import React, { useState } from 'react';
 import styles from './adminlogin.module.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 
 const AdminLogin: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'cheepers123') {
-      navigate('/admin/dashboard');
-    } else {
-      setError('Usuario o contraseña incorrectos');
+    setError('');
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/admin/login`, {
+        email,
+        password
+      });
+
+      if (response.data.success) {
+        // Podés guardar el token en localStorage si es necesario
+        localStorage.setItem('adminToken', response.data.token);
+        navigate('/admin/dashboard');
+      } else {
+        setError(response.data.message || 'Credenciales inválidas');
+      }
+    } catch (err) {
+      console.error('Error al iniciar sesión:', err);
+      setError('Error del servidor. Intenta nuevamente.');
     }
   };
 
@@ -24,10 +41,10 @@ const AdminLogin: React.FC = () => {
         <h2 className={styles.title}>Login Administrador</h2>
         {error && <p className={styles.error}>{error}</p>}
         <input
-          type="text"
-          placeholder="Usuario"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className={styles.input}
         />
         <input
