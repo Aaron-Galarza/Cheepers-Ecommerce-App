@@ -17,7 +17,7 @@ const AdminLogin: React.FC = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/admin/login`, {
+      const response = await axios.post(`${API_BASE_URL}/api/negocio/login`, {
         email,
         password
       });
