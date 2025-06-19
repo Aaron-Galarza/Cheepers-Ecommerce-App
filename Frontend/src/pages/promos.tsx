@@ -6,7 +6,7 @@ import styles from './menu.module.css';
 import { Product } from '../components/layout/productlist';
 import { useCart } from '../components/layout/cartcontext';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 
 const PromosPage: React.FC = () => {
   const { addToCart } = useCart();
@@ -19,7 +19,7 @@ const PromosPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get<Product[]>(`${API_BASE_URL}/products`);
+        const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products`);
         setProducts(response.data);
       } catch (err) {
         console.error('Error al cargar las promos:', err);
