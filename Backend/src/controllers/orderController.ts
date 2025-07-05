@@ -84,13 +84,35 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
 });
 
 
-// @desc    Obtener todos los pedidos
-// @route   GET /api/orders
+// @desc    Obtener todos los pedidos (con filtro por estado opcional)
+// @route   GET /api/orders?status=pending
 // @access  Private/Admin
 export const getOrders = asyncHandler(async (req: Request, res: Response) => {
+    // Extrae el par\u00E1metro de consulta 'status' de la URL
+    // Ejemplo: /api/orders?status=pending
+    const { status } = req.query;
+
+    let query: any = {}; // Objeto que construiremos para la consulta a Mongoose
+
+    // Lista de estados v\u00E1lidos (debe coincidir con los definidos en tu modelo Pedido.ts)
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+
+    // Verifica si se proporcion\u00F3 un estado y si es v\u00E1lido
+    if (status && typeof status === 'string') {
+        const lowerCaseStatus = status.toLowerCase(); // Convertir a min\u00FAsculas para hacer la comparaci\u00F3n insensible a may\u00FAsculas
+
+        if (validStatuses.includes(lowerCaseStatus)) {
+            query.status = lowerCaseStatus; // A\u00F1ade el filtro de estado al objeto de consulta
+        } else {
+            // Si el estado proporcionado no es v\u00E1lido, env\u00EDa un error 400
+            res.status(400); // Bad Request
+            throw new Error(`Estado de pedido inv\u00E1lido: "${status}". Los estados permitidos son: ${validStatuses.join(', ')}.`);
+        }
+    }
+
+    // Encuentra los pedidos bas\u00E1ndose en el objeto de consulta (que puede estar vac\u00EDo si no hay filtro)
     // Popula el campo 'user' para obtener informaci\u00F3n b\u00E1sica del usuario que hizo el pedido
-    // Puedes seleccionar solo los campos que te interesan, por ejemplo, 'username email'
-    const orders = await Order.find().populate('user', 'username email');
+    const orders = await Order.find(query).populate('user', 'username email');
     res.status(200).json(orders);
 });
 
