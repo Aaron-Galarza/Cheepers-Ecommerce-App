@@ -11,8 +11,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-   "engines": {
-    "node": "20.x" 
+  "engines": {
+    "node": "20.x"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
