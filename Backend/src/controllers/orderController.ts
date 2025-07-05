@@ -1,81 +1,153 @@
+// Backend/src/controllers/orderController.ts
+
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Order, { IOrder, IProductItem } from '../models/Pedido';
+import Order, { IOrder, IProductItem } from '../models/Pedido'; // Aseg\u00FArate que el modelo es 'Pedido'
 import Product from '../models/Product';
 import User from '../models/User';
+import asyncHandler from 'express-async-handler'; // Importa asyncHandler
 
 interface CreateOrderRequestBody {
-  userId: string;
-  products: { productId: string; quantity: number }[];
-  shippingAddress: { street: string; city: string; postalCode: string };
-  paymentMethod: 'cash' | 'card' | 'transfer';
-  notes?: string;
+    userId: string;
+    products: { productId: string; quantity: number }[];
+    shippingAddress: { street: string; city: string; postalCode: string };
+    paymentMethod: 'cash' | 'card' | 'transfer';
+    notes?: string;
 }
 
-// **Modificación clave:** Aseguramos que la funci\u00F3n devuelva Promise<void>
-// El res.json() y res.status() se consideran que terminan la respuesta,
-// por lo que no es necesario el 'undefined' en el Promise.
-export const createOrder = async (req: Request<{}, {}, CreateOrderRequestBody>, res: Response): Promise<void> => {
-  try {
-    const { userId, products, shippingAddress, paymentMethod, notes } = req.body;
+// @desc    Crear un nuevo pedido
+// @route   POST /api/orders
+// @access  Private (solo usuarios autenticados)
+export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderRequestBody>, res: Response) => {
+    // Cuando el usuario est\u00E1 logueado con 'protect' middleware, su ID est\u00E1 en req.user._id
+    // No necesitamos que el frontend env\u00EDe userId, lo obtenemos del token
+    const userIdFromToken = req.user?._id; // req.user viene del middleware 'protect'
 
-    if (!userId || !products || !Array.isArray(products) || products.length === 0 || !shippingAddress || !paymentMethod) {
-      res.status(400).json({ message: 'Faltan campos obligatorios para crear el pedido: userId, products, shippingAddress, paymentMethod.' });
-      return; // Aseguramos que la funci\u00F3n termine aqu\u00ED
+    const { products, shippingAddress, paymentMethod, notes } = req.body;
+
+    // Validaci\u00F3n b\u00E1sica de campos obligatorios
+    if (!userIdFromToken || !products || !Array.isArray(products) || products.length === 0 || !shippingAddress || !paymentMethod) {
+        res.status(400); // Bad Request
+        throw new Error('Faltan campos obligatorios para crear el pedido: products, shippingAddress, paymentMethod. O usuario no autenticado.');
     }
 
-    const existingUser = await User.findById(userId);
-    if (!existingUser) {
-        res.status(404).json({ message: 'Usuario no encontrado. El ID de usuario proporcionado no existe.' });
-        return; // Aseguramos que la funci\u00F3n termine aqu\u00ED
-    }
+    // Opcional: Podr\u00EDas buscar el usuario si necesitas m\u00E1s datos de \u00E9l,
+    // pero con el ID del token suele ser suficiente para el pedido.
+    // const existingUser = await User.findById(userIdFromToken);
+    // if (!existingUser) {
+    //     res.status(404);
+    //     throw new Error('Usuario no encontrado. El ID de usuario proporcionado no existe.');
+    // }
 
     let totalAmount = 0;
     const productsForOrder: IProductItem[] = [];
 
     for (const item of products) {
-      if (!item.productId || typeof item.quantity !== 'number' || item.quantity < 1) {
-        res.status(400).json({ message: 'Datos de producto inválidos. Cada ítem debe tener "productId" y "quantity" (mínimo 1).' });
-        return; // Aseguramos que la funci\u00F3n termine aqu\u00ED
-      }
+        // Validaci\u00F3n de cada item de producto
+        if (!item.productId || typeof item.quantity !== 'number' || item.quantity < 1) {
+            res.status(400);
+            throw new Error('Datos de producto inv\u00E1lidos. Cada \u00EDtem debe tener "productId" y "quantity" (m\u00EDnimo 1).');
+        }
 
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        res.status(404).json({ message: `Producto con ID ${item.productId} no encontrado.` });
-        return; // Aseguramos que la funci\u00F3n termine aqu\u00ED
-      }
+        // Buscar producto y verificar existencia
+        const product = await Product.findById(item.productId);
+        if (!product) {
+            res.status(404);
+            throw new Error(`Producto con ID ${item.productId} no encontrado.`);
+        }
 
-      const price = product.price;
-      const itemTotal = price * item.quantity;
-      totalAmount += itemTotal;
+        const price = product.price;
+        const itemTotal = price * item.quantity;
+        totalAmount += itemTotal;
 
-      productsForOrder.push({
-        productId: new mongoose.Types.ObjectId(item.productId),
-        quantity: item.quantity,
-        priceAtOrder: price,
-      });
+        productsForOrder.push({
+            productId: new mongoose.Types.ObjectId(item.productId),
+            quantity: item.quantity,
+            priceAtOrder: price,
+        });
     }
 
     const newOrder: IOrder = new Order({
-      user: new mongoose.Types.ObjectId(userId),
-      products: productsForOrder,
-      totalAmount: totalAmount,
-      shippingAddress: shippingAddress,
-      paymentMethod: paymentMethod,
-      notes: notes || '',
+        user: new mongoose.Types.ObjectId(userIdFromToken as string), // Usamos el ID del usuario autenticado
+        products: productsForOrder,
+        totalAmount: totalAmount,
+        shippingAddress: shippingAddress,
+        paymentMethod: paymentMethod,
+        notes: notes || '',
+        orderStatus: 'pending', // Estado inicial del pedido
+        // paymentStatus: 'pending' // Puedes a\u00F1adir un campo para el estado del pago si lo necesitas
     });
 
-    await newOrder.save();
+    const createdOrder = await newOrder.save();
 
-    res.status(201).json({ message: 'Pedido creado exitosamente!', order: newOrder });
+    res.status(201).json({ message: 'Pedido creado exitosamente!', order: createdOrder });
+});
 
-  } catch (error: any) {
-    console.error('Error al crear pedido:', error);
-    // IMPORTANTE: Cuando usas asyncHandler, no necesitas res.status(500) aqu\u00ED.
-    // asyncHandler se encarga de pasar el error al siguiente middleware de error de Express.
-    // Simplemente 'throw error;' o deja que el error se propague.
-    // Para depurar, puedes mantenerlo por un momento, pero la forma correcta con asyncHandler es re-lanzar o no atraparlo aqu\u00ED.
-    // Por ahora, lo dejaremos para ver si el error de tipado se va.
-    res.status(500).json({ message: 'Error del servidor.', error: error.message });
-  }
-};
+
+// @desc    Obtener todos los pedidos
+// @route   GET /api/orders
+// @access  Private/Admin
+export const getOrders = asyncHandler(async (req: Request, res: Response) => {
+    // Popula el campo 'user' para obtener informaci\u00F3n b\u00E1sica del usuario que hizo el pedido
+    // Puedes seleccionar solo los campos que te interesan, por ejemplo, 'username email'
+    const orders = await Order.find().populate('user', 'username email');
+    res.status(200).json(orders);
+});
+
+// @desc    Obtener un pedido por ID
+// @route   GET /api/orders/:id
+// @access  Private (el usuario debe ser el due\u00F1o del pedido o un admin)
+export const getOrderById = asyncHandler(async (req: Request, res: Response) => {
+    const order = await Order.findById(req.params.id).populate('user', 'username email');
+
+    if (order) {
+        // L\u00F3gica de autorizaci\u00F3n: solo el due\u00F1o del pedido o un administrador pueden verlo
+        if (req.user && (order.user.toString() === req.user._id.toString() || req.user.isAdmin)) {
+            res.status(200).json(order);
+        } else {
+            res.status(403); // Prohibido
+            throw new Error('No tienes permiso para ver este pedido');
+        }
+    } else {
+        res.status(404);
+        throw new Error('Pedido no encontrado');
+    }
+});
+
+// @desc    Actualizar el estado de un pedido
+// @route   PUT /api/orders/:id/status
+// @access  Private/Admin
+export const updateOrderStatus = asyncHandler(async (req: Request, res: Response) => {
+    const { status } = req.body; // Esperamos un campo 'orderStatus' en el body
+
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+        // Asegurarse de que el nuevo estado sea v\u00E1lido seg\u00FAn tus reglas de negocio (ej. 'pending', 'processing', 'shipped', 'delivered', 'cancelled')
+        // Puedes a\u00F1adir una validaci\u00F3n m\u00E1s estricta aqu\u00ED
+        order.status = status || order.status;
+
+        const updatedOrder = await order.save();
+        res.status(200).json({ message: 'Estado del pedido actualizado exitosamente', order: updatedOrder });
+    } else {
+        res.status(404);
+        throw new Error('Pedido no encontrado');
+    }
+});
+
+// @desc    Obtener los pedidos de un usuario espec\u00EDfico
+// @route   GET /api/orders/myorders
+// @access  Private (solo el usuario puede ver sus propios pedidos)
+export const getMyOrders = asyncHandler(async (req: Request, res: Response) => {
+    // El ID del usuario viene del token
+    const userIdFromToken = req.user?._id;
+
+    if (!userIdFromToken) {
+        res.status(401);
+        throw new Error('Usuario no autenticado para ver sus pedidos');
+    }
+
+    const orders = await Order.find({ user: userIdFromToken }).populate('user', 'username email');
+
+    res.status(200).json(orders);
+});

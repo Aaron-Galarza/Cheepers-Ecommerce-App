@@ -3,6 +3,11 @@
 import express, { Application, Request, Response, NextFunction } from 'express'; // Importa NextFunction
 import dotenv from 'dotenv';
 import cors from 'cors';
+import orderRoutes from './routes/orderRoutes';
+import productRoutes from './routes/productRoutes';
+import authRoutes from './routes/authRoutes'; // Para login y register
+// import adminRoutes from './routes/adminRoutes'; // <--- ELIMINAR O COMENTAR ESTA L\u00CDNEA
+
 
 dotenv.config();
 
@@ -44,16 +49,10 @@ app.use(cors({
 import connectDB from './config/db';
 connectDB();
 
-// --- Importar y usar Rutas ---
-import orderRoutes from './routes/orderRoutes';
-import productRoutes from './routes/productRoutes';
-// import adminRoutes from './routes/adminRoutes'; // <--- ELIMINAR O COMENTAR ESTA L\u00CDNEA
-import authRoutes from './routes/authRoutes';
-
-// Usar las rutas con un prefijo '/api'
-app.use('/api', orderRoutes);
-app.use('/api', productRoutes);
-app.use('/api', authRoutes); // authRoutes manejar\u00E1 /api/negocio/login y /api/negocio/register
+// Usar las rutas con sus prefijos espec\u00EDficos
+app.use('/api/negocio', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 // app.use('/api/negocio', adminRoutes); // <--- ELIMINAR O COMENTAR ESTA L\u00CDNEA (NO NECESARIA CON LOGIN UNIFICADO)
 
