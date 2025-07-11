@@ -1,5 +1,16 @@
-# Ignorar el directorio de dependencias de Node.js
-node_modules/
+# Directorios de dependencias (para la ra\u00EDz si existiera, o como un 'fallback')
+/node_modules/
 
-# Ignorar el archivo de variables de entorno sensibles
+# Archivos de variables de entorno sensibles (globalmente)
 .env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build artifacts (salidas de compilacien o generadas)
+/build/
+/dist/
+/out/
+/coverage/

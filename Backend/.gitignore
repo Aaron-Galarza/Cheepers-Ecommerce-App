@@ -1,14 +1,22 @@
-# Ignorar el directorio de dependencias de Node.js
+# Directorio de dependencias de Node.js
 node_modules/
 
-# Ignorar el archivo de variables de entorno sensibles
+# Archivos de variables de entorno sensibles
+# Ignora cualquier archivo .env, .env.local, o .env.MODO.local dentro del Backend
 .env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Ignorar el directorio de salida del código compilado por TypeScript
+# Directorios de salida del codigo compilado por TypeScript
 dist/
+build/
 
-# Opcional: Archivos de log u otros archivos temporales que no quieras versionar
+# Archivos de logs
+*.log
 npm-debug.log
 yarn-error.log
-build/ 
-# Si en algún momento usas otra carpeta de build
+pnpm-debug.log*
+lerna-debug.log*
