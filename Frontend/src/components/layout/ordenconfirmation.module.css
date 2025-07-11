@@ -1,0 +1,135 @@
+/* src/components/layout/confirmation.module.css */
+
+.container {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px; /* Altura mínima para que no se vea vacío */
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.icon {
+    color: #28a745; /* Verde de éxito */
+    font-size: 6rem; /* Icono grande */
+    margin-bottom: 25px;
+    animation: bounceIn 0.8s ease-out;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+.title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #28a745; /* Verde de éxito */
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+.message {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.buttonsContainer {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilos para los botones (usando clases genéricas para los botones que ya tienes) */
+/* Si tu componente Button ya tiene sus propios estilos, estas clases aquí pueden ser más específicas o usarse como modificadores */
+.buttonDefault {
+    background-color: #e53e3e; /* Rojo Cheepers */
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.buttonDefault:hover {
+    background-color: #c53030;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(229, 62, 62, 0.4);
+}
+
+.buttonOutline {
+    background-color: transparent;
+    color: #e53e3e;
+    border: 2px solid #e53e3e;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.buttonOutline:hover {
+    background-color: #e53e3e;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(229, 62, 62, 0.2);
+}
+
+/* Media Queries para Responsividad */
+@media (max-width: 600px) {
+    .container {
+        margin: 30px 20px;
+        padding: 25px;
+    }
+
+    .icon {
+        font-size: 5rem;
+    }
+
+    .title {
+        font-size: 2.2rem;
+    }
+
+    .message {
+        font-size: 1rem;
+    }
+
+    .buttonsContainer {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .buttonDefault, .buttonOutline {
+        width: 100%;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}

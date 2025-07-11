@@ -1,16 +1,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Product } from './productlist';
+import { Product } from './productlist'; // Asegúrate de que esta ruta sea correcta
 
-interface CartItem extends Product { quantity: number; }
+interface CartItem extends Product {
+  quantity: number;
+}
 
 interface CartContextType {
   cart: CartItem[];
   addToCart: (p: Product) => void;
-  removeFromCart: (id:  string) => void;
+  removeFromCart: (id: string) => void;
   clearCart: () => void;
 }
 
-const CartContext = createContext<CartContextType|undefined>(undefined);
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function useCart() {
   const ctx = useContext(CartContext);
@@ -20,6 +22,7 @@ export function useCart() {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+
   const addToCart = (product: Product) => {
     setCart(prev => {
       const exists = prev.find(x => x._id === product._id);
@@ -31,9 +34,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return [...prev, { ...product, quantity: 1 }];
     });
   };
-  const removeFromCart = (id: string) =>
-    setCart(prev => prev.filter(x => x._id !== x._id));
+
+  const removeFromCart = (id: string) => {
+    setCart(prev => prev.filter(x => x._id !== id)); // <-- CORRECCIÓN AQUÍ
+  };
+
   const clearCart = () => setCart([]);
+
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
       {children}

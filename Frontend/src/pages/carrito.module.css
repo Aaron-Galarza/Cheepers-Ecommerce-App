@@ -1,144 +1,247 @@
+/* src/pages/carrito.module.css */
+
+/* Main container for the cart page */
 .container {
-  max-width: 960px;
-  margin: 40px auto;
-  padding: 20px;
-  background-color: #ffffffd0;
-  border-radius: 16px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  border: solid 1px;
+    max-width: 960px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffffd0; /* Fondo ligeramente transparente */
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border: solid 1px #e0e0e0; /* Borde sutil */
+    font-family: 'Inter', sans-serif; /* Asegúrate de que esta fuente esté importada */
+    animation: fadeIn 0.5s ease-out; /* Animación de entrada */
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Page title */
 .title {
-  font-size: 2rem;
-  margin-bottom: 24px;
-  color: #222;
-  text-align: center;
-  font-weight: bold;
+    font-size: 2.5rem; /* Ajustado para ser más impactante */
+    font-weight: 800; /* Más negrita */
+    color: #e53e3e; /* Rojo Cheepers */
+    text-align: center;
+    margin-bottom: 30px; /* Ajustado */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1); /* Sombra de texto */
+    letter-spacing: 0.05em; /* Espaciado entre letras */
 }
 
+/* Empty cart message */
 .empty {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #777;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    padding: 50px 0;
+    font-style: italic;
 }
 
+/* List of cart items */
 .list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid; /* Usamos grid para manejar el espaciado */
+    gap: 20px; /* Espacio entre los ítems */
 }
 
+/* Each individual cart item */
 .item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px;
-  border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px;
+    background-color: #fcfcfc; /* Fondo ligeramente diferente para los ítems */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #eee; /* Borde sutil para cada ítem */
 }
 
+.item:hover {
+    transform: translateY(-3px); /* Efecto de elevación al pasar el ratón */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada al pasar el ratón */
+}
+
+/* Product image */
 .image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 12px;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #ddd; /* Borde para la imagen */
 }
 
+/* Item information */
 .info {
-  flex: 1;
+    flex: 1;
+    display: flex; /* Usamos flex para organizar el contenido */
+    flex-direction: column;
+    gap: 4px; /* Espacio entre los elementos de texto */
 }
 
 .info h2 {
-  margin: 0 0 4px 0;
-  font-size: 1.2rem;
-  color: #333;
+    margin: 0;
+    font-size: 1.3rem; /* Ligeramente más grande */
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase; /* Mayúsculas para el nombre del producto */
 }
 
 .info p {
-  margin: 4px 0;
-  font-size: 0.95rem;
-  color: #555;
+    margin: 0;
+    font-size: 1rem; /* Ligeramente más grande */
+    color: #555;
 }
 
-.remove {
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+/* Remove button */
+.removeButton { /* Renombrado de .remove a .removeButton */
+    background-color: transparent; /* Transparente */
+    color: #ef4444; /* Solo el texto rojo */
+    padding: 8px 15px; /* Más padding */
+    border-radius: 20px; /* Bordes más redondeados (píldora) */
+    font-size: 0.9rem; /* Ligeramente más grande */
+    font-weight: 600; /* Más negrita */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease; /* Transición de color de fondo y texto */
+    border: 1px solid #ef4444; /* Borde rojo */
+    box-shadow: none; /* Sin sombra */
 }
 
-.remove:hover {
-  background-color: #d9363e;
+.removeButton:hover { /* Renombrado de .remove:hover a .removeButton:hover */
+    background-color: #ef4444; /* Fondo rojo al pasar el ratón */
+    color: white; /* Texto blanco al pasar el ratón */
+    transform: translateY(-1px); /* Efecto de elevación sutil */
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25); /* Sombra sutil */
 }
 
+/* Cart footer (Total and buttons) */
 .footer {
-  margin-top: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+    margin-top: 40px; /* Ajustado */
+    padding-top: 25px; /* Ajustado */
+    border-top: 1px dashed #e0e0e0; /* Borde superior punteado */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinea los elementos a la derecha */
+    gap: 20px; /* Espacio entre el total y los botones */
 }
 
 .total {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #222;
+    font-size: 2rem; /* Tamaño más grande para el total */
+    font-weight: 800; /* Muy negrita */
+    color: #2d3748;
+    text-align: right;
+    text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.05); /* Sombra sutil */
 }
 
-.checkout {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+/* Contenedor de los botones de acción (Confirmar y Vaciar) */
+.buttonsContainer {
+    display: flex;
+    gap: 15px; /* Espacio entre los botones */
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    width: 100%; /* Ocupa todo el ancho disponible */
 }
 
-.checkout:hover {
-  background-color: #218838;
+/* Botón "Confirmar pedido" */
+.checkoutButton { /* Renombrado de .checkout a .checkoutButton */
+    background-color: #e53e3e; /* Rojo Cheepers */
+    color: white;
+    border: none;
+    padding: 14px 28px; /* Más padding */
+    border-radius: 10px; /* Bordes redondeados */
+    font-size: 1.1rem; /* Tamaño de fuente más grande */
+    font-weight: 700; /* Más negrita */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase; /* Mayúsculas */
+    letter-spacing: 0.05em; /* Espaciado entre letras */
+    box-shadow: 0 5px 15px rgba(229, 62, 62, 0.3); /* Sombra para el botón */
 }
 
-.clear {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.checkoutButton:hover { /* Renombrado de .checkout:hover a .checkoutButton:hover */
+    background-color: #c53030; /* Rojo más oscuro al pasar el ratón */
+    transform: translateY(-3px); /* Efecto de elevación */
+    box-shadow: 0 8px 20px rgba(229, 62, 62, 0.4); /* Sombra más pronunciada */
 }
 
-.clear:hover {
-  background-color: #5a6268;
+/* Botón "Vaciar Carrito" */
+.clearCartButton { /* Renombrado de .clear a .clearCartButton */
+    background-color: #a0aec0; /* Gris */
+    color: white;
+    border: none;
+    padding: 12px 24px; /* Más padding */
+    border-radius: 10px; /* Bordes redondeados */
+    font-size: 1.05rem; /* Tamaño de fuente ligeramente más grande */
+    font-weight: 700; /* Más negrita */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    box-shadow: 0 4px 12px rgba(160, 174, 192, 0.25); /* Sombra para el botón */
 }
 
-@media (max-width: 600px) {
-  .item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.clearCartButton:hover { /* Renombrado de .clear:hover a .clearCartButton:hover */
+    background-color: #718096; /* Gris más oscuro al pasar el ratón */
+    transform: translateY(-2px); /* Efecto de elevación */
+    box-shadow: 0 6px 15px rgba(160, 174, 192, 0.35); /* Sombra más pronunciada */
+}
 
-  .image {
-    width: 100%;
-    height: auto;
-  }
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
 
-  .info {
-    width: 100%;
-  }
+    .title {
+        font-size: 2rem;
+    }
 
-  .footer {
-    align-items: stretch;
-  }
+    .item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+        gap: 10px; /* Ajustado para móviles */
+    }
 
-  .checkout,
-  .clear {
-    width: 100%;
-  }
+    .image {
+        margin-right: 0;
+        margin-bottom: 15px;
+        width: 100%;
+        height: 120px;
+    }
+
+    .info {
+        width: 100%;
+    }
+
+    .removeButton {
+        align-self: stretch;
+        text-align: center;
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+
+    .footer {
+        align-items: center;
+    }
+
+    .buttonsContainer {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .checkoutButton, .clearCartButton {
+        width: 100%;
+        text-align: center;
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+
+    .total {
+        font-size: 1.8rem;
+    }
 }

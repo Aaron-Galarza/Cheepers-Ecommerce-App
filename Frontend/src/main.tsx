@@ -1,21 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css';
+// src/main.tsx o src/index.tsx
+    import React from 'react';
+    import ReactDOM from 'react-dom/client';
+    import { BrowserRouter } from 'react-router-dom'; // <--- ¡Importa esto!
+    import App from './App';
+    import './index.css'; // O './App.css' si es tu archivo CSS principal
 
-import { BrowserRouter } from 'react-router-dom';
-import { CartProvider } from './components/layout/cartcontext';
+    // Importa tu CartProvider
+    import { CartProvider } from './components/layout/cartcontext'; // Asegúrate de que la ruta sea correcta
 
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('No se encontró <div id="root">');
-
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </BrowserRouter>
-  </React.StrictMode>
-);
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+      <React.StrictMode>
+        {/* ¡ESTO ES LO MÁS IMPORTANTE! BrowserRouter DEBE ENVOLVER TODO */}
+        <BrowserRouter>
+          {/* El CartProvider también debe estar dentro de BrowserRouter */}
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </BrowserRouter>
+      </React.StrictMode>,
+    );
+    
