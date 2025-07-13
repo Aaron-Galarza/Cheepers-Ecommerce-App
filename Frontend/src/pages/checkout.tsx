@@ -80,7 +80,7 @@ const CheckoutPage: React.FC = () => {
         };
 
         try {
-            // 5. Enviar el pedido al backend usando AXIOS
+            // 5. Enviar el pedido (METODO POST) al backend usando AXIOS
             const response = await axios.post(`${API_BASE_URL}/api/orders`, orderData);
             
             console.log('Pedido creado exitosamente:', response.data.order);
