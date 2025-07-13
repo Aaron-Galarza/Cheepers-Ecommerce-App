@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Product } from './productlist'; // Asegúrate de que esta ruta sea correcta
+// C:\Users\Usuario\Desktop\Aaron\Cheepers-Ecommerce-App\Frontend\src\components\layout\cartcontext.tsx
+
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react'; // <--- Añade useCallback aquí
+import { Product } from './productlist';
 
 interface CartItem extends Product {
   quantity: number;
@@ -23,17 +25,16 @@ export function useCart() {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  const addToCart = (product: Product) => {
+  // Memoiza addToCart
+  const addToCart = useCallback((product: Product) => {
     setCart(prev => {
-      const MAX_QUANTITY = 10; // Define el límite máximo de cantidad por producto
+      const MAX_QUANTITY = 10;
       const exists = prev.find(x => x._id === product._id);
 
       if (exists) {
-        // Si el producto ya existe, verifica si agregar uno más excede el límite
         if (exists.quantity >= MAX_QUANTITY) {
           console.warn(`No se puede agregar más de ${MAX_QUANTITY} unidades de ${product.name}.`);
-          // Opcional: podrías mostrar un toast o un mensaje al usuario aquí
-          return prev; // Retorna el estado anterior sin cambios
+          return prev;
         }
         return prev.map(x =>
           x._id === product._id ? { ...x, quantity: x.quantity + 1 } : x
@@ -41,13 +42,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
-  };
+  }, []); // Dependencias vacías porque `setCart` es garantizado estable por React
 
-  const removeFromCart = (id: string) => {
+  // Memoiza removeFromCart
+  const removeFromCart = useCallback((id: string) => {
     setCart(prev => prev.filter(x => x._id !== id));
-  };
+  }, []); // Dependencias vacías porque `setCart` es estable
 
-  const clearCart = () => setCart([]);
+  // Memoiza clearCart (¡ESTA ES LA CLAVE PARA EL ERROR!)
+  const clearCart = useCallback(() => {
+    setCart([]);
+  }, []); // Dependencias vacías porque `setCart` es estable
 
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
