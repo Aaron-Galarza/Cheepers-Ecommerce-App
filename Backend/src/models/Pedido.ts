@@ -2,28 +2,44 @@
 
 import mongoose, { Schema, Document } from 'mongoose';
 
-// Interfaces para tipado fuerte con TypeScript
+// Interfaces para el podructo entrante al pedido
 export interface IProductItem {
     productId: mongoose.Types.ObjectId;
-    name: string;      // <--- A\u00D1ADIDO AL ESQUEMA
-    imageUrl: string;  // <--- A\u00D1ADIDO AL ESQUEMA
+    name: string;      
+    imageUrl: string;  
     quantity: number;
     priceAtOrder: number;
 }
 
+// la constante del producto entrante
+const IProductItemSchema: Schema = new Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  name: { type: String, required: true },
+  quantity: { type: Number, required: true, min: 1 },
+  priceAtOrder: { type: Number, required: true, min: 1 },
+  imageUrl: { type: String }
+}, { _id: false });
+
+// interfaces para la direccion (si es delivery)
 export interface IShippingAddress {
     street: string;
     city: string;
-    postalCode: string;
-    // Puedes a\u00F1adir m\u00E1s campos aqu\u00ED si tu direcci\u00F3n de env\u00EDo es m\u00E1s compleja (ej. 'province', 'country', 'apartment/unit')
 }
 
+// la constante de la direccion
+const ShippingAddressSchema: Schema = new Schema({
+  street: { type: String, required: true }, // La calle siempre será requerida si hay envío
+  city: { type: String, required: true, default: 'Resistencia' }, // Podemos poner un default aquí o manejarlo en el controller
+}, { _id: false });
+
+// Interface para el pedido
 export interface IOrder extends Document {
     guestEmail: string;
     guestPhone: string;
     products: IProductItem[];
     totalAmount: number;
-    shippingAddress: IShippingAddress;
+    shippingAddress?: IShippingAddress;
+    deliveryType: 'delivery' | 'pickup'; // <-- NUEVO CAMPO
     paymentMethod: 'cash' | 'card' | 'transfer';
     status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'; // Estado del pedido
     notes?: string;
@@ -31,6 +47,7 @@ export interface IOrder extends Document {
     updatedAt: Date;
 }
 
+// la constante del pedido
 const orderSchema: Schema = new Schema({
     guestEmail: {
         type: String,
@@ -41,42 +58,24 @@ const orderSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    products: [
-        {
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: 'Product',
-                required: true,
-            },
-            name: { // <--- A\u00D1ADIDO AL ESQUEMA
-                type: String,
-                required: true,
-            },
-            imageUrl: { // <--- A\u00D1ADIDO AL ESQUEMA
-                type: String,
-                required: true,
-            },
-            quantity: {
-                type: Number,
-                required: true,
-                min: 1,
-            },
-            priceAtOrder: {
-                type: Number,
-                required: true,
-                min: 0,
-            }
-        },
-    ],
+    products: [IProductItemSchema],
     totalAmount: {
         type: Number,
         required: true,
         min: 0,
     },
+     deliveryType: { // <-- NUEVO CAMPO
+    type: String,
+    enum: ['delivery', 'pickup'],
+    required: true,
+    default: 'delivery'
+    },
+    // La dirección de envío ahora es condicional
     shippingAddress: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        postalCode: { type: String, required: true },
+    type: ShippingAddressSchema,
+    required: function(this: IOrder) { // Mongoose permite funciones para required
+      return this.deliveryType === 'delivery'; // Solo requerido si el tipo de entrega es 'delivery'
+    }
     },
     paymentMethod: {
         type: String,
@@ -96,11 +95,6 @@ const orderSchema: Schema = new Schema({
     timestamps: true, // <--- REEMPLAZA EL MIDDLEWARE pre('save')
 });
 
-// REMOVED: Middleware para actualizar `updatedAt` autom\u00E1ticamente en cada guardado del documento
-// orderSchema.pre<IOrder>('save', function(next) {
-//   this.updatedAt = new Date();
-//   next();
-// });
 
 const Pedido = mongoose.model<IOrder>('Pedido', orderSchema);
 
