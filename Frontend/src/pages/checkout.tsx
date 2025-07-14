@@ -4,35 +4,46 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../components/layout/cartcontext'; // Asegúrate de que esta ruta sea correcta
 import styles from './checkout.module.css'; // Importa tu CSS Module
 import Button from '../components/layout/button'; // Importa el componente Button desde su ubicación
-import { FaUser, FaPhone, FaEnvelope, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaMapPin } from 'react-icons/fa'; // Iconos de Font Awesome
+// Importa solo los iconos necesarios sin FaInfoCircle si no lo quieres usar
+import { FaUser, FaPhone, FaEnvelope, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaMapPin, FaStore } from 'react-icons/fa';
 import axios from 'axios'; // ¡Importar axios!
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com'; // Definir la URL base aquí
 
 const CheckoutPage: React.FC = () => {
     const [email, setEmail] = useState('');
-    const [name, setName] = useState(''); // El campo 'name' lo usaremos para 'nombre y apellido'
+    const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
+    const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery'); // 'delivery' por defecto
     const [street, setStreet] = useState('');
     const [city, setCity] = useState('');
-    const [postalCode, setPostalCode] = useState('');
-    const [metodo, setMetodo] = useState(''); // 'efectivo' o 'mercadopago'
+    // const [postalCode, setPostalCode] = useState(''); // Comentado, ya no se usa en el backend
+    const [metodo, setMetodo] = useState<'efectivo' | 'mercadopago'>('efectivo');
     const [errorMessage, setErrorMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(false); // Nuevo estado para indicar si se está cargando
-    
+    const [isLoading, setIsLoading] = useState(false);
+
     const navigate = useNavigate();
     const { cart, clearCart } = useCart();
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    const handleConfirm = async () => { // Hacemos la función asíncrona
-        setErrorMessage(''); // Limpia cualquier mensaje de error previo
-        setIsLoading(true); // Activa el estado de carga
+    const handleConfirm = async () => {
+        setErrorMessage('');
+        setIsLoading(true);
 
-        // 1. Validación de campos (ya la tienes, asegurándonos de que esté completa)
-        if (!email || !name || !phone || !street || !city || !postalCode || !metodo) { // Corregido: !phone en vez de !!phone
-            setErrorMessage('Por favor, completá todos los campos.');
-            setIsLoading(false); // Desactiva la carga si hay un error
+        // Validaciones iniciales
+        if (!email || !name || !phone || !metodo || !deliveryType) {
+            setErrorMessage('Por favor, completá todos los campos generales y de pago.');
+            setIsLoading(false);
             return;
+        }
+
+        // Validación condicional de dirección según el tipo de entrega
+        if (deliveryType === 'delivery') {
+            if (!street || !city) {
+                setErrorMessage('Para envío a domicilio, la calle y la ciudad son obligatorias.');
+                setIsLoading(false);
+                return;
+            }
         }
 
         // Validar que el carrito no esté vacío
@@ -42,58 +53,56 @@ const CheckoutPage: React.FC = () => {
             return;
         }
 
-        // 2. Mapear el carrito a la estructura esperada por el backend (IProductItem[])
+        // Mapear el carrito a la estructura esperada por el backend (solo productId y quantity)
         const productsForOrder = cart.map(item => ({
-            productId: item._id, // Usamos el _id del producto del carrito
-            name: item.name,
-            imageUrl: item.imageUrl, // Asumo que el carrito tiene 'image', si es 'imageUrl' cámbialo
+            productId: item._id,
             quantity: item.quantity,
-            priceAtOrder: item.price,
         }));
 
-        // 3. Mapear el método de pago al formato del backend
+        // Mapear el método de pago al formato del backend
         let backendPaymentMethod: 'cash' | 'card' | 'transfer';
         if (metodo === 'efectivo') {
             backendPaymentMethod = 'cash';
         } else if (metodo === 'mercadopago') {
-            // Asumo que Mercado Pago se mapea a 'card' o 'transfer'.
-            // Si en el backend usas 'mercadopago', deberías agregarlo al enum en Pedido.ts.
-            backendPaymentMethod = 'card'; 
+            backendPaymentMethod = 'card';
         } else {
             setErrorMessage('Método de pago no válido.');
             setIsLoading(false);
             return;
         }
 
-        // 4. Preparar el objeto de datos del pedido
-        const orderData = {
+        // Preparar el objeto de datos del pedido
+        const orderData: any = {
             products: productsForOrder,
-            shippingAddress: {
-                street: street,
-                city: city,
-                postalCode: postalCode,
-            },
-            paymentMethod: backendPaymentMethod,
             guestEmail: email,
             guestPhone: phone,
-            notes: '', // Puedes agregar un campo de notas en el frontend si lo deseas
+            totalAmount: total,
+            paymentMethod: backendPaymentMethod,
+            deliveryType: deliveryType,
+            notes: '',
         };
 
+        // Añadir la dirección de envío solo si el tipo de entrega es 'delivery'
+        if (deliveryType === 'delivery') {
+            orderData.shippingAddress = {
+                street: street,
+                city: city,
+            };
+        }
+
         try {
-            // 5. Enviar el pedido (METODO POST) al backend usando AXIOS
             const response = await axios.post(`${API_BASE_URL}/api/orders`, orderData);
             
             console.log('Pedido creado exitosamente:', response.data.order);
 
-            // 6. Si el pedido se creó exitosamente:
-            clearCart(); // Limpia el carrito SOLO si el pedido fue exitoso
-            navigate('/order-confirmation'); // Navega a la página de confirmación
+            clearCart();
+            navigate('/order-confirmation');
 
         } catch (error: any) {
             console.error('Hubo un error al confirmar el pedido:', error.response?.data?.message || error.message);
             setErrorMessage(error.response?.data?.message || 'Ocurrió un error inesperado al procesar tu pedido. Por favor, intenta de nuevo.');
         } finally {
-            setIsLoading(false); // Desactiva el estado de carga siempre al finalizar
+            setIsLoading(false);
         }
     };
 
@@ -145,41 +154,74 @@ const CheckoutPage: React.FC = () => {
                             />
                         </div>
                     </div>
+
+                    {/* Selector de Tipo de Entrega */}
                     <h3 className={styles.sectionTitle}>
-                        <span className={styles.iconWrapper}><FaHome /></span> Dirección de Envío
+                        <span className={styles.iconWrapper}><FaHome /></span> Tipo de Entrega
                     </h3>
-                    <div className={styles.inputGroup}>
-                        <div className={styles.inputWrapper}>
-                            <span className={styles.inputIcon}><FaRoad /></span>
+                    <div className={styles.radioGroup}>
+                        <label className={styles.radioLabel}>
                             <input
-                                type="text"
-                                placeholder="Calle y número"
-                                value={street}
-                                onChange={e => setStreet(e.target.value)}
-                                className={styles.inputField}
+                                type="radio"
+                                value="delivery"
+                                checked={deliveryType === 'delivery'}
+                                onChange={() => setDeliveryType('delivery')}
+                                className={styles.radioInput}
                             />
-                        </div>
-                        <div className={styles.inputWrapper}>
-                            <span className={styles.inputIcon}><FaCity /></span>
+                            {/* Ajuste: Mover el icono DENTRO de un span con clase, o ponerle el margen directo si funciona */}
+                            <span className={styles.radioText}>
+                                <FaHome/> Envío a Domicilio
+                            </span>
+                        </label>
+                        <label className={styles.radioLabel}>
                             <input
-                                type="text"
-                                placeholder="Ciudad"
-                                value={city}
-                                onChange={e => setCity(e.target.value)}
-                                className={styles.inputField}
+                                type="radio"
+                                value="pickup"
+                                checked={deliveryType === 'pickup'}
+                                onChange={() => setDeliveryType('pickup')}
+                                className={styles.radioInput}
                             />
-                        </div>
-                        <div className={styles.inputWrapper}>
-                            <span className={styles.inputIcon}><FaMapPin /></span>
-                            <input
-                                type="text"
-                                placeholder="Código Postal"
-                                value={postalCode}
-                                onChange={e => setPostalCode(e.target.value)}
-                                className={styles.inputField}
-                            />
-                        </div>
+                            <span className={styles.radioText}>
+                                <FaStore /> Retiro en Sucursal
+                            </span>
+                        </label>
                     </div>
+
+                    {/* Campos de Dirección de Envío (condicionales) */}
+                    {deliveryType === 'delivery' && (
+                        <>
+                            <h3 className={styles.sectionTitle}>
+                                <span className={styles.iconWrapper}><FaHome /></span> Dirección de Envío
+                            </h3>
+                            <div className={styles.inputGroup}>
+                                <div className={styles.inputWrapper}>
+                                    <span className={styles.inputIcon}><FaRoad /></span>
+                                    <input
+                                        type="text"
+                                        placeholder="Calle y número"
+                                        value={street}
+                                        onChange={e => setStreet(e.target.value)}
+                                        className={styles.inputField}
+                                    />
+                                </div>
+                                <div className={styles.inputWrapper}>
+                                    <span className={styles.inputIcon}><FaCity /></span>
+                                    <input
+                                        type="text"
+                                        placeholder="Ciudad"
+                                        value={city}
+                                        onChange={e => setCity(e.target.value)}
+                                        className={styles.inputField}
+                                    />
+                                </div>
+                                {/* Si quitaste FaInfoCircle para evitar errores, el mensaje simple queda así: */}
+                                <p className={styles.infoTextSimple}>
+                                    Actualmente solo hacemos envíos en Resistencia.
+                                </p>
+                            </div>
+                        </>
+                    )}
+
                     <h3 className={styles.sectionTitle}>
                         <span className={styles.iconWrapper}><FaMoneyBillWave /></span> Forma de Pago
                     </h3>
@@ -213,7 +255,7 @@ const CheckoutPage: React.FC = () => {
                         <Button
                             className={styles.confirmButton}
                             onClick={handleConfirm}
-                            disabled={isLoading || cart.length === 0} // Deshabilita el botón si carga o carrito vacío
+                            disabled={isLoading || cart.length === 0}
                         >
                             {isLoading ? 'Confirmando...' : 'Confirmar pedido'}
                         </Button>

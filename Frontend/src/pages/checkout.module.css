@@ -318,3 +318,64 @@
         text-align: center;
     }
 }
+
+/* ... tus estilos existentes ... */
+
+.infoText {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 10px;
+    background-color: #f0f8ff; /* Un azul muy claro */
+    border: 1px solid #cceeff; /* Un borde azul claro */
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.infoIcon {
+    margin-right: 5px; /* Este es el estilo que estaba dando error en línea */
+    color: #007bff; /* Un color para el icono de información */
+}
+
+/* Estilos para los span que envuelven los iconos en los títulos y campos de input */
+.iconWrapper,
+.inputIcon {
+    /* Estas clases ya las tenías, solo asegúrate de que definan el tamaño y el margen del icono */
+    display: inline-flex; /* Para centrar el icono si hay espacio */
+    align-items: center;
+    justify-content: center;
+    width: 20px; /* Ajusta según el tamaño deseado para el icono */
+    height: 20px; /* Ajusta según el tamaño deseado para el icono */
+    margin-right: 8px; /* Espacio entre el icono y el texto/input */
+    color: #333; /* Color predeterminado para los iconos */
+}
+
+/* NUEVA CLASE para los spans que envuelven los iconos en los radio buttons */
+.radioIconWrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; /* Un poco más pequeño que los de los títulos */
+    height: 18px;
+    margin-right: 5px; /* Espacio entre el icono del radio y el texto */
+    color: #555; /* Color para los iconos de los radios */
+}
+
+/* Asegúrate de que .radioText también tenga display: flex si quieres que el icono y texto se alineen bien */
+.radioText {
+    display: flex;
+    align-items: center;
+    /* ... otros estilos para .radioText ... */
+}
+
+/* El estilo para el mensaje informativo, si no tiene icono, no necesita el margen del icono */
+.infoTextSimple {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 10px;
+    background-color: #f0f8ff;
+    border: 1px solid #cceeff;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
