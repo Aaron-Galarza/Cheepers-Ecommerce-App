@@ -1,22 +1,38 @@
 import React from 'react';
-import styles from './dashboard.module.css';
-import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar } from 'react-icons/fa';
+import styles from './dashboard.module.css'; // Asegúrate de que esta ruta sea correcta
+import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken'); // CAMBIO: sessionStorage -> localStorage
+    navigate('/admin/login');
+  };
+
   return (
     <div className={styles.dashboardContainer}>
       <aside className={styles.sidebar}>
         <h2 className={styles.logo}>CHEEPERS <span className={styles.admin}>ADMIN</span></h2>
         <nav className={styles.nav}>
-          <a href="#" className={styles.navItem}><FaHamburger /> Productos</a>
-          <a href="#" className={styles.navItem}><FaPizzaSlice /> Promos</a>
-          <a href="#" className={styles.navItem}><FaChartBar /> Ventas</a>
-          <a href="#" className={styles.navItem}><FaUserShield /> Clientes</a>
+          <a href="#" className={styles.navItem}><span><FaHamburger /></span> Productos</a>
+          <a href="#" className={styles.navItem}><span><FaPizzaSlice /></span> Promos</a>
+          <a href="#" className={styles.navItem}><span><FaChartBar /></span> Ventas</a>
+          <a href="#" className={styles.navItem}><span><FaUserShield /></span> Clientes</a>
         </nav>
       </aside>
 
       <main className={styles.mainContent}>
-        <h1>Bienvenido al Panel de Administración</h1>
+        <div className={styles.mainHeader}>
+          <h1>Bienvenido al Panel de Administración</h1>
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            <span className={styles.logoutIcon}>
+              <FaSignOutAlt />
+            </span>
+            Cerrar Sesión
+          </button>
+        </div>
         <p>Desde aquí podés gestionar tus productos, promociones y más.</p>
 
         <div className={styles.cardsContainer}>

@@ -1,4 +1,4 @@
-// src/App.tsx
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
@@ -10,10 +10,11 @@ import CarritoPage from './pages/carrito';
 import PromosPage from './pages/promos';
 import AdminLoginPage from './pages/login';
 import Dashboard from './components/layout/dashboard';
+import CheckoutPage from './pages/checkout';
+import OrderConfirmationPage from './components/layout/ordenconfirmation';
 
-// Importa los nuevos componentes de página
-import CheckoutPage from './pages/checkout'; // La página de datos del cliente
-import OrderConfirmationPage from './components/layout/ordenconfirmation'; // <--- RUTA ACTUALIZADA AQUÍ
+// Importa el nuevo ProtectedRoute
+import ProtectedRoute from './components/layout/protectedroute'; // CAMBIO AQUÍ
 
 function Footer() {
   return (
@@ -42,11 +43,19 @@ function App() {
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/promos" element={<PromosPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
           
-          {/* Rutas de Checkout y Confirmación */}
-          <Route path="/checkout" element={<CheckoutPage />} /> {/* Ruta para el formulario de checkout */}
-          <Route path="/order-confirmation" element={<OrderConfirmationPage />} /> {/* Ruta para la confirmación final */}
+          {/* Protege la ruta del Dashboard */}
+          <Route 
+            path="/admin/dashboard" 
+            element={
+              <ProtectedRoute> {/* Envuelve el Dashboard con ProtectedRoute */}
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
 
         </Routes>
       </main>

@@ -1,6 +1,6 @@
-// src/pages/AdminLogin.tsx
+// src/pages/login.tsx
 import React, { useState } from 'react';
-import styles from './adminlogin.module.css';
+import styles from './adminlogin.module.css'; // Asegúrate de que esta ruta sea correcta
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -23,8 +23,8 @@ const AdminLogin: React.FC = () => {
       });
 
       if (response.data.success) {
-        // Podés guardar el token en localStorage si es necesario
-        localStorage.setItem('adminToken', response.data.token);
+        // Guardar el token en localStorage
+        localStorage.setItem('adminToken', response.data.token); // CAMBIO: sessionStorage -> localStorage
         navigate('/admin/dashboard');
       } else {
         setError(response.data.message || 'Credenciales inválidas');
