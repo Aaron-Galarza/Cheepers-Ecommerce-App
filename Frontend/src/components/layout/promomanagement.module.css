@@ -1,0 +1,286 @@
+/* src/components/layout/promomanagement.module.css */
+
+.promoManagementContainer {
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    margin: 20px;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #e53e3e; /* Rojo Cheepers */
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.formSection {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 40px;
+}
+
+.formTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.promoForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.inputField, .textareaField {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #4a5568;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputField:focus, .textareaField:focus {
+    outline: none;
+    border-color: #e53e3e;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+}
+
+.textareaField {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+.checkboxField {
+    width: 20px;
+    height: 20px;
+    accent-color: #e53e3e; /* Color del checkbox */
+}
+
+.formActions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.saveButton, .cancelButton {
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.saveButton {
+    background-color: #28a745; /* Verde */
+    color: white;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+.saveButton:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(33, 136, 56, 0.4);
+}
+
+.cancelButton {
+    background-color: #a0aec0; /* Gris */
+    color: white;
+    box-shadow: 0 4px 10px rgba(160, 174, 192, 0.3);
+}
+
+.cancelButton:hover {
+    background-color: #718096;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(160, 174, 192, 0.4);
+}
+
+.noPromosMessage {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #6b7280;
+    padding: 30px 0;
+    font-style: italic;
+}
+
+.listTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.promotionsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 25px;
+}
+
+.promoCard {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e0e0e0;
+}
+
+.promoCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.promoImage {
+    width: 100%;
+    height: 180px; /* Altura fija para la imagen */
+    object-fit: cover;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.promoInfo {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.promoInfo h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.promoInfo p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.promoDiscount {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #28a745; /* Verde para el descuento */
+    margin-top: 10px;
+}
+
+.promoStatus {
+    font-size: 0.85rem;
+    color: #718096;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.promoActions {
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    gap: 10px;
+}
+
+.editButton, .deleteButton {
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.editButton {
+    background-color: #3182ce; /* Azul */
+    color: white;
+}
+
+.editButton:hover {
+    background-color: #2b6cb0;
+    transform: translateY(-1px);
+}
+
+.deleteButton {
+    background-color: #e53e3e; /* Rojo */
+    color: white;
+}
+
+.deleteButton:hover {
+    background-color: #c53030;
+    transform: translateY(-1px);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .promoManagementContainer {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .title {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    .formSection {
+        padding: 20px;
+    }
+
+    .formTitle {
+        font-size: 1.5rem;
+    }
+
+    .formActions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .saveButton, .cancelButton {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .listTitle {
+        font-size: 1.8rem;
+        margin-top: 40px;
+    }
+
+    .promotionsList {
+        grid-template-columns: 1fr; /* Una columna en móviles */
+    }
+
+    .promoImage {
+        height: 150px;
+    }
+}

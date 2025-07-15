@@ -3,6 +3,7 @@ import styles from './dashboard.module.css';
 import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt, FaThLarge } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ProductManagement from './productmanagement';
+import PromoManagement from './promomanagement'; // Importa el nuevo componente de gestión de promociones
 import authService from '../../services/authservice'; // Ruta correcta según tu estructura
 
 const Dashboard: React.FC = () => {
@@ -31,17 +32,13 @@ const Dashboard: React.FC = () => {
       case 'products':
         return <ProductManagement />;
       case 'promos':
-        return (
-          <div>
-            <h2>Gestión de Promociones</h2>
-            <p>Aquí podrás agregar, editar y eliminar promociones.</p>
-          </div>
-        );
+        return <PromoManagement />; {/* CAMBIO: Muestra el componente PromoManagement */}
       case 'sales':
         return (
           <div>
             <h2>Reportes de Ventas</h2>
             <p>Aquí podrás ver las estadísticas de ventas.</p>
+            {/* Aquí iría tu componente de reportes de ventas */}
           </div>
         );
       case 'clients':
@@ -49,6 +46,7 @@ const Dashboard: React.FC = () => {
           <div>
             <h2>Gestión de Clientes</h2>
             <p>Aquí podrás ver y gestionar la información de tus clientes.</p>
+            {/* Aquí iría tu componente de gestión de clientes */}
           </div>
         );
       case 'welcome':
