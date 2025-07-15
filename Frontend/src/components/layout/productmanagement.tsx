@@ -1,8 +1,9 @@
 // src/components/layout/ProductManagement.tsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from 'axios'; // Axios ya estará configurado con el interceptor gracias a authService.ts
 import styles from './productmanagement.module.css'; // Importa el nuevo CSS Module
 import { FaEdit, FaTrash, FaPlus, FaSave, FaTimes, FaUpload } from 'react-icons/fa'; // Iconos para CRUD
+import authService from '../../services/authservice'; // Importa authService para que su interceptor se inicialice
 
 // Asegúrate de que esta interfaz Product sea la misma que usas en menu.tsx y productlist.ts
 export interface Product {
@@ -38,16 +39,20 @@ const ProductManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('adminToken'); // Obtén el token del localStorage
-      const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Envía el token en los headers
-        },
-      });
+      // Eliminado: const token = localStorage.getItem('adminToken');
+      // Eliminado: headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products`);
       setProducts(response.data);
-    } catch (err) {
+    } catch (err: any) { // Asegúrate de tipar 'err' para acceder a 'response.status'
       console.error('Error al cargar los productos:', err);
-      setError('No se pudieron cargar los productos. ¿Estás logueado?');
+      // Si el error es 401 (Unauthorized), redirigir al login
+      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+        authService.logout(); // Limpia el token si la sesión no es válida
+        // No redirigimos aquí, ProtectedRoute se encargará de eso
+        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+      } else {
+        setError('No se pudieron cargar los productos. ¿Estás logueado?');
+      }
     } finally {
       setLoading(false);
     }
@@ -56,17 +61,19 @@ const ProductManagement: React.FC = () => {
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.post(`${API_BASE_URL}/api/products`, newProduct, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Eliminado: const token = localStorage.getItem('adminToken');
+      // Eliminado: headers: { Authorization: `Bearer ${token}` }
+      await axios.post(`${API_BASE_URL}/api/products`, newProduct);
       setNewProduct({ name: '', description: '', price: 0, imageUrl: '', category: 'Hamburguesas' }); // Reset form
       fetchProducts(); // Refresh list
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al crear producto:', err);
-      setError('Error al crear producto. Verifica los datos y tu sesión.');
+      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+        authService.logout();
+        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+      } else {
+        setError('Error al crear producto. Verifica los datos y tu sesión.');
+      }
     }
   };
 
@@ -78,33 +85,37 @@ const ProductManagement: React.FC = () => {
     e.preventDefault();
     if (!editingProduct) return;
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(`${API_BASE_URL}/api/products/${editingProduct._id}`, editingProduct, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Eliminado: const token = localStorage.getItem('adminToken');
+      // Eliminado: headers: { Authorization: `Bearer ${token}` }
+      await axios.put(`${API_BASE_URL}/api/products/${editingProduct._id}`, editingProduct);
       setEditingProduct(null); // Exit editing mode
       fetchProducts(); // Refresh list
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al actualizar producto:', err);
-      setError('Error al actualizar producto. Verifica los datos y tu sesión.');
+      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+        authService.logout();
+        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+      } else {
+        setError('Error al actualizar producto. Verifica los datos y tu sesión.');
+      }
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Eliminado: const token = localStorage.getItem('adminToken');
+      // Eliminado: headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`${API_BASE_URL}/api/products/${id}`);
       fetchProducts(); // Refresh list
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al eliminar producto:', err);
-      setError('Error al eliminar producto. Verifica tu sesión.');
+      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+        authService.logout();
+        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+      } else {
+        setError('Error al eliminar producto. Verifica tu sesión.');
+      }
     }
   };
 

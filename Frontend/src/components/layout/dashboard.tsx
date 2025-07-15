@@ -3,21 +3,26 @@ import styles from './dashboard.module.css';
 import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt, FaThLarge } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ProductManagement from './productmanagement';
+import authService from '../../services/authservice'; // Ruta correcta según tu estructura
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('welcome');
 
-  // 👇 Esta parte es la clave para aplicar estilos solo en Dashboard
+  // 🔐 Verifica autenticación al cargar
   useEffect(() => {
+    if (!authService.isAuthenticated()) {
+      navigate('/admin/login');
+    }
+
     document.body.classList.add('dashboardPage');
     return () => {
       document.body.classList.remove('dashboardPage');
     };
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    authService.logout();
     navigate('/admin/login');
   };
 

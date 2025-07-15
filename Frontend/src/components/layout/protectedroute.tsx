@@ -1,18 +1,19 @@
-// src/components/layout/ProtectedRoute.tsx
+
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import authService from '../../services/authservice'; // Importa el nuevo servicio
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('adminToken'); // CAMBIO: sessionStorage -> localStorage
+  const isAuthenticated = authService.isAuthenticated(); // Usa el servicio de autenticación
   const location = useLocation();
 
   useEffect(() => {
     console.log(`ProtectedRoute: Rendered for path: ${location.pathname}`);
-    console.log(`ProtectedRoute: adminToken in localStorage: ${isAuthenticated ? 'Exists' : 'Does NOT exist'}`);
+    console.log(`ProtectedRoute: adminToken status: ${isAuthenticated ? 'Authenticated' : 'Not Authenticated'}`);
   }, [isAuthenticated, location.pathname]);
 
   if (!isAuthenticated) {

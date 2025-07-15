@@ -1,10 +1,8 @@
-// src/pages/login.tsx
-import React, { useState } from 'react';
-import styles from './adminlogin.module.css'; // Asegúrate de que esta ruta sea correcta
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+import React, { useState } from 'react';
+import styles from './adminlogin.module.css';
+import { useNavigate } from 'react-router-dom';
+import authService from '../services/authservice'; // Importa el nuevo servicio
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,21 +15,11 @@ const AdminLogin: React.FC = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/negocio/login`, {
-        email,
-        password
-      });
-
-      if (response.data.success) {
-        // Guardar el token en localStorage
-        localStorage.setItem('adminToken', response.data.token); // CAMBIO: sessionStorage -> localStorage
-        navigate('/admin/dashboard');
-      } else {
-        setError(response.data.message || 'Credenciales inválidas');
-      }
-    } catch (err) {
+      await authService.login(email, password); // Usa el servicio de autenticación
+      navigate('/admin/dashboard');
+    } catch (err: any) { // Captura el error para mostrarlo
       console.error('Error al iniciar sesión:', err);
-      setError('Error del servidor. Intenta nuevamente.');
+      setError(err.message || 'Error del servidor. Intenta nuevamente.');
     }
   };
 
@@ -46,6 +34,7 @@ const AdminLogin: React.FC = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={styles.input}
+          required
         />
         <input
           type="password"
@@ -53,6 +42,7 @@ const AdminLogin: React.FC = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={styles.input}
+          required
         />
         <button type="submit" className={styles.button}>
           Ingresar
