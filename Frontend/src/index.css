@@ -1,10 +1,6 @@
-/* ===================== Variables CSS de Cheepers ===================== */
-/*
-  ¡IMPORTANTE!
-  Reemplaza los valores hexadecimales (#...) y otros valores
-  para que coincidan exactamente con la paleta de colores,
-  tipografía y espaciado de la marca Cheepers.
-*/
+body.dashboardPage {
+  overflow: hidden;
+}
 :root {
   /* Colores de Marca Cheepers */
   --color-primary: #D32F2F; /* Rojo: para botones, acentos, precios */
@@ -34,6 +30,9 @@
   --space-small: 8px;
   --space-medium: 15px;
   --space-large: 30px;
+
+   height: 100vh;
+
 }
 
 /* ===================== General / Layout Base (Resets y Estilos Globales) ===================== */
@@ -41,6 +40,11 @@
 Estos estilos se aplican a elementos HTML básicos y al contenedor principal de la app.
 Proporcionan una base consistente para toda la aplicación.
 */
+html, body {
+  height: 100%; /* Asegura que html y body ocupen toda la altura */
+  margin: 0;
+  padding: 0;
+}
 body {
   margin: 0;
   padding: 0;
