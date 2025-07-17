@@ -8,6 +8,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  toggleProductActiveStatus,
 } from '../controllers/productController'; // Tus controladores de producto
 import { protect, admin } from '../middleware/authMiddleware'; // <--- IMPORTA LOS MIDDLEWARES
 
@@ -24,5 +25,7 @@ router.post('/', protect, admin, asyncHandler(createProduct));
 router.put('/:id', protect, admin, asyncHandler(updateProduct));
 // Para eliminar un producto, necesitas estar autenticado Y ser admin
 router.delete('/:id', protect, admin, asyncHandler(deleteProduct));
+// Ruta para que el administrador pueda habilitar/deshabilitar un producto
+router.put('/:id/toggle-active', protect, admin, toggleProductActiveStatus);
 
 export default router;
