@@ -284,3 +284,82 @@
         height: 150px;
     }
 }
+
+/* promomanagement.module.css */
+
+/* Estilos para el checkbox de 'Activa' en el formulario */
+.formGroup {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.formGroup label {
+  font-weight: bold;
+  color: #333;
+}
+
+.checkboxField {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Estilos para mostrar el estado de la promoción en la lista */
+.promoStatus { /* Se cambió de productStatus a promoStatus */
+  font-size: 0.9em;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.activeStatus {
+  color: #28a745; /* Verde para activa */
+}
+
+.inactiveStatus {
+  color: #dc3545; /* Rojo para inactiva */
+}
+
+/* Estilos para el botón de Activar/Desactivar promoción */
+.toggleActiveButton {
+  background-color: #28a745; /* Verde para activar */
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+.toggleActiveButton:hover {
+  background-color: #218838;
+}
+
+.toggleInactiveButton {
+  background-color: #dc3545; /* Rojo para desactivar */
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+.toggleInactiveButton:hover {
+  background-color: #c82333;
+}
+
+/* Ajustar los estilos existentes de promoActions si es necesario */
+.promoActions {
+  display: flex;
+  flex-direction: column; /* Apila los botones verticalmente */
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-left: 1px solid #eee;
+}

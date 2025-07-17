@@ -1,11 +1,12 @@
 // src/components/layout/ProductManagement.tsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Axios ya estará configurado con el interceptor gracias a authService.ts
-import styles from './productmanagement.module.css'; // Importa el nuevo CSS Module
-import { FaEdit, FaTrash, FaPlus, FaSave, FaTimes, FaUpload } from 'react-icons/fa'; // Iconos para CRUD
-import authService from '../../services/authservice'; // Importa authService para que su interceptor se inicialice
+import axios from 'axios';
+import styles from './productmanagement.module.css';
+// Importa los iconos que podrías necesitar, como FaToggleOn/Off o un switch si usas una librería de UI
+import { FaEdit, FaTrash, FaPlus, FaSave, FaTimes, FaUpload } from 'react-icons/fa';
+import authService from '../../services/authservice';
 
-// Asegúrate de que esta interfaz Product sea la misma que usas en menu.tsx y productlist.ts
+// <-- CAMBIO/ADICIÓN AQUÍ: Actualiza la interfaz Product para incluir isActive
 export interface Product {
   _id: string;
   name: string;
@@ -13,7 +14,11 @@ export interface Product {
   price: number;
   imageUrl: string;
   category: string;
+  isActive: boolean; // <-- NUEVO CAMPO
 }
+
+// <-- CAMBIO/ADICIÓN AQUÍ: Actualiza la interfaz para nuevos productos para que también incluya isActive
+type NewProductData = Omit<Product, '_id'>;
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 
@@ -22,14 +27,16 @@ const ProductManagement: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [newProduct, setNewProduct] = useState<Omit<Product, '_id'>>({
+  // <-- CAMBIO/ADICIÓN AQUÍ: Inicializa newProduct con isActive
+  const [newProduct, setNewProduct] = useState<NewProductData>({
     name: '',
     description: '',
     price: 0,
     imageUrl: '',
-    category: 'Hamburguesas', // Default category for new product
+    category: 'Hamburguesas',
+    isActive: true, // <-- Por defecto, un nuevo producto estará activo
   });
-  const [filterCategory, setFilterCategory] = useState<string>('Todas'); // Nuevo estado para el filtro de categoría
+  const [filterCategory, setFilterCategory] = useState<string>('Todas');
 
   useEffect(() => {
     fetchProducts();
@@ -39,16 +46,14 @@ const ProductManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      // Eliminado: const token = localStorage.getItem('adminToken');
-      // Eliminado: headers: { Authorization: `Bearer ${token}` }
-      const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products`);
+      // <-- CAMBIO/ADICIÓN AQUÍ: Añade el parámetro includeInactive=true
+      // Esto le dice al backend que queremos TODOS los productos (activos e inactivos) para el panel de administración
+      const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products?includeInactive=true`);
       setProducts(response.data);
-    } catch (err: any) { // Asegúrate de tipar 'err' para acceder a 'response.status'
+    } catch (err: any) {
       console.error('Error al cargar los productos:', err);
-      // Si el error es 401 (Unauthorized), redirigir al login
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout(); // Limpia el token si la sesión no es válida
-        // No redirigimos aquí, ProtectedRoute se encargará de eso
+        authService.logout();
         setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
       } else {
         setError('No se pudieron cargar los productos. ¿Estás logueado?');
@@ -61,10 +66,9 @@ const ProductManagement: React.FC = () => {
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Eliminado: const token = localStorage.getItem('adminToken');
-      // Eliminado: headers: { Authorization: `Bearer ${token}` }
+      // <-- CAMBIO/ADICIÓN AQUÍ: newProduct ya incluye isActive
       await axios.post(`${API_BASE_URL}/api/products`, newProduct);
-      setNewProduct({ name: '', description: '', price: 0, imageUrl: '', category: 'Hamburguesas' }); // Reset form
+      setNewProduct({ name: '', description: '', price: 0, imageUrl: '', category: 'Hamburguesas', isActive: true }); // Reset form
       fetchProducts(); // Refresh list
     } catch (err: any) {
       console.error('Error al crear producto:', err);
@@ -85,8 +89,7 @@ const ProductManagement: React.FC = () => {
     e.preventDefault();
     if (!editingProduct) return;
     try {
-      // Eliminado: const token = localStorage.getItem('adminToken');
-      // Eliminado: headers: { Authorization: `Bearer ${token}` }
+      // <-- CAMBIO/ADICIÓN AQUÍ: editingProduct ya incluye isActive
       await axios.put(`${API_BASE_URL}/api/products/${editingProduct._id}`, editingProduct);
       setEditingProduct(null); // Exit editing mode
       fetchProducts(); // Refresh list
@@ -104,8 +107,6 @@ const ProductManagement: React.FC = () => {
   const handleDeleteProduct = async (id: string) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
     try {
-      // Eliminado: const token = localStorage.getItem('adminToken');
-      // Eliminado: headers: { Authorization: `Bearer ${token}` }
       await axios.delete(`${API_BASE_URL}/api/products/${id}`);
       fetchProducts(); // Refresh list
     } catch (err: any) {
@@ -115,6 +116,23 @@ const ProductManagement: React.FC = () => {
         setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
       } else {
         setError('Error al eliminar producto. Verifica tu sesión.');
+      }
+    }
+  };
+
+  // <-- ADICIÓN AQUÍ: Nueva función para cambiar el estado activo
+  const handleToggleActive = async (id: string, currentStatus: boolean) => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/api/products/${id}/toggle-active`);
+      console.log(`Producto ${id} cambiado a ${response.data.product.isActive}`);
+      fetchProducts(); // Refresca la lista para mostrar el nuevo estado
+    } catch (err: any) {
+      console.error(`Error al cambiar estado de producto ${id}:`, err);
+      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+        authService.logout();
+        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+      } else {
+        setError(`Error al cambiar estado de producto. ¿Estás logueado?`);
       }
     }
   };
@@ -179,6 +197,18 @@ const ProductManagement: React.FC = () => {
             {/* Agrega más categorías si tienes */}
           </select>
 
+          {/* <-- ADICIÓN AQUÍ: Campo para isActive en el formulario de edición/creación */}
+          <div className={styles.formGroup}>
+            <label htmlFor="isActive">Activo:</label>
+            <input
+              type="checkbox"
+              id="isActive"
+              checked={editingProduct ? editingProduct.isActive : newProduct.isActive}
+              onChange={(e) => editingProduct ? setEditingProduct({ ...editingProduct, isActive: e.target.checked }) : setNewProduct({ ...newProduct, isActive: e.target.checked })}
+              className={styles.checkboxField}
+            />
+          </div>
+
           <div className={styles.formActions}>
             <button type="submit" className={styles.saveButton}>
               <FaSave /> {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
@@ -199,7 +229,7 @@ const ProductManagement: React.FC = () => {
           id="categoryFilter"
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className={styles.selectField} /* Reutiliza el estilo del select */
+          className={styles.selectField}
         >
           <option value="Todas">Todas las Categorías</option>
           <option value="Hamburguesas">Hamburguesas</option>
@@ -223,8 +253,17 @@ const ProductManagement: React.FC = () => {
                 <p>{p.description}</p>
                 <p className={styles.productPrice}>${p.price.toFixed(2)}</p>
                 <p className={styles.productCategory}>Categoría: {p.category}</p>
+                {/* <-- ADICIÓN AQUÍ: Mostrar el estado isActive */}
+                <p className={styles.productStatus}>Estado: <span className={p.isActive ? styles.activeStatus : styles.inactiveStatus}>{p.isActive ? 'Activo' : 'Inactivo'}</span></p>
               </div>
               <div className={styles.productActions}>
+                {/* <-- ADICIÓN AQUÍ: Botón para cambiar el estado isActive */}
+                <button
+                  onClick={() => handleToggleActive(p._id, p.isActive)}
+                  className={p.isActive ? styles.toggleInactiveButton : styles.toggleActiveButton} // Clases CSS para diferentes estilos
+                >
+                  {p.isActive ? 'Desactivar' : 'Activar'}
+                </button>
                 <button onClick={() => handleEditProduct(p)} className={styles.editButton}>
                   <FaEdit />
                 </button>

@@ -296,3 +296,82 @@
         grid-template-columns: 1fr; /* Una columna en móviles */
     }
 }
+
+/* productmanagement.module.css */
+
+/* Estilos para el checkbox de 'Activo' */
+.formGroup {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacio entre label y checkbox */
+}
+
+.formGroup label {
+  font-weight: bold;
+  color: #333;
+}
+
+.checkboxField {
+  transform: scale(1.2); /* Hace el checkbox un poco más grande */
+  cursor: pointer;
+}
+
+/* Estilos para mostrar el estado del producto */
+.productStatus {
+  font-size: 0.9em;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.activeStatus {
+  color: #28a745; /* Verde para activo */
+}
+
+.inactiveStatus {
+  color: #dc3545; /* Rojo para inactivo */
+}
+
+/* Estilos para el botón de Activar/Desactivar */
+.toggleActiveButton {
+  background-color: #28a745; /* Verde para activar */
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+  margin-right: 10px; /* Espacio entre botones */
+}
+
+.toggleActiveButton:hover {
+  background-color: #218838;
+}
+
+.toggleInactiveButton {
+  background-color: #dc3545; /* Rojo para desactivar */
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+.toggleInactiveButton:hover {
+  background-color: #c82333;
+}
+
+/* Ajustar los estilos existentes de productActions si es necesario */
+.productActions {
+  display: flex;
+  flex-direction: column; /* Apila los botones verticalmente */
+  gap: 10px; /* Espacio entre los botones */
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-left: 1px solid #eee; /* Separador visual */
+}

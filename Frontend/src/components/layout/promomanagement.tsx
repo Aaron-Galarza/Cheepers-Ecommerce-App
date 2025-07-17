@@ -1,24 +1,27 @@
 // src/components/layout/PromoManagement.tsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './promomanagement.module.css'; // Importa el CSS Module
-import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa'; // Iconos para CRUD
-import authService from '../../services/authservice'; // Importa authService para su interceptor
+import styles from './promomanagement.module.css';
+import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
+import authService from '../../services/authservice';
 
-// Interfaz para la estructura de una Promoción (ahora compatible con Product)
-// Asumimos que las promociones son productos con una categoría específica.
+// <-- CAMBIO/ADICIÓN AQUÍ: Interfaz Promotion debe ser idéntica a Product del backend
 export interface Promotion {
   _id: string;
   name: string;
   description: string;
-  price: number; // Las promociones también pueden tener un precio base
+  price: number;
   imageUrl: string;
-  category: string; // Esperamos 'Promos Solo en Efectivo'
-  // Puedes añadir otros campos específicos de promoción si tu backend los maneja,
-  // pero por ahora, nos basamos en la estructura de Product.
-  discountPercentage?: number; // Campo opcional si lo usas para mostrar
-  isActive?: boolean; // Campo opcional si lo usas para activar/desactivar
+  category: string;
+  // Estos campos ahora son obligatorios en la interfaz para que TypeScript los reconozca siempre
+  // si tu backend los devuelve, lo cual es el caso de 'isActive'.
+  discountPercentage?: number; // Sigue siendo opcional si no lo usas en el backend para todas las promos
+  isActive: boolean; // <-- AHORA OBLIGATORIO Y PARTE DE CADA PROMOCIÓN/PRODUCTO
 }
+
+// <-- CAMBIO/ADICIÓN AQUÍ: Tipo para crear/editar promociones sin _id
+type NewPromotionData = Omit<Promotion, '_id'>;
+
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 
@@ -27,14 +30,15 @@ const PromoManagement: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
-  const [newPromotion, setNewPromotion] = useState<Omit<Promotion, '_id'>>({
+  // <-- CAMBIO/ADICIÓN AQUÍ: Inicializa newPromotion con isActive: true
+  const [newPromotion, setNewPromotion] = useState<NewPromotionData>({
     name: '',
     description: '',
-    price: 0, // Precio base para la promoción
+    price: 0,
     imageUrl: '',
-    category: 'Promos Solo en Efectivo', // Categoría por defecto para nuevas promociones
-    discountPercentage: 0, // Se mantiene en el estado inicial, pero no se muestra en el formulario
-    isActive: true, // Se mantiene en el estado inicial, pero no se muestra en el formulario
+    category: 'Promos Solo en Efectivo',
+    discountPercentage: 0,
+    isActive: true, // <-- Por defecto, una nueva promoción estará activa
   });
 
   useEffect(() => {
@@ -45,14 +49,14 @@ const PromoManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      // Obtener productos y luego filtrar por categoría de promoción
-      const response = await axios.get<Promotion[]>(`${API_BASE_URL}/api/products`);
+      // <-- CAMBIO/ADICIÓN AQUÍ: Obtener TODOS los productos (incluyendo inactivos) para el admin
+      const response = await axios.get<Promotion[]>(`${API_BASE_URL}/api/products?includeInactive=true`);
       const filteredPromos = response.data.filter(p => p.category === 'Promos Solo en Efectivo');
       setPromotions(filteredPromos);
     } catch (err: any) {
       console.error('Error al cargar las promociones:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout(); // Limpia el token si la sesión no es válida
+        authService.logout();
         setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
       } else {
         setError('No se pudieron cargar las promociones. Verifica la conexión o tu sesión.');
@@ -65,10 +69,9 @@ const PromoManagement: React.FC = () => {
   const handleCreatePromotion = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Al crear, enviamos a /api/products con la categoría de promoción
+      // newPromotion ya incluye isActive por defecto
       await axios.post(`${API_BASE_URL}/api/products`, newPromotion);
-      // Reset form, manteniendo los valores por defecto para discountPercentage y isActive
-      setNewPromotion({ name: '', description: '', price: 0, imageUrl: '', category: 'Promos Solo en Efectivo', discountPercentage: 0, isActive: true });
+      setNewPromotion({ name: '', description: '', price: 0, imageUrl: '', category: 'Promos Solo en Efectivo', discountPercentage: 0, isActive: true }); // Reset form
       fetchPromotions(); // Refresh list
     } catch (err: any) {
       console.error('Error al crear promoción:', err);
@@ -89,8 +92,7 @@ const PromoManagement: React.FC = () => {
     e.preventDefault();
     if (!editingPromotion) return;
     try {
-      // Al actualizar, enviamos a /api/products/:id
-      // Se envían todos los campos del objeto editingPromotion, incluyendo discountPercentage e isActive
+      // editingPromotion ya incluye isActive
       await axios.put(`${API_BASE_URL}/api/products/${editingPromotion._id}`, editingPromotion);
       setEditingPromotion(null); // Exit editing mode
       fetchPromotions(); // Refresh list
@@ -108,7 +110,6 @@ const PromoManagement: React.FC = () => {
   const handleDeletePromotion = async (id: string) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar esta promoción?')) return;
     try {
-      // Al eliminar, enviamos a /api/products/:id
       await axios.delete(`${API_BASE_URL}/api/products/${id}`);
       fetchPromotions(); // Refresh list
     } catch (err: any) {
@@ -121,6 +122,24 @@ const PromoManagement: React.FC = () => {
       }
     }
   };
+
+  // <-- ADICIÓN AQUÍ: Nueva función para cambiar el estado activo de una promoción
+  const handleToggleActive = async (id: string, currentStatus: boolean) => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/api/products/${id}/toggle-active`);
+      console.log(`Promoción ${id} cambiada a ${response.data.product.isActive}`);
+      fetchPromotions(); // Refresca la lista para mostrar el nuevo estado
+    } catch (err: any) {
+      console.error(`Error al cambiar estado de promoción ${id}:`, err);
+      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+        authService.logout();
+        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+      } else {
+        setError(`Error al cambiar estado de promoción. ¿Estás logueado?`);
+      }
+    }
+  };
+
 
   if (loading) return <div className={styles.loading}>Cargando promociones...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
@@ -157,8 +176,6 @@ const PromoManagement: React.FC = () => {
             step="0.01"
             required
           />
-          {/* Campo de Porcentaje de Descuento ELIMINADO */}
-          {/* Checkbox de Promoción Activa ELIMINADO */}
           <input
             type="text"
             placeholder="URL de la Imagen (Opcional)"
@@ -166,6 +183,17 @@ const PromoManagement: React.FC = () => {
             onChange={(e) => editingPromotion ? setEditingPromotion({ ...editingPromotion, imageUrl: e.target.value }) : setNewPromotion({ ...newPromotion, imageUrl: e.target.value })}
             className={styles.inputField}
           />
+          {/* <-- ADICIÓN AQUÍ: Campo para isActive en el formulario de edición/creación */}
+          <div className={styles.formGroup}>
+            <label htmlFor="promoIsActive">Activa:</label>
+            <input
+              type="checkbox"
+              id="promoIsActive"
+              checked={editingPromotion ? editingPromotion.isActive : newPromotion.isActive}
+              onChange={(e) => editingPromotion ? setEditingPromotion({ ...editingPromotion, isActive: e.target.checked }) : setNewPromotion({ ...newPromotion, isActive: e.target.checked })}
+              className={styles.checkboxField}
+            />
+          </div>
 
           <div className={styles.formActions}>
             <button type="submit" className={styles.saveButton}>
@@ -193,10 +221,17 @@ const PromoManagement: React.FC = () => {
                 <h3>{promo.name}</h3>
                 <p>{promo.description}</p>
                 <p className={styles.promoPrice}>Precio: ${promo.price?.toFixed(2) || 'N/A'}</p>
-                {/* Descuento ELIMINADO */}
-                {/* Estado ELIMINADO */}
+                {/* <-- ADICIÓN AQUÍ: Mostrar el estado isActive para la promoción */}
+                <p className={styles.promoStatus}>Estado: <span className={promo.isActive ? styles.activeStatus : styles.inactiveStatus}>{promo.isActive ? 'Activa' : 'Inactiva'}</span></p>
               </div>
               <div className={styles.promoActions}>
+                {/* <-- ADICIÓN AQUÍ: Botón para cambiar el estado isActive de la promoción */}
+                <button
+                  onClick={() => handleToggleActive(promo._id, promo.isActive)}
+                  className={promo.isActive ? styles.toggleInactiveButton : styles.toggleActiveButton} // Clases CSS para diferentes estilos
+                >
+                  {promo.isActive ? 'Desactivar' : 'Activar'}
+                </button>
                 <button onClick={() => handleEditPromotion(promo)} className={styles.editButton}>
                   <FaEdit />
                 </button>
