@@ -1,5 +1,3 @@
-/* src/components/layout/promomanagement.module.css */
-
 .promoManagementContainer {
     padding: 30px;
     background-color: #f8f9fa;
@@ -41,7 +39,7 @@
     gap: 15px;
 }
 
-.inputField, .textareaField {
+.inputField, .textareaField, .selectField {
     width: 100%;
     padding: 12px;
     border: 1px solid #cbd5e0;
@@ -51,7 +49,7 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.inputField:focus, .textareaField:focus {
+.inputField:focus, .textareaField:focus, .selectField:focus {
     outline: none;
     border-color: #e53e3e;
     box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
@@ -62,19 +60,22 @@
     resize: vertical;
 }
 
-.checkboxLabel {
+/* Manteniendo formGroup para el checkbox */
+.formGroup {
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1rem;
-    color: #4a5568;
-    cursor: pointer;
+}
+
+.formGroup label {
+    font-weight: bold;
+    color: #333;
 }
 
 .checkboxField {
-    width: 20px;
-    height: 20px;
-    accent-color: #e53e3e; /* Color del checkbox */
+    transform: scale(1.2);
+    cursor: pointer;
 }
 
 .formActions {
@@ -98,7 +99,7 @@
 }
 
 .saveButton {
-    background-color: #28a745; /* Verde */
+    background-color: #28a745;
     color: white;
     box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
 }
@@ -110,7 +111,7 @@
 }
 
 .cancelButton {
-    background-color: #a0aec0; /* Gris */
+    background-color: #a0aec0;
     color: white;
     box-shadow: 0 4px 10px rgba(160, 174, 192, 0.3);
 }
@@ -142,7 +143,7 @@
 
 .promotionsList {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 25px;
 }
 
@@ -157,6 +158,13 @@
     border: 1px solid #e0e0e0;
 }
 
+/* Clase para promociones desactivadas (ahora .inactiveProduct para consistencia) */
+.inactiveProduct {
+    opacity: 0.7;
+    filter: grayscale(1%) brightness(1); /* Ajustado para ser más sutil */
+    transition: all 0.3s ease;
+}
+
 .promoCard:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
@@ -164,7 +172,7 @@
 
 .promoImage {
     width: 100%;
-    height: 180px; /* Altura fija para la imagen */
+    height: 180px;
     object-fit: cover;
     border-bottom: 1px solid #e0e0e0;
 }
@@ -190,23 +198,34 @@
 .promoDiscount {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #28a745; /* Verde para el descuento */
+    color: #28a745;
     margin-top: 10px;
 }
 
+/* Estilos para mostrar el estado de la promoción */
 .promoStatus {
-    font-size: 0.85rem;
-    color: #718096;
-    font-style: italic;
+    font-size: 0.9em;
     margin-top: 5px;
+    font-weight: bold;
 }
 
+.activeStatus {
+    color: #28a745; /* Verde para activo */
+}
+
+.inactiveStatus {
+    color: #dc3545; /* Rojo para inactivo */
+}
+
+/* Ajuste de los botones de acción en la tarjeta */
 .promoActions {
     display: flex;
+    flex-direction: row; /* Cambiado a fila para alineación horizontal */
     justify-content: flex-end; /* Alinea los botones a la derecha */
+    align-items: center; /* Centra verticalmente los botones */
     padding: 15px;
-    border-top: 1px solid #e0e0e0;
-    gap: 10px;
+    border-top: 1px solid #e0e0e0; /* Cambiado de border-left a border-top */
+    gap: 10px; /* Espacio entre los botones */
 }
 
 .editButton, .deleteButton {
@@ -222,7 +241,7 @@
 }
 
 .editButton {
-    background-color: #3182ce; /* Azul */
+    background-color: #3182ce;
     color: white;
 }
 
@@ -232,7 +251,7 @@
 }
 
 .deleteButton {
-    background-color: #e53e3e; /* Rojo */
+    background-color: #e53e3e;
     color: white;
 }
 
@@ -241,125 +260,164 @@
     transform: translateY(-1px);
 }
 
-/* Media Queries */
-@media (max-width: 768px) {
-    .promoManagementContainer {
-        padding: 20px;
-        margin: 10px;
-    }
-
-    .title {
-        font-size: 2rem;
-        margin-bottom: 30px;
-    }
-
-    .formSection {
-        padding: 20px;
-    }
-
-    .formTitle {
-        font-size: 1.5rem;
-    }
-
-    .formActions {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .saveButton, .cancelButton {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .listTitle {
-        font-size: 1.8rem;
-        margin-top: 40px;
-    }
-
-    .promotionsList {
-        grid-template-columns: 1fr; /* Una columna en móviles */
-    }
-
-    .promoImage {
-        height: 150px;
-    }
-}
-
-/* promomanagement.module.css */
-
-/* Estilos para el checkbox de 'Activa' en el formulario */
-.formGroup {
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.formGroup label {
-  font-weight: bold;
-  color: #333;
-}
-
-.checkboxField {
-  transform: scale(1.2);
-  cursor: pointer;
-}
-
-/* Estilos para mostrar el estado de la promoción en la lista */
-.promoStatus { /* Se cambió de productStatus a promoStatus */
-  font-size: 0.9em;
-  margin-top: 5px;
-  font-weight: bold;
-}
-
-.activeStatus {
-  color: #28a745; /* Verde para activa */
-}
-
-.inactiveStatus {
-  color: #dc3545; /* Rojo para inactiva */
-}
-
-/* Estilos para el botón de Activar/Desactivar promoción */
+/* Estilos para el botón de Activar/Desactivar */
 .toggleActiveButton {
-  background-color: #28a745; /* Verde para activar */
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: background-color 0.3s ease;
-  margin-right: 10px;
+    background-color: #28a745; /* Verde para activar */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+    /* margin-right: 10px; -- Eliminado, el 'gap' del contenedor maneja el espacio */
 }
 
 .toggleActiveButton:hover {
-  background-color: #218838;
+    background-color: #218838;
 }
 
 .toggleInactiveButton {
-  background-color: #dc3545; /* Rojo para desactivar */
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: background-color 0.3s ease;
-  margin-right: 10px;
+    background-color: #dc3545; /* Rojo para desactivar */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+    /* margin-right: 10px; -- Eliminado, el 'gap' del contenedor maneja el espacio */
 }
 
 .toggleInactiveButton:hover {
-  background-color: #c82333;
+    background-color: #c82333;
 }
 
-/* Ajustar los estilos existentes de promoActions si es necesario */
+
+.filterSection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-size: 1.2rem;
+    color: #2d3748;
+}
+
+/* Estilo de la etiqueta del filtro */
+.filterLabel {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+/* Ya definida como selectField — solo mejoramos visualmente */
+.selectField {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #cbd5e0;
+    background-color: #fff;
+    color: #2d3748;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.selectField:focus {
+    outline: none;
+    border-color: #e53e3e;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.3);
+}
+
+/* RESPONSIVE ajustado a móvil */
+@media (max-width: 768px) {
+    .filterSection {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filterLabel {
+        font-size: 1rem;
+    }
+
+    .selectField {
+        width: 100%;
+    }
+}
+
+/* DESKTOP - horizontal alignment */
+@media (min-width: 769px) {
+    .filterSection {
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .selectField {
+        width: auto;
+    }
+}
+
+
+/* Capa gris para promos desactivadas (sin tapar botones) */
+.promoCardOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.4);
+    z-index: 1;
+    border-radius: 10px;
+    pointer-events: none;
+}
+
+/* Contenedor de botones siempre por encima del overlay gris */
 .promoActions {
-  display: flex;
-  flex-direction: column; /* Apila los botones verticalmente */
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  border-left: 1px solid #eee;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    gap: 10px;
+}
+
+.promoCard {
+    position: relative; /* necesario para que el overlay se posicione bien */
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e0e0e0;
+}
+
+.promoCardOverlay {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(160, 160, 160, 0.4); /* Gris suave */
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 10px;
+}
+
+/* Todo el contenido debe quedar encima del overlay */
+.promoInfo,
+.promoActions {
+    position: relative;
+    z-index: 2;
 }
