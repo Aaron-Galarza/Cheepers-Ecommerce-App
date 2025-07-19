@@ -6,6 +6,7 @@ import cors from 'cors';
 import orderRoutes from './routes/orderRoutes';
 import productRoutes from './routes/productRoutes';
 import authRoutes from './routes/authRoutes'; // Para login y register
+import addOnRoutes from './routes/addOnRoutes';
 // import adminRoutes from './routes/adminRoutes'; // <--- ELIMINAR O COMENTAR ESTA L\u00CDNEA
 
 
@@ -53,6 +54,7 @@ connectDB();
 app.use('/api/negocio', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/addons', addOnRoutes); // Esto montará todas las rutas de adicionales bajo /api/addons
 
 // app.use('/api/negocio', adminRoutes); // <--- ELIMINAR O COMENTAR ESTA L\u00CDNEA (NO NECESARIA CON LOGIN UNIFICADO)
 
