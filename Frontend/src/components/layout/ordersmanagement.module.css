@@ -1,0 +1,250 @@
+.ordersManagementContainer {
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    margin: 20px;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #e53e3e; /* Rojo Cheepers */
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.ordersList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    gap: 25px;
+}
+
+.orderCard {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e0e0e0;
+}
+
+.orderCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.orderHeader {
+    background-color: #f0f2f5;
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    color: #555;
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+    gap: 10px; /* Espacio entre los elementos del encabezado */
+}
+
+.orderHeader p {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+}
+
+.orderDate, .customerName, .customerPhone { /* Añadido .customerPhone */
+    color: #333;
+}
+
+.orderBody {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.productsList {
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 15px;
+}
+
+.productsTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.productsList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.productsList li {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.orderDetails p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.totalAmount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #e53e3e; /* Rojo Cheepers */
+    margin-top: 10px;
+}
+
+.orderStatus {
+    font-weight: bold;
+}
+
+.statusPending {
+    color: #ffc107; /* Amarillo para pendiente */
+}
+
+.statusDelivered { /* Nuevo estado para "Entregado" */
+    color: #28a745; /* Verde para entregado */
+}
+
+.statusCancelled { /* Nuevo estado para "Cancelado" */
+    color: #dc3545; /* Rojo para cancelado */
+}
+
+.orderActions {
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    gap: 10px; /* Espacio entre los botones */
+    flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+}
+
+.deliveredButton {
+    background-color: #28a745; /* Verde para entregado */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+.deliveredButton:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(33, 136, 56, 0.4);
+}
+
+.cancelButton { /* Estilo para el botón de cancelar */
+    background-color: #dc3545; /* Rojo para cancelar */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
+.cancelButton:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200, 35, 51, 0.4);
+}
+
+.restoreButton { /* Nuevo estilo para el botón de restaurar */
+    background-color: #007bff; /* Azul para restaurar */
+    color: white;
+    padding: 6px 10px; /* Reducido el padding */
+    border: none;
+    border-radius: 6px; /* Reducido el border-radius */
+    cursor: pointer;
+    font-size: 0.85rem; /* Reducido el tamaño de fuente */
+    font-weight: 500; /* Menos negrita */
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Reducido el espacio entre icono y texto */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2); /* Reducida la sombra */
+}
+
+.restoreButton:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px); /* Reducido el efecto de elevación */
+    box-shadow: 0 3px 8px rgba(0, 86, 179, 0.3); /* Reducida la sombra en hover */
+}
+
+
+.noOrdersMessage {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #6b7280;
+    padding: 30px 0;
+    font-style: italic;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .ordersManagementContainer {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .title {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    .ordersList {
+        grid-template-columns: 1fr; /* Una columna en móviles */
+    }
+
+    .orderHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .orderActions {
+        flex-direction: column;
+        align-items: stretch; /* Estira el botón a lo ancho */
+        gap: 8px;
+    }
+
+    .deliveredButton, .cancelButton, .restoreButton { /* Aplica a todos los botones de acción */
+        width: 100%; /* Ocupa todo el ancho disponible */
+        justify-content: center;
+        padding: 8px 12px; /* Ajuste para móviles */
+        font-size: 0.9rem; /* Ajuste para móviles */
+    }
+}

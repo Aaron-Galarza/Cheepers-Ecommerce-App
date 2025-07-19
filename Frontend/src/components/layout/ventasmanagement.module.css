@@ -1,0 +1,410 @@
+/* src/components/layout/ventasmanagement.module.css */
+
+.ventasManagementContainer {
+    padding: 30px;
+    background-color: #f8f9fa; /* Fondo general más claro */
+    border-radius: 12px; /* Ligeramente más redondeado */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada pero suave */
+    font-family: 'Inter', sans-serif;
+    margin: 20px auto; /* Centrar y añadir margen automático */
+    max-width: 1200px; /* Limitar ancho para legibilidad */
+    color: #333;
+}
+
+.title {
+    font-size: 2.8rem; /* Un poco más grande */
+    font-weight: 800;
+    color: #e53e3e; /* Rojo Cheepers */
+    text-align: center;
+    margin-bottom: 45px; /* Más espacio debajo del título */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.15); /* Sombra de texto más suave */
+}
+
+.loading, .error {
+    text-align: center;
+    font-size: 1.3rem; /* Un poco más grande */
+    color: #6b7280;
+    padding: 50px 0;
+    font-weight: 500;
+}
+
+.error {
+    color: #dc3545; /* Rojo para errores */
+}
+
+/* Sección de Filtros */
+.filterSection {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px; /* Aumentar el espacio entre elementos */
+    margin-bottom: 35px; /* Más espacio debajo de la sección */
+    background-color: #ffffff;
+    padding: 25px; /* Más padding */
+    border-radius: 12px; /* Más redondeado */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Sombra más definida */
+    flex-wrap: wrap;
+    justify-content: center; /* Centrar elementos en la fila */
+}
+
+.filterLabel {
+    font-size: 1.15rem; /* Un poco más grande */
+    font-weight: 600;
+    color: #444; /* Color ligeramente más oscuro */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Más espacio entre icono y texto */
+}
+
+.selectField, .inputField {
+    padding: 12px 18px; /* Más padding */
+    border: 1px solid #a0c4ff; /* Borde más azulado */
+    border-radius: 10px; /* Más redondeado */
+    font-size: 1.05rem; /* Ligeramente más grande */
+    color: #4a5568;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transición más suave */
+    flex-grow: 1;
+    min-width: 160px; /* Ancho mínimo ligeramente mayor */
+}
+
+.selectField:focus, .inputField:focus {
+    outline: none;
+    border-color: #007bff; /* Azul primario en foco */
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3); /* Sombra azul más prominente en foco */
+}
+
+.customDateFilter {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-grow: 2;
+}
+
+.searchButton {
+    background-color: #28a745; /* Verde para el botón de buscar */
+    color: white;
+    padding: 12px 20px; /* Más padding */
+    border: none;
+    border-radius: 10px; /* Más redondeado */
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); /* Sombra verde */
+}
+
+.searchButton:hover {
+    background-color: #218838; /* Verde más oscuro al hover */
+    transform: translateY(-3px); /* Pequeño levantamiento */
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
+/* Métricas Resumen Grid */
+.metricsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Min-width un poco más grande */
+    gap: 30px; /* Más espacio entre tarjetas */
+    margin-bottom: 45px;
+}
+
+.metricCard {
+    background-color: #ffffff;
+    border-radius: 12px; /* Más redondeado */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Sombra más suave y extendida */
+    padding: 25px; /* Más padding */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.metricCard:hover {
+    transform: translateY(-7px); /* Mayor levantamiento al hover */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Sombra más intensa al hover */
+}
+
+.metricIconContainer {
+    font-size: 2.2rem; /* Icono más pequeño */
+    color: #007bff; /* Azul primario para el ícono */
+    margin-bottom: 18px; /* Más espacio */
+    background-color: #e7f3ff; /* Fondo azul claro para el ícono */
+    border-radius: 50%;
+    width: 65px; /* Tamaño del círculo del icono más pequeño */
+    height: 65px; /* Tamaño del círculo del icono más pequeño */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.25); /* Sombra azul para el ícono */
+}
+
+.metricCard h3 {
+    font-size: 1.35rem; /* Un poco más grande */
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.metricCard p {
+    font-size: 2.2rem; /* Valor numérico más grande */
+    font-weight: 800;
+    color: #007bff; /* Azul primario para los valores */
+}
+
+/* Contenedor de Gráficos y Lista */
+.chartsContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* CAMBIO CLAVE: Ahora ambos ocupan el mismo ancho */
+    gap: 30px; /* Más espacio entre tarjetas */
+}
+
+@media (max-width: 992px) {
+    .chartsContainer {
+        grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+    }
+}
+
+.chartCard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    padding: 25px; /* Más padding */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 450px; /* Altura mínima ligeramente mayor */
+}
+
+.chartTitle {
+    font-size: 1.8rem; /* Un poco más grande */
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px; /* Más espacio */
+    text-align: center;
+}
+
+/* Estilos para la lista de Top 5 Productos */
+.bestSellingList {
+    width: 100%;
+    max-height: 450px; /* Ajustar max-height para que se alinee con el gráfico si es posible */
+    overflow-y: auto;
+    padding: 10px;
+    /* Añadido para un mejor scrollbar si es necesario */
+    scrollbar-width: thin;
+    scrollbar-color: #a0c4ff #f1f1f1;
+}
+
+.bestSellingList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bestSellingItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px; /* Más padding para cada ítem */
+    margin-bottom: 10px; /* Espacio entre ítems */
+    border-bottom: none; /* Quitamos el borde inferior individual */
+    border-radius: 8px; /* Bordes redondeados para cada ítem */
+    background-color: #ffffff; /* Fondo blanco para cada ítem */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra sutil para cada ítem */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bestSellingItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.bestSellingItem:last-child {
+    margin-bottom: 0; /* No hay margen inferior en el último elemento */
+}
+
+.bestSellingName {
+    font-weight: 700; /* Más negrita */
+    color: #333;
+    flex-basis: 50%; /* Ajustado para dar más espacio a cantidad/porcentaje */
+    font-size: 1.05rem;
+    word-break: break-word; /* Permite que las palabras largas se rompan */
+}
+
+.bestSellingQuantity {
+    flex-basis: 25%; /* Ajuste de espacio */
+    text-align: right;
+    color: #6c757d;
+    font-size: 0.95rem;
+    white-space: nowrap; /* Evita que "unidades" se rompa en varias líneas */
+}
+
+.bestSellingPercentage {
+    flex-basis: 25%; /* Ajuste de espacio */
+    text-align: right;
+    font-weight: 700;
+    background-color: #e0f2ff; /* Fondo azul claro para el porcentaje */
+    padding: 8px 10px; /* Ajustado el padding para que no sea tan ancho */
+    border-radius: 8px; /* Más redondeado */
+    color: #007bff; /* Color azul para el porcentaje */
+    font-size: 0.9rem;
+    min-width: 65px; /* Asegurar un ancho mínimo para el porcentaje */
+    box-sizing: border-box; /* Incluye padding en el ancho */
+}
+
+.noDataMessage {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Estilos para la sección de Mejores Días */
+.bestDaysSection {
+    margin-top: 25px; /* Más espacio */
+    width: 100%;
+    text-align: left;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0; /* Borde superior sutil */
+}
+
+.bestDaysTitle {
+    font-size: 1.5rem; /* Un poco más grande */
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px; /* Más espacio */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Más espacio entre icono y texto */
+    justify-content: center; /* Centrar el título */
+}
+
+.trophyIcon {
+    color: #ffc107; /* Color dorado para el trofeo */
+    font-size: 1.8em; /* Tamaño del trofeo */
+}
+
+.bestDaysList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bestDaysItem {
+    padding: 10px 0; /* Más padding */
+    border-bottom: 1px solid #f0f0f0; /* Borde más sutil */
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.05rem;
+    color: #555;
+}
+
+.bestDaysItem:last-child {
+    border-bottom: none;
+}
+
+.bestDaysItem span:last-child {
+    font-weight: 700; /* Más negrita */
+    color: #007bff;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .ventasManagementContainer {
+        padding: 15px;
+        margin: 15px;
+    }
+
+    .title {
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+    }
+
+    .filterSection {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .customDateFilter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .selectField, .inputField, .searchButton {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .metricsGrid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .metricCard {
+        padding: 18px;
+    }
+
+    .metricIconContainer {
+        font-size: 2.2rem;
+        width: 65px;
+        height: 65px;
+    }
+
+    .metricCard h3 {
+        font-size: 1.1rem;
+    }
+
+    .metricCard p {
+        font-size: 1.8rem;
+    }
+
+    .chartsContainer {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .chartCard {
+        padding: 18px;
+        min-height: 380px;
+    }
+
+    .chartTitle {
+        font-size: 1.4rem;
+    }
+
+    .bestDaysTitle {
+        font-size: 1.2rem;
+    }
+
+    .bestDaysItem {
+        font-size: 0.95rem;
+        padding: 8px 0;
+    }
+
+    .bestSellingItem {
+        flex-direction: column; /* Apilar en pantallas pequeñas */
+        align-items: flex-start;
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+
+    .bestSellingName, .bestSellingQuantity, .bestSellingPercentage {
+        flex-basis: auto;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px; /* Espacio entre los elementos apilados */
+    }
+
+    .bestSellingPercentage {
+        text-align: left; /* Alinear a la izquierda en móvil */
+        margin-top: 5px; /* Espacio extra arriba del porcentaje */
+    }
+}

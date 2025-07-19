@@ -1,30 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import styles from './dashboard.module.css';
-import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt, FaThLarge } from 'react-icons/fa';
+import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ProductManagement from './productmanagement';
-import PromoManagement from './promomanagement'; // Importa el nuevo componente de gestión de promociones
-import authService from '../../services/authservice'; // Ruta correcta según tu estructura
+import OrdersManagement from './ordersmanagement'; // Importa el componente OrdersManagement
+import PromoManagement from './promomanagement'; // Gestión de promociones
+import VentasManagement from '../layout/ventasmanagement'; // Importa el componente VentasManagement
+import authService from '../../services/authservice'; // Servicio de autenticación
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('welcome');
 
-  // 🔐 Verifica autenticación al cargar
   useEffect(() => {
+    // Verifica la autenticación al montar el componente
     if (!authService.isAuthenticated()) {
       navigate('/admin/login');
     }
 
+    // Añade la clase 'dashboardPage' al body para estilos específicos
     document.body.classList.add('dashboardPage');
+    // Función de limpieza para remover la clase cuando el componente se desmonte
     return () => {
       document.body.classList.remove('dashboardPage');
     };
-  }, [navigate]);
+  }, [navigate]); // Dependencia 'navigate' para asegurar que el efecto se ejecute si cambia
 
   const handleLogout = () => {
-    authService.logout();
-    navigate('/admin/login');
+    authService.logout(); // Usa el servicio de autenticación para cerrar sesión
+    navigate('/admin/login'); // Redirige al login después de cerrar sesión
   };
 
   const renderContent = () => {
@@ -32,23 +36,11 @@ const Dashboard: React.FC = () => {
       case 'products':
         return <ProductManagement />;
       case 'promos':
-        return <PromoManagement />; {/* CAMBIO: Muestra el componente PromoManagement */}
+        return <PromoManagement />; // Renderiza el componente de gestión de promociones
       case 'sales':
-        return (
-          <div>
-            <h2>Reportes de Ventas</h2>
-            <p>Aquí podrás ver las estadísticas de ventas.</p>
-            {/* Aquí iría tu componente de reportes de ventas */}
-          </div>
-        );
-      case 'clients':
-        return (
-          <div>
-            <h2>Gestión de Clientes</h2>
-            <p>Aquí podrás ver y gestionar la información de tus clientes.</p>
-            {/* Aquí iría tu componente de gestión de clientes */}
-          </div>
-        );
+        return <VentasManagement />; // ¡Aquí se renderiza VentasManagement!
+      case 'orders': // Caso para la gestión de pedidos
+        return <OrdersManagement />; {/* Renderiza el componente OrdersManagement */}
       case 'welcome':
       default:
         return (
@@ -65,8 +57,8 @@ const Dashboard: React.FC = () => {
                 <p>Agregá, editá o eliminá promociones destacadas.</p>
               </div>
               <div className={styles.card}>
-                <h3>Clientes</h3>
-                <p>Registro de los clientes que realizaron pedidos.</p>
+                <h3>Pedidos</h3>
+                <p>Visualizá y gestioná los pedidos realizados por los clientes.</p>
               </div>
               <div className={styles.card}>
                 <h3>Estadísticas</h3>
@@ -95,8 +87,8 @@ const Dashboard: React.FC = () => {
           <a href="#" className={styles.navItem} onClick={() => setActiveSection('sales')}>
             <span><FaChartBar /></span> Ventas
           </a>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('clients')}>
-            <span><FaUserShield /></span> Clientes
+          <a href="#" className={styles.navItem} onClick={() => setActiveSection('orders')}>
+            <span><FaClipboardList /></span> Pedidos
           </a>
         </nav>
       </aside>
