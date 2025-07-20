@@ -28,6 +28,7 @@ interface CreateOrderRequestBody {
     }[];
     guestEmail: string;
     guestPhone: string;
+    guestName: string;
     paymentMethod: 'cash' | 'card' | 'transfer';
     deliveryType: 'delivery' | 'pickup';
     shippingAddress?: { street: string; city: string };
@@ -38,10 +39,10 @@ interface CreateOrderRequestBody {
 // @route     POST /api/orders
 // @access    Public (solo invitados)
 export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderRequestBody>, res: Response) => {
-    const { products, shippingAddress, paymentMethod, notes, guestEmail, guestPhone, deliveryType } = req.body;
+    const { products, shippingAddress, paymentMethod, notes, guestEmail, guestName, guestPhone, deliveryType } = req.body;
 
     // 1. Validaciones básicas iniciales
-    if (!products || products.length === 0 || !paymentMethod || !guestEmail || !guestPhone || !deliveryType) {
+    if (!products || products.length === 0 || !paymentMethod || !guestEmail || !guestPhone || !guestName || !deliveryType) {
         res.status(400);
         throw new Error('Faltan campos obligatorios para crear el pedido: productos, método de pago, email, teléfono, y tipo de entrega.');
     }
@@ -142,6 +143,7 @@ let itemPrice = product.price; // Precio base del producto
     const newOrder: IOrder = new Pedido({
         guestEmail: guestEmail,
         guestPhone: guestPhone,
+        guestName: guestName,
         products: productsForOrder,
         totalAmount: totalAmount,
         paymentMethod: paymentMethod,
