@@ -2,7 +2,8 @@
 
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Pedido, { IOrder, IProductItem, IShippingAddress } from '../models/Pedido';
+import Pedido, { IOrder, IProductItem, ISelectedAddOn, IShippingAddress } from '../models/Pedido';
+import AddOn, { IAddOn } from '../models/AddOn'; // ADICIÓN: Importa el modelo AddOn
 // <--- CAMBIO IMPORTANTE AQUÍ: Importa 'IProduct' de tu modelo 'Product'
 import Product, { IProduct } from '../models/Product';
 import asyncHandler from 'express-async-handler';
@@ -18,15 +19,19 @@ declare module 'express-serve-static-core' {
     }
 }
 
-// Nueva interfaz para el cuerpo de la solicitud de creación de pedido
+// Nueva interfaz para el cuerpo de la solicitud de creación de pedido (MODIFICADO)
 interface CreateOrderRequestBody {
-    products: { productId: string; quantity: number }[];
-    guestEmail: string;
-    guestPhone: string;
-    paymentMethod: 'cash' | 'card' | 'transfer';
-    deliveryType: 'delivery' | 'pickup';
-    shippingAddress?: { street: string; city: string };
-    notes?: string;
+    products: {
+        productId: string;
+        quantity: number;
+        addOns?: { addOnId: string; quantity: number }[]; // ADICIÓN: Espera array de addOns
+    }[];
+    guestEmail: string;
+    guestPhone: string;
+    paymentMethod: 'cash' | 'card' | 'transfer';
+    deliveryType: 'delivery' | 'pickup';
+    shippingAddress?: { street: string; city: string };
+    notes?: string;
 }
 
 // @desc      Crear un nuevo pedido
@@ -85,17 +90,53 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         }
         // No se necesita lógica de stock, solo esta validación de isActive
 
-        const price = product.price; // Asumo que `product.price` es el precio actual
-        totalAmount += price * item.quantity;
+let itemPrice = product.price; // Precio base del producto
 
-        productsForOrder.push({
-            productId: new mongoose.Types.ObjectId(item.productId),
-            name: product.name,
-            imageUrl: product.imageUrl || '',
-            quantity: item.quantity,
-            priceAtOrder: price,
-        });
-    }
+        const selectedAddOnsForProduct: ISelectedAddOn[] = [];
+
+        // ADICIÓN: Procesar los adicionales si existen
+        if (item.addOns && item.addOns.length > 0) {
+            for (const addOnRequest of item.addOns) {
+                if (!addOnRequest.addOnId || typeof addOnRequest.quantity !== 'number' || addOnRequest.quantity < 1) {
+                    res.status(400);
+                    throw new Error('Datos de adicional inválidos. Cada adicional debe tener "addOnId" y "quantity" (mínimo 1).');
+                }
+
+                const addOn: IAddOn | null = await AddOn.findById(addOnRequest.addOnId);
+                if (!addOn) {
+                    res.status(404);
+                    throw new Error(`Adicional con ID ${addOnRequest.addOnId} no encontrado.`);
+                }
+
+                if (!addOn.isActive) {
+                    res.status(400);
+                    throw new Error(`El adicional "${addOn.name}" (ID: ${addOnRequest.addOnId}) no está disponible actualmente.`);
+                }
+
+                // Sumar el precio del adicional al total del ítem
+                itemPrice += addOn.price * addOnRequest.quantity;
+
+                selectedAddOnsForProduct.push({
+                    addOnId: new mongoose.Types.ObjectId(addOnRequest.addOnId),
+                    name: addOn.name,
+                    quantity: addOnRequest.quantity,
+                    priceAtOrder: addOn.price, // Guardamos el precio del adicional en el momento del pedido
+                });
+            }
+        }
+
+        // El totalAmount acumula el precio total de cada item (base + adicionales) multiplicado por su cantidad principal
+        totalAmount += itemPrice * item.quantity;
+
+        productsForOrder.push({
+            productId: new mongoose.Types.ObjectId(item.productId),
+            name: product.name,
+            imageUrl: product.imageUrl || '',
+            quantity: item.quantity,
+            priceAtOrder: product.price, // Esto es el precio BASE del producto, no su subtotal con adicionales
+            addOns: selectedAddOnsForProduct, // ADICIÓN: Añadimos los adicionales procesados
+        });
+    }
 
     // 3. Crear el nuevo pedido, pasando el 'deliveryType' y la 'shippingAddress' condicional
     const newOrder: IOrder = new Pedido({
