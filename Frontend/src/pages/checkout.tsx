@@ -6,11 +6,12 @@ import Button from '../components/layout/button';
 import { FaUser, FaPhone, FaEnvelope, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
 import axios from 'axios';
 
+// Considera mover esta URL a una variable de entorno para producción
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 
 const CheckoutPage: React.FC = () => {
     const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
+    const [name, setName] = useState(''); // Estado para el nombre
     const [phone, setPhone] = useState('');
     const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
     const [street, setStreet] = useState('');
@@ -20,16 +21,14 @@ const CheckoutPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
-    // CAMBIO: Importamos calculateCartTotal directamente del contexto
     const { cart, clearCart, calculateCartTotal } = useCart();
-    // CAMBIO: Usamos calculateCartTotal para obtener el total, que ahora incluye adicionales
     const total = calculateCartTotal();
 
     const handleConfirm = async () => {
         setErrorMessage('');
         setIsLoading(true);
 
-        if (!email || !name || !phone || !metodo || !deliveryType) {
+        if (!email || !name || !phone || !metodo || !deliveryType) { // Asegurarse de que 'name' también esté validado
             setErrorMessage('Por favor, completá todos los campos generales y de pago.');
             setIsLoading(false);
             return;
@@ -49,22 +48,20 @@ const CheckoutPage: React.FC = () => {
             return;
         }
 
-        // CAMBIO CLAVE: Mapear el carrito a la estructura esperada por el backend, incluyendo adicionales
         const productsForOrder = cart.map(item => ({
             productId: item._id,
             quantity: item.quantity,
-            // ADICIÓN: Incluimos los adicionales si existen para este item del carrito
             addOns: item.addOns?.map(addOn => ({
                 addOnId: addOn._id,
                 quantity: addOn.quantity,
-            })) || [], // Si no hay adicionales, se envía un array vacío
+            })) || [],
         }));
 
-        let backendPaymentMethod: 'cash' | 'card' | 'transfer';
+        let backendPaymentMethod: 'cash' | 'card' | 'transfer'; // Asumiendo estos tipos en el backend
         if (metodo === 'efectivo') {
             backendPaymentMethod = 'cash';
         } else if (metodo === 'mercadopago') {
-            backendPaymentMethod = 'card';
+            backendPaymentMethod = 'card'; // O 'transfer' si Mercado Pago implica transferencia
         } else {
             setErrorMessage('Método de pago no válido.');
             setIsLoading(false);
@@ -72,13 +69,15 @@ const CheckoutPage: React.FC = () => {
         }
 
         const orderData: any = {
-            products: productsForOrder, // Ahora incluye la estructura con addOns
+            products: productsForOrder,
+            // AÑADIDO: Conectamos el estado 'name' con 'guestName' para el backend
+            guestName: name, 
             guestEmail: email,
             guestPhone: phone,
-            totalAmount: total, // Usamos el total calculado por calculateCartTotal
+            totalAmount: total,
             paymentMethod: backendPaymentMethod,
             deliveryType: deliveryType,
-            notes: '',
+            notes: '', // Asumo que `notes` se mantendrá vacío o se añadiría un input para ello
         };
 
         if (deliveryType === 'delivery') {
@@ -266,9 +265,8 @@ const CheckoutPage: React.FC = () => {
                             <p className={styles.summaryEmpty}>No hay productos en el carrito.</p>
                         ) : (
                             cart.map(item => (
-                                <div key={item.cartItemId} className={styles.summaryItem}> {/* Usar item.cartItemId para la key */}
+                                <div key={item.cartItemId} className={styles.summaryItem}>
                                     <p className={styles.summaryItemName}><strong>{item.name}</strong> (x{item.quantity})</p>
-                                    {/* Muestra los adicionales en el resumen del pedido */}
                                     {item.addOns && item.addOns.length > 0 && (
                                         <ul className={styles.addOnsSummaryList}>
                                             {item.addOns.map(addOn => (
