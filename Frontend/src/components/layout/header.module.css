@@ -1,0 +1,215 @@
+/* src/components/layout/Header.module.css */
+
+/* Variables de color (asegúrate de que estas estén definidas en tu archivo principal de CSS o donde sea global) */
+:root {
+  --color-primary: #e53e3e; /* Rojo Cheepers */
+  --color-secondary: #f12424; /* Naranja */
+  --color-dark-text: #2d3748; /* Gris oscuro para texto principal */
+  --color-medium-text: #4a5568; /* Gris medio para texto secundario */
+  --color-light-text: #718096; /* Gris claro para texto terciario */
+  --color-white: #ffffff;
+  --color-off-white: #FDFDF5; /* Blanco roto a un crema muy sutil para fondos generales */
+  --color-grey-background: #edf2f7; /* Gris muy claro para fondos */
+  --color-hero-background: #FFF8E1; /* Color de fondo del hero a un crema más cálido */
+
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 48px;
+  --space-xl: 80px;
+
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+  --border-radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Estructura principal del header (Desktop First) */
+.header {
+  background-color: white;
+  padding: 15px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Espacia el logo y el grupo de acciones */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+}
+
+/* Logo + texto "CHEEPERS" */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-image {
+  height: 70px; /* Tamaño del logo en desktop */
+  width: auto;
+  margin-right: 12px;
+}
+
+.logo-text {
+  font-size: 2.2rem; /* Tamaño del texto "CHEEPERS" en desktop */
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-dark-text);
+  text-decoration: none;
+}
+
+/* Navegación principal (para desktop) */
+.nav-links {
+  display: flex;
+  gap: 25px;
+  font-size: 1.2rem;
+  align-items: center;
+}
+
+.navLink {
+  text-decoration: none;
+  color: var(--color-dark-text);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover,
+.navLink.active {
+  color: var(--color-primary); /* Usa la variable de color */
+  font-weight: bold;
+}
+
+/* Contenedor de acciones (carrito, usuario, y toggle de menú) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre los botones de acción */
+}
+
+.action-button {
+  position: relative;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-size: 1.1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.action-button:hover {
+  background-color: rgb(228, 18, 18);
+  transform: translateY(-2px);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  border-radius: var(--border-radius-full);
+  padding: 2px 6px;
+  font-weight: bold;
+  border: 2px solid var(--color-primary);
+}
+
+/* Botón de usuario (solo visible en desktop por defecto) */
+.user-button-desktop {
+  display: flex; /* Visible en desktop */
+}
+
+/* Menú hamburguesa (oculto en desktop por defecto) */
+.menu-toggle {
+  display: none; /* Oculto en desktop */
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+}
+
+/* --- RESPONSIVE STYLES (Mobile) --- */
+@media (max-width: 768px) {
+  .header {
+    padding: var(--space-sm) 3%; /* Ajusta el padding para móvil */
+  }
+
+  /* Ocultar la navegación principal en móvil */
+  .nav-links {
+    display: none;
+    width: 100%; /* Ocupa todo el ancho cuando está abierto */
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    position: absolute; /* Posicionamiento absoluto para el menú desplegable */
+    top: 70px; /* Ajusta según la altura de tu header */
+    left: 0;
+    background-color: var(--color-white);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-md);
+    z-index: 999;
+    border-bottom-left-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+  }
+
+  .nav-links.open {
+    display: flex; /* Muestra el menú cuando está abierto */
+  }
+
+  .nav-links .navLink {
+    width: 100%; /* Los enlaces ocupan todo el ancho del menú desplegable */
+    text-align: center;
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--color-grey-background); /* Separador entre enlaces */
+  }
+
+  .nav-links .navLink:last-child {
+    border-bottom: none; /* No hay separador en el último enlace */
+  }
+
+  /* Mostrar el menú hamburguesa en móvil */
+  .menu-toggle {
+    display: block; /* Muestra el botón de hamburguesa */
+  }
+
+  /* Ajustes para el logo y texto "CHEEPERS" en móvil */
+  .logo-image {
+    height: 40px; /* Tamaño del logo más pequeño en móvil */
+    width: auto;
+    margin-right: 8px; /* Espacio más compacto */
+  }
+
+  .logo-text {
+    font-size: 1.8rem; /* Tamaño del texto "CHEEPERS" ajustado para móvil */
+  }
+
+  /* Ajustes para los botones de acción en móvil */
+  .header-actions {
+    /* El `justify-content: space-between` en .header ya los empuja a la derecha */
+    margin-left: auto; /* Asegura que este grupo se alinee a la derecha */
+    gap: var(--space-sm); /* Espacio entre el carrito y el menú toggle */
+  }
+
+  .user-button-desktop {
+    display: none; /* Oculta el botón de usuario en móvil */
+  }
+}

@@ -1,92 +1,78 @@
+// src/components/layout/Header.tsx
 import React, { useState } from 'react';
-// Importa NavLink en lugar de Link
 import { NavLink } from 'react-router-dom';
-import logo from '../../assets/images/logocheepers.png'; // Importa tu logo (ajusta la ruta si es necesario)
+import logo from '../../assets/images/logocheepers.png';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
-import { GiHamburgerMenu } from 'react-icons/gi'; // Importa un icono de hamburguesa
-import { useCart } from './cartcontext'; // Asegurate de esta ruta
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { useCart } from './cartcontext';
+import styles from './Header.module.css';
 
-interface HeaderProps {}
-
-const Header: React.FC<HeaderProps> = () => {
+const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cart } = useCart(); // Obtenemos el carrito
-  const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+  const { cart } = useCart();
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
-    <header className="header">
-      <div className="logo">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive ? "logo-link active-logo-link" : "logo-link"
-          }
-          end
-        >
-          <img src={logo} alt="Logo de Cheepers" className="logo-image" />
-          <span className="logo-text">CHEEPERS</span>
+    <header className={styles.header}>
+      <div className={styles['logo-container']}>
+        <NavLink to="/" className={styles['logo-link']} end>
+          <img src={logo} alt="Logo de Cheepers" className={styles['logo-image']} />
+          <span className={styles['logo-text']}>CHEEPERS</span>
         </NavLink>
       </div>
 
-      <button className="mobile-menu-button" onClick={toggleMobileMenu}>
-        <GiHamburgerMenu />
-      </button>
-
-      <nav className={`nav ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+      <nav className={`${styles['nav-links']} ${isMobileMenuOpen ? styles.open : ''}`}>
         <NavLink
           to="/"
-          className={({ isActive }) =>
-            isActive ? "navLink active-nav-link" : "navLink"
-          }
           end
+          className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+          onClick={() => setIsMobileMenuOpen(false)} // Cierra el menú al hacer clic
         >
           Inicio
         </NavLink>
-
         <NavLink
           to="/menu"
-          className={({ isActive }) =>
-            isActive ? "navLink active-nav-link" : "navLink"
-          }
+          className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+          onClick={() => setIsMobileMenuOpen(false)} // Cierra el menú al hacer clic
         >
           Menú
         </NavLink>
-
         <NavLink
           to="/promos"
-          className={({ isActive }) =>
-            isActive ? "navLink active-nav-link" : "navLink"
-          }
+          className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
+          onClick={() => setIsMobileMenuOpen(false)} // Cierra el menú al hacer clic
         >
           Promos
         </NavLink>
-
       </nav>
 
-      <div className="navActions">
+      {/* Unificamos los botones de acción y el toggle de menú en un solo contenedor */}
+      <div className={styles['header-actions']}>
         <NavLink
-          to="/carrito" // ahora enlaza a la página de carrito
+          to="/carrito"
           className={({ isActive }) =>
-            isActive ? "actionButton active-action-button" : "actionButton"
+            isActive ? `${styles['action-button']} ${styles.active}` : styles['action-button']
           }
         >
           <FaShoppingCart />
-          {totalItems > 0 && (
-            <span className="badge">{totalItems}</span>
-          )}
+          {totalItems > 0 && <span className={styles.badge}>{totalItems}</span>}
         </NavLink>
+        {/* El botón de usuario solo se muestra en desktop, se oculta en móvil vía CSS */}
         <NavLink
           to="/admin/login"
           className={({ isActive }) =>
-            isActive ? "actionButton active-action-button" : "actionButton"
+            isActive ? `${styles['action-button']} ${styles.active} ${styles['user-button-desktop']}` : `${styles['action-button']} ${styles['user-button-desktop']}`
           }
         >
           <FaUser />
         </NavLink>
+        <button className={styles['menu-toggle']} onClick={toggleMobileMenu} aria-label="Toggle mobile menu">
+          <GiHamburgerMenu />
+        </button>
       </div>
     </header>
   );

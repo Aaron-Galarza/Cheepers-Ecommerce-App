@@ -94,7 +94,7 @@ const VentasManagement: React.FC = () => {
   // Handler for custom date range search button
   const handleCustomSearch = () => {
     if (startDate && endDate) {
-      setTriggerSearch(prev => prev + 1); // Increment to trigger useEffect
+      setTriggerSearch(prev => prev + 1); 
     } else {
       setError('Por favor, selecciona ambas fechas para el rango personalizado.');
     }

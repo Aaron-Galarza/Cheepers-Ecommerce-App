@@ -1,18 +1,27 @@
-// src/components/layout/OrdersManagement.tsx
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './ordersmanagement.module.css';
-import { FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave, FaCheckCircle, FaTimesCircle, FaPhone, FaRedo } from 'react-icons/fa'; // Importa FaRedo para el botón de restaurar
-import authService from '../../services/authservice'; // Importa authService para que su interceptor se inicialice
+import { FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave, FaCheckCircle, FaTimesCircle, FaPhone, FaRedo } from 'react-icons/fa';
+import authService from '../../services/authservice';
+import { SelectedAddOn, IAddOn } from './productlist'; // Importa SelectedAddOn y IAddOn para tipar correctamente
 
-// Interfaz para un producto dentro de un pedido (con nombre populado para mostrar)
+// Interfaz para el formato de los productos tal como vienen en el pedido "crudo" del backend
+interface OrderProductRaw {
+  productId: string;
+  quantity: number;
+  addOns?: SelectedAddOn[]; // Los adicionales en el pedido pueden venir ya con nombre/precio si el backend los popula, o solo _id/quantity
+}
+
+// Interfaz para el formato de los productos para mostrar en la UI, con nombres de productos y adicionales populados
 interface OrderProductDisplay {
   productId: string;
   quantity: number;
   name: string; // Nombre del producto, populado desde la lista de productos
+  addOns?: SelectedAddOn[]; // Adicionales con su nombre y precio para mostrar
 }
 
-// Interfaz para la estructura de un pedido tal como viene del backend
+// Interfaz principal para la estructura de un pedido
 export interface Order {
   _id: string;
   guestEmail: string;
@@ -25,12 +34,12 @@ export interface Order {
     street: string;
     city: string;
   };
-  products: Array<{ productId: string; quantity: number }>; // Productos en el formato original del backend
-  createdAt: string; // Fecha de creación del pedido
-  status: 'pending' | 'delivered' | 'cancelled'; // Estados posibles del pedido
+  products: OrderProductRaw[]; // Usa la interfaz raw para los productos del pedido
+  createdAt: string;
+  status: 'pending' | 'delivered' | 'cancelled';
 }
 
-// Interfaz para la estructura de un pedido con los nombres de los productos ya populados
+// Interfaz para el pedido una vez que sus productos han sido procesados para mostrar
 interface OrderDisplay extends Omit<Order, 'products'> {
   products: OrderProductDisplay[];
 }
@@ -57,36 +66,52 @@ const OrdersManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      // El token se adjunta automáticamente por el interceptor de Axios configurado en authService
-      // No es necesario obtenerlo manualmente aquí ni pasarlo en los headers.
 
-      // Paso 1: Obtener todos los productos para crear un mapa de IDs a nombres
-      const productsResponse = await axios.get<Product[]>(`${API_BASE_URL}/api/products`);
-      const productMap = new Map<string, string>();
-      productsResponse.data.forEach(p => productMap.set(p._id, p.name));
+      // Realiza todas las llamadas a la API en paralelo para mayor eficiencia
+      const [productsResponse, addOnsResponse, ordersResponse] = await Promise.all([
+        axios.get<Product[]>(`${API_BASE_URL}/api/products`),
+        // CAMBIO CLAVE AQUÍ: Añadimos ?includeInactive=true para traer todos los adicionales
+        axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`),
+        axios.get<Order[]>(`${API_BASE_URL}/api/orders`),
+      ]);
 
-      // Paso 2: Obtener todos los pedidos
-      // Asegúrate de que tu backend envíe TODOS los pedidos, incluyendo los entregados/cancelados
-      const ordersResponse = await axios.get<Order[]>(`${API_BASE_URL}/api/orders`);
+      // Crea mapas para una búsqueda rápida por ID
+      const productMap = new Map(productsResponse.data.map(p => [p._id, p.name]));
+      const addOnMap = new Map(addOnsResponse.data.map(a => [a._id, a])); // Mapa de adicionales disponibles
 
-      // Paso 3: Mapear los pedidos y poblar los nombres de los productos
-      const ordersWithProductNames: OrderDisplay[] = ordersResponse.data.map(order => ({
+      // Mapea los pedidos y popula los nombres de los productos y sus adicionales
+      const ordersWithDetails: OrderDisplay[] = ordersResponse.data.map(order => ({
         ...order,
-        products: order.products.map(p => ({
-          ...p,
-          name: productMap.get(p.productId) || 'Producto Desconocido', // Asigna el nombre o un valor por defecto
-        })),
+        products: order.products.map(p => {
+          const productDisplayName = productMap.get(p.productId) || 'Producto Desconocido';
+          const populatedAddOns = p.addOns?.map(a => {
+  const addOnId = (a as any)._id || (a as any).addOnId; // Soporta ambos formatos
+  const addOnInfo = addOnMap.get(addOnId?.toString?.() ?? '');
+  return {
+    _id: addOnId?.toString?.() ?? '',
+    quantity: (a as any).quantity || 1,
+    name: (a as any).name || addOnInfo?.name || 'Adicional desconocido',
+    price: (a as any).priceAtOrder || addOnInfo?.price || 0,
+  };
+}) || [];
+
+          return {
+            productId: p.productId,
+            quantity: p.quantity,
+            name: productDisplayName,
+            addOns: populatedAddOns,
+          };
+        }),
       }));
 
-      // Ordenar los pedidos por fecha de creación (más recientes primero)
-      ordersWithProductNames.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-      setOrders(ordersWithProductNames);
+      // Ordena los pedidos por fecha de creación (más recientes primero)
+      ordersWithDetails.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setOrders(ordersWithDetails);
     } catch (err: any) {
       console.error('Error al cargar los pedidos:', err);
       if (axios.isAxiosError(err) && err.response) {
         if (err.response.status === 401) {
-          authService.logout(); // Limpia el token si la sesión no es válida
+          authService.logout();
           setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
         } else {
           setError(`Error al cargar los pedidos: ${err.response.data.message || err.message}`);
@@ -99,20 +124,18 @@ const OrdersManagement: React.FC = () => {
     }
   };
 
-  // Función para actualizar el estado del pedido
   const updateOrderStatus = async (orderId: string, newStatus: 'pending' | 'delivered' | 'cancelled') => {
     try {
-      // El token se adjunta automáticamente por el interceptor de Axios
       await axios.put(`${API_BASE_URL}/api/orders/${orderId}/status`, { status: newStatus });
       fetchOrders(); // Refrescar la lista de pedidos después de la actualización
     } catch (err: any) {
       console.error(`Error al actualizar el pedido ${orderId} a ${newStatus}:`, err);
       if (axios.isAxiosError(err) && err.response) {
         if (err.response.status === 401) {
-          authService.logout(); // Limpia el token si la sesión no es válida
+          authService.logout();
           setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
         } else {
-          setError(`Error al actualizar el pedido: ${err.response.data.message || err.message}. Asegúrate de que la ruta PUT /api/orders/:id/status acepte actualizaciones de estado y que tengas permisos.`);
+          setError(`Error al actualizar el pedido: ${err.response.data.message || err.message}`);
         }
       } else {
         setError('Error al actualizar el pedido. Verifica la conexión a internet.');
@@ -146,30 +169,36 @@ const OrdersManagement: React.FC = () => {
       <h1 className={styles.title}>Gestión de Pedidos</h1>
 
       <div className={styles.ordersList}>
-        {orders.length === 0 && !loading && !error ? (
+        {orders.length === 0 ? (
           <p className={styles.noOrdersMessage}>No hay pedidos para mostrar.</p>
         ) : (
           orders.map((order) => (
             <div key={order._id} className={styles.orderCard}>
               <div className={styles.orderHeader}>
-                {/* Muestra la fecha y hora sin segundos */}
                 <p className={styles.orderDate}>
                   <FaCalendarAlt /> {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
-                {/* Muestra el nombre y número de teléfono del cliente */}
-                <p className={styles.customerName}>
-                  <FaUser /> {order.guestName}
-                </p>
-                <p className={styles.customerPhone}>
-                  <FaPhone /> {order.guestPhone}
-                </p>
+                <p className={styles.customerName}><FaUser /> {order.guestName}</p>
+                <p className={styles.customerPhone}><FaPhone /> {order.guestPhone}</p>
               </div>
               <div className={styles.orderBody}>
                 <div className={styles.productsList}>
                   <p className={styles.productsTitle}><FaBox /> Productos:</p>
                   <ul>
                     {order.products.map((item, index) => (
-                      <li key={index}>{item.name} (x{item.quantity})</li>
+                      <li key={index}>
+                        {item.name} (x{item.quantity})
+                        {/* Muestra los adicionales si existen */}
+                        {item.addOns && item.addOns.length > 0 && (
+                          <ul className={styles.addOnsSublist}>
+                            {item.addOns.map((addOn, i) => (
+                              <li key={i} className={styles.addOnItem}>
+                                └ {addOn.name} (x{addOn.quantity}) - ${addOn.price.toFixed(2)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -180,7 +209,6 @@ const OrdersManagement: React.FC = () => {
                     <p className={styles.shippingAddress}>Dirección: {order.shippingAddress.street}, {order.shippingAddress.city}</p>
                   )}
                   <p className={styles.paymentMethod}>Método de pago: {order.paymentMethod === 'cash' ? 'Efectivo' : 'Mercado Pago'}</p>
-                  {/* Muestra el estado del pedido con clases CSS condicionales */}
                   <p className={styles.orderStatus}>Estado:
                     <span className={
                       order.status === 'pending' ? styles.statusPending :
@@ -195,29 +223,18 @@ const OrdersManagement: React.FC = () => {
                 </div>
               </div>
               <div className={styles.orderActions}>
-                {/* Botones para marcar como Entregado o Cancelar, solo si el estado es 'pending' */}
                 {order.status === 'pending' && (
                   <>
-                    <button
-                      onClick={() => handleOrderDelivered(order._id)}
-                      className={styles.deliveredButton}
-                    >
+                    <button onClick={() => handleOrderDelivered(order._id)} className={styles.deliveredButton}>
                       <FaCheckCircle /> Pedido Entregado
                     </button>
-                    <button
-                      onClick={() => handleOrderCancelled(order._id)}
-                      className={styles.cancelButton}
-                    >
+                    <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
                       <FaTimesCircle /> Cancelar
                     </button>
                   </>
                 )}
-                {/* Botón para Restaurar, si el estado es 'delivered' o 'cancelled' */}
                 {(order.status === 'delivered' || order.status === 'cancelled') && (
-                  <button
-                    onClick={() => handleOrderRestore(order._id)}
-                    className={styles.restoreButton}
-                  >
+                  <button onClick={() => handleOrderRestore(order._id)} className={styles.restoreButton}>
                     <FaRedo /> Restaurar a Pendiente
                   </button>
                 )}
