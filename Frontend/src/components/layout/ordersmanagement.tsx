@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './ordersmanagement.module.css';
@@ -57,6 +56,9 @@ const OrdersManagement: React.FC = () => {
   const [orders, setOrders] = useState<OrderDisplay[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Nuevo estado para filtro de status
+  const [filterStatus, setFilterStatus] = useState<'pending' | 'delivered' | 'cancelled' | 'all'>('all');
 
   useEffect(() => {
     fetchOrders();
@@ -85,15 +87,15 @@ const OrdersManagement: React.FC = () => {
         products: order.products.map(p => {
           const productDisplayName = productMap.get(p.productId) || 'Producto Desconocido';
           const populatedAddOns = p.addOns?.map(a => {
-  const addOnId = (a as any)._id || (a as any).addOnId; // Soporta ambos formatos
-  const addOnInfo = addOnMap.get(addOnId?.toString?.() ?? '');
-  return {
-    _id: addOnId?.toString?.() ?? '',
-    quantity: (a as any).quantity || 1,
-    name: (a as any).name || addOnInfo?.name || 'Adicional desconocido',
-    price: (a as any).priceAtOrder || addOnInfo?.price || 0,
-  };
-}) || [];
+            const addOnId = (a as any)._id || (a as any).addOnId; // Soporta ambos formatos
+            const addOnInfo = addOnMap.get(addOnId?.toString?.() ?? '');
+            return {
+              _id: addOnId?.toString?.() ?? '',
+              quantity: (a as any).quantity || 1,
+              name: (a as any).name || addOnInfo?.name || 'Adicional desconocido',
+              price: (a as any).priceAtOrder || addOnInfo?.price || 0,
+            };
+          }) || [];
 
           return {
             productId: p.productId,
@@ -161,6 +163,9 @@ const OrdersManagement: React.FC = () => {
     }
   };
 
+  // Filtra los pedidos según el filtro seleccionado
+  const filteredOrders = filterStatus === 'all' ? orders : orders.filter(o => o.status === filterStatus);
+
   if (loading) return <div className={styles.loading}>Cargando pedidos...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
@@ -168,11 +173,27 @@ const OrdersManagement: React.FC = () => {
     <div className={styles.ordersManagementContainer}>
       <h1 className={styles.title}>Gestión de Pedidos</h1>
 
+      {/* Selector para filtrar pedidos por estado */}
+      <div className={styles.filterContainer}>
+        <label htmlFor="statusFilter">Filtrar por estado: </label>
+        <select
+          id="statusFilter"
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value as 'pending' | 'delivered' | 'cancelled' | 'all')}
+          className={styles.filterSelect}
+        >
+          <option value="all">Todos</option>
+          <option value="pending">Pendientes</option>
+          <option value="delivered">Entregados</option>
+          <option value="cancelled">Cancelados</option>
+        </select>
+      </div>
+
       <div className={styles.ordersList}>
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <p className={styles.noOrdersMessage}>No hay pedidos para mostrar.</p>
         ) : (
-          orders.map((order) => (
+          filteredOrders.map((order) => (
             <div key={order._id} className={styles.orderCard}>
               <div className={styles.orderHeader}>
                 <p className={styles.orderDate}>

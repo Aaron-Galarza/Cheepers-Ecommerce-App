@@ -248,3 +248,31 @@
         font-size: 0.9rem; /* Ajuste para móviles */
     }
 }
+
+/* Contenedor del filtro */
+.filterContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.8rem;
+  font-weight: 600;
+  color: #374151; /* gris oscuro suave */
+  font-size: 1rem;
+}
+
+/* Select del filtro */
+.filterSelect {
+  padding: 0.4rem 0.7rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1.8px solid #cbd5e1; /* gris claro */
+  background-color: white;
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.filterSelect:hover,
+.filterSelect:focus {
+  border-color: #2563eb; /* azul intenso al hover/focus */
+  outline: none;
+}

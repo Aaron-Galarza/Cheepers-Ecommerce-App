@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import styles from './ventasmanagement.module.css';
-import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch } from 'react-icons/fa';
+import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch, FaFileCsv } from 'react-icons/fa';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Brush
 } from 'recharts';
 import authService from '../../services/authservice';
+import { SelectedAddOn, IAddOn } from './productlist';
 
-// Reutilizamos las interfaces de Order y Product de OrdersManagement
-interface Order {
+export interface Order {
   _id: string;
   guestEmail: string;
   guestName: string;
@@ -20,8 +20,8 @@ interface Order {
     street: string;
     city: string;
   };
-  products: Array<{ productId: string; quantity: number }>;
-  createdAt: string; // ISO 8601 string, likely UTC
+  products: Array<{ productId: string; quantity: number; addOns?: SelectedAddOn[] }>;
+  createdAt: string;
   status: 'pending' | 'delivered' | 'cancelled';
 }
 
@@ -40,8 +40,17 @@ interface BestSellingProduct {
 }
 
 interface SalesData {
-  period: string; // 'YYYY-MM-DD' for daily, 'YYYY-MM' for monthly
+  period: string;
   sales: number;
+}
+
+// INTERFAZ ACTUALIZADA para los datos de la tabla diaria (una fila por pedido)
+interface DailySaleTableItem {
+  orderId: string;
+  orderSummary: string; // Resumen de productos y adicionales del pedido
+  subtotal: number; // totalAmount del pedido
+  orderTime: string; // Hora del pedido
+  fullOrderTime: Date; // Para ordenar
 }
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
@@ -49,16 +58,21 @@ const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 const VentasManagement: React.FC = () => {
   const [allOrders, setAllOrders] = useState<Order[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allAddOns, setAllAddOns] = useState<Map<string, IAddOn>>(new Map());
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [timeRangeFilter, setTimeRangeFilter] = useState<'today' | 'week' | 'month' | 'year' | 'custom'>('month');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [triggerSearch, setTriggerSearch] = useState<number>(0); // Used to trigger fetch for custom date range
+  const [triggerSearch, setTriggerSearch] = useState<number>(0);
+
+  const [selectedDailyDate, setSelectedDailyDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [dailySalesTableData, setDailySalesTableData] = useState<DailySaleTableItem[]>([]);
+  const [dailyTotalSales, setDailyTotalSales] = useState<number>(0);
+
 
   useEffect(() => {
-    // Fetch data when filter changes or custom search is triggered
     if (timeRangeFilter !== 'custom' || triggerSearch > 0) {
       fetchData();
     }
@@ -69,18 +83,22 @@ const VentasManagement: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch products
-      const productsResponse = await axios.get<Product[]>(`${API_BASE_URL}/api/products`);
-      setAllProducts(productsResponse.data);
+      const [productsResponse, addOnsResponse, ordersResponse] = await Promise.all([
+        axios.get<Product[]>(`${API_BASE_URL}/api/products`),
+        axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`),
+        axios.get<Order[]>(`${API_BASE_URL}/api/orders`),
+      ]);
 
-      // Fetch orders
-      const ordersResponse = await axios.get<Order[]>(`${API_BASE_URL}/api/orders`);
+      setAllProducts(productsResponse.data);
       setAllOrders(ordersResponse.data);
+
+      const addOnMap = new Map<string, IAddOn>();
+      addOnsResponse.data.forEach(ao => addOnMap.set(ao._id, ao));
+      setAllAddOns(addOnMap);
 
     } catch (err: any) {
       console.error('Error al cargar datos para estadísticas:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        // If unauthorized, log out the user
         authService.logout();
         setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
       } else {
@@ -91,73 +109,130 @@ const VentasManagement: React.FC = () => {
     }
   };
 
-  // Handler for custom date range search button
   const handleCustomSearch = () => {
     if (startDate && endDate) {
-      setTriggerSearch(prev => prev + 1); 
+      setTriggerSearch(prev => prev + 1);
     } else {
       setError('Por favor, selecciona ambas fechas para el rango personalizado.');
     }
   };
 
-  // Memoized calculations for all statistics
+  // Función para procesar los datos de la tabla diaria (una fila por pedido)
+  const processDailySalesData = useCallback(() => {
+    const dailyData: DailySaleTableItem[] = [];
+    let currentDailyTotal = 0;
+
+    const selectedDateObj = new Date(selectedDailyDate + 'T00:00:00');
+    const productMap = new Map(allProducts.map(p => [p._id, p]));
+
+    allOrders.forEach(order => {
+      const orderCreatedAt = new Date(order.createdAt); 
+
+      const orderYear = orderCreatedAt.getFullYear();
+      const orderMonth = orderCreatedAt.getMonth();
+      const orderDay = orderCreatedAt.getDate();
+
+      const selectedYear = selectedDateObj.getFullYear();
+      const selectedMonth = selectedDateObj.getMonth();
+      const selectedDay = selectedDateObj.getDate();
+
+      // Filtrar por pedidos entregados y dentro del día seleccionado
+      if (order.status === 'delivered' &&
+          orderYear === selectedYear &&
+          orderMonth === selectedMonth &&
+          orderDay === selectedDay) {
+
+        // Construir el resumen de productos y adicionales para esta fila del pedido
+        let orderSummary = order.products.map(productInOrder => {
+          const productInfo = productMap.get(productInOrder.productId);
+          let productText = productInfo ? `${productInfo.name} (x${productInOrder.quantity})` : `Producto desconocido (x${productInOrder.quantity})`;
+
+          if (productInOrder.addOns && productInOrder.addOns.length > 0) {
+            const addOnsText = productInOrder.addOns.map(ao => {
+              const addOnDetail = allAddOns.get(ao._id);
+              const name = addOnDetail?.name || ao.name || 'Adicional desconocido';
+              return `+ ${name} (x${ao.quantity})`;
+            }).join(', ');
+            productText += ` [${addOnsText}]`;
+          }
+          return productText;
+        }).join('; '); // Separar los productos con punto y coma
+
+        dailyData.push({
+          orderId: order._id,
+          orderSummary: orderSummary,
+          subtotal: order.totalAmount, // Directamente el totalAmount del pedido
+          orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+          fullOrderTime: orderCreatedAt
+        });
+        currentDailyTotal += order.totalAmount; // Sumar el totalAmount del pedido al total del día
+      }
+    });
+
+    dailyData.sort((a, b) => a.fullOrderTime.getTime() - b.fullOrderTime.getTime());
+
+    setDailySalesTableData(dailyData);
+    setDailyTotalSales(currentDailyTotal);
+  }, [selectedDailyDate, allOrders, allProducts, allAddOns]);
+
+  useEffect(() => {
+    if (selectedDailyDate && allOrders.length > 0 && allProducts.length > 0 && allAddOns.size > 0) {
+      processDailySalesData();
+    } else if (!selectedDailyDate) {
+      setDailySalesTableData([]);
+      setDailyTotalSales(0);
+    }
+  }, [selectedDailyDate, allOrders, allProducts, allAddOns, processDailySalesData]);
+
+
   const {
-    filteredOrders,
     totalSales,
     totalOrdersCount,
     completedOrdersCount,
-    completedOrdersSubtotal,
     activeProductsCount,
     promosSoldCount,
     bestSellingProducts,
-    salesDataForChart, // Data for the chart (all periods in range, chronologically sorted)
-    topSellingPeriods // Data for the "top N" list (top periods by sales)
+    salesDataForChart,
+    topSellingPeriods
   } = useMemo(() => {
     let currentOrders = [...allOrders];
-    const now = new Date(); // Current local date/time
+    const now = new Date();
+
     let filterStartDate: Date | null = null;
     let filterEndDate: Date | null = null;
 
-    // Determine the date range based on the selected filter
     if (timeRangeFilter === 'today') {
-      filterStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      filterStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
       filterEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     } else if (timeRangeFilter === 'week') {
-      filterStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      filterStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6, 0, 0, 0, 0);
       filterEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     } else if (timeRangeFilter === 'month') {
-      filterStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      filterEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); // Last day of current month
+      filterStartDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      filterEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
     } else if (timeRangeFilter === 'year') {
-      filterStartDate = new Date(now.getFullYear(), 0, 1); // January 1st of current year
-      filterEndDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999); // December 31st of current year
+      filterStartDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+      filterEndDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
     } else if (timeRangeFilter === 'custom' && startDate && endDate) {
-      // For custom range, parse dates as local to match user input
-      filterStartDate = new Date(startDate + 'T00:00:00'); // Parse as local start of day
-      filterEndDate = new Date(endDate + 'T23:59:59.999'); // Parse as local end of day
+      filterStartDate = new Date(startDate + 'T00:00:00');
+      filterEndDate = new Date(endDate + 'T23:59:59.999');
     }
 
-    // Filter orders by the determined date range
     if (filterStartDate && filterEndDate) {
       currentOrders = currentOrders.filter(order => {
-        const orderDate = new Date(order.createdAt); // Date object from backend UTC string
-        // Compare timestamps (milliseconds since epoch), which are timezone-agnostic
+        const orderDate = new Date(order.createdAt);
         return orderDate.getTime() >= filterStartDate!.getTime() && orderDate.getTime() <= filterEndDate!.getTime();
       });
     }
 
-    // Filter for delivered orders
     const deliveredOrders = currentOrders.filter(order => order.status === 'delivered');
 
-    // Calculate summary metrics
     const calculatedTotalSales = deliveredOrders.reduce((sum, order) => sum + order.totalAmount, 0);
     const calculatedTotalOrdersCount = currentOrders.length;
     const calculatedCompletedOrdersCount = deliveredOrders.length;
-    const calculatedCompletedOrdersSubtotal = deliveredOrders.reduce((sum, order) => sum + order.totalAmount, 0);
 
     const calculatedActiveProductsCount = allProducts.filter(p => p.isActive).length;
 
-    // Calculate promos sold count
     let calculatedPromosSoldCount = 0;
     deliveredOrders.forEach(order => {
       order.products.forEach(item => {
@@ -168,7 +243,6 @@ const VentasManagement: React.FC = () => {
       });
     });
 
-    // Calculate best selling products
     const productSalesMap = new Map<string, { quantity: number; totalAmount: number }>();
     deliveredOrders.forEach(order => {
       order.products.forEach(item => {
@@ -191,7 +265,7 @@ const VentasManagement: React.FC = () => {
         };
       })
       .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 5); // Top 5 best-selling products
+      .slice(0, 5);
 
     const totalQuantitySold = bestSelling.reduce((sum, p) => sum + p.quantity, 0);
     const bestSellingWithPercentage = bestSelling.map(p => ({
@@ -199,16 +273,14 @@ const VentasManagement: React.FC = () => {
       percentage: totalQuantitySold > 0 ? (p.quantity / totalQuantitySold) * 100 : 0
     }));
 
-    // Group sales data by period (day or month) based on local date
     let allSalesData: SalesData[] = [];
     if (timeRangeFilter === 'year') {
       const monthlySalesMap = new Map<string, number>();
       deliveredOrders.forEach(order => {
         const orderDate = new Date(order.createdAt);
-        // Extract local year and month for grouping
         const year = orderDate.getFullYear();
-        const month = orderDate.getMonth() + 1; // getMonth() is 0-indexed
-        const monthKey = `${year}-${String(month).padStart(2, '0')}`; // YYYY-MM
+        const month = orderDate.getMonth() + 1;
+        const monthKey = `${year}-${String(month).padStart(2, '0')}`;
         monthlySalesMap.set(monthKey, (monthlySalesMap.get(monthKey) || 0) + order.totalAmount);
       });
       allSalesData = Array.from(monthlySalesMap.entries())
@@ -217,39 +289,32 @@ const VentasManagement: React.FC = () => {
       const dailySalesMap = new Map<string, number>();
       deliveredOrders.forEach(order => {
         const orderDate = new Date(order.createdAt);
-        // Extract local year, month, and day for grouping
         const year = orderDate.getFullYear();
         const month = orderDate.getMonth() + 1;
         const day = orderDate.getDate();
-        const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`; // YYYY-MM-DD
+        const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         dailySalesMap.set(dateKey, (dailySalesMap.get(dateKey) || 0) + order.totalAmount);
       });
       allSalesData = Array.from(dailySalesMap.entries())
         .map(([period, sales]) => ({ period, sales }));
     }
 
-    // Data for the chart: all sales data in the range, sorted chronologically by period
     const calculatedSalesDataForChart = [...allSalesData].sort((a, b) => a.period.localeCompare(b.period));
 
-    // Data for the "top N" list: all sales data, sorted by sales amount (descending)
     let calculatedTopSellingPeriods = [...allSalesData].sort((a, b) => b.sales - a.sales);
 
-    // Apply slicing for "top N" based on time range filter
     if (timeRangeFilter === 'week') {
-      calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 3); // Top 3 days for week
+      calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 3);
     } else if (timeRangeFilter === 'month') {
-      calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 10); // Top 10 days for month
+      calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 10);
     } else if (timeRangeFilter === 'year') {
-      calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 5); // Top 5 months for year
+      calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 5);
     }
-    // For 'today' and 'custom', all periods with sales are shown, sorted by sales amount
 
     return {
-      filteredOrders: currentOrders,
       totalSales: calculatedTotalSales,
       totalOrdersCount: calculatedTotalOrdersCount,
       completedOrdersCount: calculatedCompletedOrdersCount,
-      completedOrdersSubtotal: calculatedCompletedOrdersSubtotal,
       activeProductsCount: calculatedActiveProductsCount,
       promosSoldCount: calculatedPromosSoldCount,
       bestSellingProducts: bestSellingWithPercentage,
@@ -257,6 +322,46 @@ const VentasManagement: React.FC = () => {
       topSellingPeriods: calculatedTopSellingPeriods
     };
   }, [allOrders, allProducts, timeRangeFilter, startDate, endDate]);
+
+  const exportDailySalesToCsv = () => {
+    if (dailySalesTableData.length === 0) {
+      alert('No hay datos para exportar.');
+      return;
+    }
+
+    const headers = [
+      'Hora',
+      'Resumen del Pedido',
+      'Subtotal'
+    ];
+
+    const rows = dailySalesTableData.map(item => [
+      `"${item.orderTime}"`,
+      `"${item.orderSummary.replace(/"/g, '""')}"`,
+      `"${item.subtotal.toFixed(2)}"`
+    ]);
+
+    rows.push(['', 'Total del Día:', `"${dailyTotalSales.toFixed(2)}"`]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    // Añadir el BOM para UTF-8 al inicio del contenido del CSV
+    const BOM = "\uFEFF"; // Byte Order Mark para UTF-8
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `ventas_diarias_${selectedDailyDate}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
 
   if (loading) return <div className={styles.loading}>Cargando estadísticas...</div>;
@@ -276,9 +381,9 @@ const VentasManagement: React.FC = () => {
           value={timeRangeFilter}
           onChange={(e) => {
             setTimeRangeFilter(e.target.value as 'today' | 'week' | 'month' | 'year' | 'custom');
-            setStartDate(''); // Clear custom dates on filter change
+            setStartDate('');
             setEndDate('');
-            setTriggerSearch(0); // Reset trigger
+            setTriggerSearch(0);
           }}
           className={styles.selectField}
         >
@@ -368,11 +473,9 @@ const VentasManagement: React.FC = () => {
                 height={60}
                 tickFormatter={(tick) => {
                   if (timeRangeFilter === 'year') {
-                    // Format YYYY-MM to MM/YYYY
                     const [year, month] = tick.split('-');
                     return `${month}/${year}`;
                   } else {
-                    // Format YYYY-MM-DD to DD/MM
                     const [year, month, day] = tick.split('-');
                     return `${day}/${month}`;
                   }
@@ -400,16 +503,12 @@ const VentasManagement: React.FC = () => {
                 {topSellingPeriods.map((data, index) => {
                   let displayDate;
                   if (timeRangeFilter === 'year') {
-                    // For year, display month name and year (e.g., "Julio 2025")
-                    // data.period is YYYY-MM. Create a Date object in local time for correct month name.
                     const [year, month] = data.period.split('-').map(Number);
-                    const localDate = new Date(year, month - 1, 1); // Month is 0-indexed
+                    const localDate = new Date(year, month - 1, 1);
                     displayDate = localDate.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
                   } else {
-                    // For other filters, data.period is YYYY-MM-DD
-                    // Create a Date object in local time for correct day, month, year.
                     const [year, month, day] = data.period.split('-').map(Number);
-                    const localDate = new Date(year, month - 1, day); // Month is 0-indexed
+                    const localDate = new Date(year, month - 1, day);
                     displayDate = localDate.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                   }
                   return (
@@ -445,6 +544,57 @@ const VentasManagement: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* NUEVA SECCIÓN: Tabla de Ventas Diarias */}
+      <div className={styles.dailySalesTableSection}>
+        <h2 className={styles.sectionTitle}>
+          <FaCalendarDay /> Detalle de Ventas por Día
+        </h2>
+        <div className={styles.dailyDateFilter}>
+          <label htmlFor="dailyDate" className={styles.filterLabel}>Seleccionar Fecha:</label>
+          <input
+            type="date"
+            id="dailyDate"
+            value={selectedDailyDate}
+            onChange={(e) => setSelectedDailyDate(e.target.value)}
+            className={styles.inputField}
+          />
+          <button onClick={exportDailySalesToCsv} className={styles.exportButton}>
+            <FaFileCsv /> Exportar CSV
+          </button>
+        </div>
+
+        {dailySalesTableData.length > 0 ? (
+          <div className={styles.tableContainer}>
+            <table className={styles.dailySalesTable}>
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Pedido</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dailySalesTableData.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.orderTime}</td>
+                    <td>{item.orderSummary}</td>
+                    <td>${item.subtotal.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={2} className={styles.totalRowLabel}>Total del Día:</td>
+                  <td className={styles.totalRowValue}>${dailyTotalSales.toFixed(2)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        ) : (
+          <p className={styles.noDataMessage}>No hay ventas registradas para la fecha seleccionada.</p>
+        )}
       </div>
     </div>
   );
