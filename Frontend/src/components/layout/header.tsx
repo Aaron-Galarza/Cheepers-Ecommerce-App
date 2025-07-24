@@ -5,7 +5,7 @@ import logo from '../../assets/images/logocheepers.png';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { useCart } from './cartcontext';
-import styles from './Header.module.css';
+import styles from './header.module.css';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
