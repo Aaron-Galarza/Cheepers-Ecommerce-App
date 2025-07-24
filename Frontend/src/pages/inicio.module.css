@@ -1,3 +1,4 @@
+
 :root {
   --color-primary: #e53e3e; /* Rojo Cheepers */
   --color-secondary: #f6ad55; /* Naranja */
@@ -26,8 +27,6 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 }
 
-/* Importar fuentes de Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Open+Sans:wght@300;400;600&display=swap');
 
 body {
   font-family: 'Open Sans', sans-serif;
