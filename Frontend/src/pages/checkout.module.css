@@ -301,21 +301,56 @@
 
 @media (max-width: 768px) {
     .pageContainer {
-        margin: 20px;
-        padding: 20px;
+        margin: 15px; /* Reducido el margen exterior */
+        padding: 15px; /* Reducido el padding exterior */
     }
 
     .pageTitle {
-        font-size: 2.5rem;
+        font-size: 2rem; /* Ligeramente más pequeño para móviles */
+        margin-bottom: 25px;
+    }
+
+    .formSection, .summarySection {
+        padding: 15px; /* Reducido el padding interno de las secciones */
+    }
+
+    .sectionTitle {
+        font-size: 1.5rem; /* Títulos de sección más pequeños */
+        margin-bottom: 15px;
+    }
+
+    .inputField {
+        padding: 10px 15px 10px 40px; /* Ajusta padding para el icono */
+        font-size: 0.95rem; /* Fuente más pequeña */
+    }
+
+    .radioLabel {
+        padding: 10px 12px;
+        font-size: 1rem; /* Fuente más pequeña */
+    }
+
+    .radioText {
+        font-size: 0.95rem; /* Fuente más pequeña */
     }
 
     .formButtons {
         flex-direction: column;
+        gap: 10px;
     }
 
     .backButton, .confirmButton {
         width: 100%;
         text-align: center;
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
+    .summaryTotalRow {
+        font-size: 1.2rem;
+    }
+
+    .summaryGrandTotalRow {
+        font-size: 1.8rem;
     }
 }
 

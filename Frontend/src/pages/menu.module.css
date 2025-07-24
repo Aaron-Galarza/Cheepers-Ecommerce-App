@@ -18,8 +18,17 @@ body {
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: var(--color-tertiary);
+--color-dark-text: #2d3748; /* Asumiendo que --color-tertiary está definido en algún lugar o es un color válido */
+  /* --- AÑADIDO: Margen inferior extra para separación entre secciones --- */
+  margin-bottom: 2rem; /* Aumenta el espacio debajo de cada título de sección */
+  margin-top: 3.5rem; /* Añade un poco más de espacio arriba también, para el primer título */
 }
+
+/* Ajuste para el primer sectionTitle si es el primero en la página */
+.menuContainer .sectionTitle:first-of-type {
+    margin-top: 0; /* Elimina el margen superior si es el primer título */
+}
+
 
 .grid {
   display: grid;
@@ -87,4 +96,53 @@ body {
 
 .button:hover {
   background-color: #ee7f18;
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+  .menuContainer {
+    padding: 1rem;
+    margin-top: 79px;
+  }
+
+  .sectionTitle {
+    font-size: 1.8rem;
+    margin-bottom: 3rem; /* Ajuste para móvil */
+    margin-top: 3rem; /* Ajuste para móvil */
+  }
+
+  .grid {
+    grid-template-columns: 1fr; /* Una columna en móviles */
+    gap: 1rem;
+  }
+
+  .card {
+    border-radius: 8px;
+  }
+
+  .image {
+    height: 150px;
+  }
+
+  .info {
+    padding: 0.8rem 0.8rem 0.8rem 1rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .description {
+    font-size: 0.85rem;
+    min-height: 3rem;
+  }
+
+  .price {
+    font-size: 1rem;
+  }
+
+  .button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
 }

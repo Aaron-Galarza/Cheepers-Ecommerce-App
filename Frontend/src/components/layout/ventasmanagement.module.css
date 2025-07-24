@@ -40,7 +40,7 @@
 /* Contenedor principal del panel */
 .ventasManagementContainer {
     padding: 30px;
-    background-color: var(--color-background-light);
+    background-color: white;
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-md);
     font-family: 'Inter', sans-serif;

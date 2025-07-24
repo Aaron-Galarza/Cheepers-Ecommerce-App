@@ -1,6 +1,3 @@
-/* src/components/layout/inicio.module.css */
-
-/* Variables de color */
 :root {
   --color-primary: #e53e3e; /* Rojo Cheepers */
   --color-secondary: #f6ad55; /* Naranja */
@@ -70,7 +67,7 @@ body {
   height: 100%;
   opacity: 0;
   transform: translateX(10%); /* Inicia ligeramente a la derecha */
-  transition: opacity 1s ease-in-out, transform 1s ease-in-out; /* Transición suave */
+  transition: opacity 2s ease-in-out, transform 2s ease-in-out; /* Transición suave */
   display: flex;
   align-items: center;
   justify-content: space-around; /* Distribuye espacio entre imagen y texto */
@@ -392,6 +389,7 @@ body {
     min-height: 580px; /* Ajustado para dar más espacio en móvil */
     flex-direction: column;
     padding: var(--space-md);
+    margin-top: 55px;
   }
 
   .heroSlide {
@@ -402,10 +400,11 @@ body {
   }
 
   .heroImageContainer {
-    width: 90%; /* La imagen ocupa un 90% del ancho disponible */
+    width: 95%; /* La imagen ocupa un 90% del ancho disponible */
     height: 280px; /* Altura fija para la imagen en móvil */
     margin-bottom: var(--space-md); /* Espacio entre imagen y texto */
     max-width: none; /* Elimina la limitación de max-width para que el 90% sea efectivo */
+    margin-top: 0px;
   }
 
   .heroContent {
@@ -427,12 +426,13 @@ body {
   }
 
   .heroCallToAction {
-    font-size: 1em;
+    font-size: 14px;
     padding: 10px 20px;
+    margin-bottom: 6px;
   }
 
   .bannerDots {
-    bottom: var(--space-sm);
+    bottom: 3px;
     gap: var(--space-xs);
   }
 

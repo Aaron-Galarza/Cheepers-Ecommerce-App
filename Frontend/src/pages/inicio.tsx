@@ -1,14 +1,15 @@
 // src/components/layout/Inicio.tsx
 import React, { useState, useEffect } from 'react';
 import styles from './inicio.module.css';
-import { useNavigate } from 'react-router-dom';  // <-- IMPORTAR useNavigate
+import { useNavigate } from 'react-router-dom';
 
 // Asegúrate de que las rutas de las imágenes sean correctas
 import baconcheep from '../assets/images/baconcheep.jpg';
 import barbacue from '../assets/images/cheddar.jpg';
 import cheddar from '../assets/images/barbacue.jpg';
 
-import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
+// Importar FaClock además de los otros iconos
+import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // Definición de los elementos del banner
 const bannerItems = [
@@ -19,7 +20,7 @@ const bannerItems = [
 
 const Inicio: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const navigate = useNavigate();  // <-- Crear instancia para navegación
+  const navigate = useNavigate();
 
   // Funcionalidad de auto-slide para el banner
   useEffect(() => {
@@ -39,8 +40,8 @@ const Inicio: React.FC = () => {
   };
 
   // Números de WhatsApp (¡RECUERDA CAMBIAR ESTOS VALORES!)
-  const whatsappPedidosNumber = 'NUMERO_PEDIDOS';
-  const whatsappConsultasNumber = 'NUMERO_CONSULTAS';
+  // const whatsappPedidosNumber = 'NUMERO_PEDIDOS'; // Ya está en el href
+  // const whatsappConsultasNumber = 'NUMERO_CONSULTAS'; // Ya está en el href
   const whatsappPedidoMessage = 'Hola! Quisiera hacer un pedido.';
   const whatsappConsultaMessage = 'Hola! Tengo una consulta.';
 
@@ -70,7 +71,7 @@ const Inicio: React.FC = () => {
               {/* BOTÓN CON NAVEGACIÓN A /menu */}
               <button
                 className={styles.heroCallToAction}
-                onClick={() => navigate('/menu')}  // <-- Navega a /menu al hacer clic
+                onClick={() => navigate('/menu')}
               >
                 {item.callToAction}
               </button>
@@ -97,7 +98,7 @@ const Inicio: React.FC = () => {
         <div className={styles.aboutContent}>
 
           <h2 className={styles.aboutMainTitle}>
-              Bienvenidos a Cheepers The Burger House, la mejor calidad
+              Bienvenidos a Cheepers The Burger House, la mejor calidad y los mejores precios
           </h2>
 
           <p className={styles.aboutParagraph}>
@@ -145,9 +146,24 @@ const Inicio: React.FC = () => {
                     <FaPhone/>
                   </span>
                   <p className={styles.contactText}>
-                    Pedidos y Consultas <a href="tel:+543624063011">+54 3624063011</a> {/* **REEMPLAZAR NÚMERO** */}
-                    {' '} (<a href={`https://wa.me/543624063011?text=${encodeURIComponent('Hola! Quisiera hacer un pedido.')}`} target="_blank" rel="noopener noreferrer">Enviar WhatsApp</a>) {/* **REEMPLAZAR NÚMERO Y MENSAJE** */}
+                    Consultas y pedidos <a href="tel:+543624063011">+54 3624063011</a>
+                    <br />
+                    <a href={`https://wa.me/543624063011?text=${encodeURIComponent(whatsappPedidoMessage)}`} target="_blank" rel="noopener noreferrer">
+                      Enviar WhatsApp (Pedidos)
+                    </a>
                   </p>
+              </div>
+
+              {/* Contacto Item: Horario de Atención */}
+              <div className={styles.contactItem}>
+                  <span className={styles.contactIconWrapper}>
+                    <FaClock/>
+                  </span>
+                  <div className={styles.contactText}>
+                    <p><strong>Horario de Atención:</strong></p>
+                    <p>Lunes a Domingo: 20:00 - 23:00 hs</p>
+                    <p>Sabados: hasta las 00:00</p>
+                  </div>
               </div>
 
               {/* Contacto Item: Ubicación */}
@@ -156,8 +172,8 @@ const Inicio: React.FC = () => {
                     <FaMapMarkerAlt/>
                   </span>
                   <p className={styles.contactText}>
-                    Ubicados en Corrientes 1200, Resistencia - Chaco {/* **REEMPLAZAR DIRECCIÓN** */}
-                    {' '} (<a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>) {/* URL para abrir en Maps app/site */}
+                    Ubicados en Corrientes 1200, Resistencia - Chaco
+                    {' '} (<a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
                   </p>
               </div>
             </div> {/* Fin contactInfoBlock */}
@@ -176,12 +192,12 @@ const Inicio: React.FC = () => {
 
             {/* Botón "Abrir en Maps" */}
             <a
-             href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar" 
-             target="_blank"
-             rel="noopener noreferrer"
-             className={styles.openInMapsButton}
+              href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.openInMapsButton}
             >
-             Abrir en Maps <FaArrowRight />
+              Abrir en Maps <FaArrowRight />
             </a>
         </div> {/* Fin mapEmbedContainer */}
 

@@ -1,6 +1,4 @@
-/* src/components/layout/Header.module.css */
-
-/* Variables de color (asegúrate de que estas estén definidas en tu archivo principal de CSS o donde sea global) */
+/* Variables de color */
 :root {
   --color-primary: #e53e3e; /* Rojo Cheepers */
   --color-secondary: #f12424; /* Naranja */
@@ -37,7 +35,7 @@
   align-items: center;
   justify-content: space-between; /* Espacia el logo y el grupo de acciones */
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  position: sticky; /* Se mantiene sticky en desktop */
   top: 0;
   z-index: 1000;
   flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
@@ -147,10 +145,14 @@
   padding: 0;
 }
 
-/* --- RESPONSIVE STYLES (Mobile) --- */
+/* --- ESTILOS RESPONSIVOS (Mobile) --- */
 @media (max-width: 768px) {
   .header {
     padding: var(--space-sm) 3%; /* Ajusta el padding para móvil */
+    position: fixed; /* ES FIJO EN MÓVIL */
+    width: 100%; /* Ocupa todo el ancho */
+    top: 0; /* Se pega a la parte superior */
+    left: 0; /* Se pega a la izquierda */
   }
 
   /* Ocultar la navegación principal en móvil */
