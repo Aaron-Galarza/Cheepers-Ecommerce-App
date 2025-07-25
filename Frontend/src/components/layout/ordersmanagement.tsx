@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import styles from './ordersmanagement.module.css';
-import { FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave, FaCheckCircle, FaTimesCircle, FaPhone, FaRedo } from 'react-icons/fa';
+import { FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave, FaCheckCircle, FaTimesCircle, FaPhone, FaRedo } from 'react-icons/fa'; // FaVolumeUp eliminado
 import authService from '../../services/authservice';
-import { SelectedAddOn, IAddOn } from './productlist'; // Importa SelectedAddOn y IAddOn para tipar correctamente
+import { SelectedAddOn, IAddOn } from './productlist';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// useSound importado eliminado
 
 // Interfaz para el formato de los productos tal como vienen en el pedido "crudo" del backend
 interface OrderProductRaw {
   productId: string;
   quantity: number;
-  addOns?: SelectedAddOn[]; // Los adicionales en el pedido pueden venir ya con nombre/precio si el backend los popula, o solo _id/quantity
+  addOns?: SelectedAddOn[];
 }
 
 // Interfaz para el formato de los productos para mostrar en la UI, con nombres de productos y adicionales populados
 interface OrderProductDisplay {
   productId: string;
   quantity: number;
-  name: string; // Nombre del producto, populado desde la lista de productos
-  addOns?: SelectedAddOn[]; // Adicionales con su nombre y precio para mostrar
+  name: string;
+  addOns?: SelectedAddOn[];
 }
 
 // Interfaz principal para la estructura de un pedido
@@ -33,7 +37,7 @@ export interface Order {
     street: string;
     city: string;
   };
-  products: OrderProductRaw[]; // Usa la interfaz raw para los productos del pedido
+  products: OrderProductRaw[];
   createdAt: string;
   status: 'pending' | 'delivered' | 'cancelled';
 }
@@ -47,47 +51,65 @@ interface OrderDisplay extends Omit<Order, 'products'> {
 interface Product {
   _id: string;
   name: string;
-  // Otros campos de producto si son necesarios, pero solo necesitamos _id y name aquí
 }
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+// NOTIFICATION_SOUND_URL y importación de sonido eliminados
 
 const OrdersManagement: React.FC = () => {
   const [orders, setOrders] = useState<OrderDisplay[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Nuevo estado para filtro de status
   const [filterStatus, setFilterStatus] = useState<'pending' | 'delivered' | 'cancelled' | 'all'>('all');
 
+  const previousOrderIds = useRef<Set<string>>(new Set());
+  
+  // Hook de useSound eliminado
+  // Estado autoplayWarningShown eliminado
+
+  // Función playSound eliminada
+
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(true);
   }, []);
 
-  const fetchOrders = async () => {
+  // Intervalo automático para refrescar cada 15 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrders(false);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchOrders = async (initialLoad: boolean) => {
     try {
-      setLoading(true);
+      if (initialLoad) {
+        setInitialLoading(true);
+      } else {
+        setIsFetching(true);
+      }
       setError(null);
 
-      // Realiza todas las llamadas a la API en paralelo para mayor eficiencia
+      const token = localStorage.getItem('adminToken');
+      const responseConfig = { headers: { Authorization: `Bearer ${token}` } };
+
       const [productsResponse, addOnsResponse, ordersResponse] = await Promise.all([
-        axios.get<Product[]>(`${API_BASE_URL}/api/products`),
-        // CAMBIO CLAVE AQUÍ: Añadimos ?includeInactive=true para traer todos los adicionales
-        axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`),
-        axios.get<Order[]>(`${API_BASE_URL}/api/orders`),
+        axios.get<Product[]>(`${API_BASE_URL}/api/products`, responseConfig),
+        axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`, responseConfig),
+        axios.get<Order[]>(`${API_BASE_URL}/api/orders`, responseConfig),
       ]);
 
-      // Crea mapas para una búsqueda rápida por ID
       const productMap = new Map(productsResponse.data.map(p => [p._id, p.name]));
-      const addOnMap = new Map(addOnsResponse.data.map(a => [a._id, a])); // Mapa de adicionales disponibles
+      const addOnMap = new Map(addOnsResponse.data.map(a => [a._id, a]));
 
-      // Mapea los pedidos y popula los nombres de los productos y sus adicionales
       const ordersWithDetails: OrderDisplay[] = ordersResponse.data.map(order => ({
         ...order,
         products: order.products.map(p => {
           const productDisplayName = productMap.get(p.productId) || 'Producto Desconocido';
           const populatedAddOns = p.addOns?.map(a => {
-            const addOnId = (a as any)._id || (a as any).addOnId; // Soporta ambos formatos
+            const addOnId = (a as any)._id || (a as any).addOnId;
             const addOnInfo = addOnMap.get(addOnId?.toString?.() ?? '');
             return {
               _id: addOnId?.toString?.() ?? '',
@@ -106,8 +128,30 @@ const OrdersManagement: React.FC = () => {
         }),
       }));
 
-      // Ordena los pedidos por fecha de creación (más recientes primero)
       ordersWithDetails.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      // Detectar pedidos nuevos
+      const currentOrderIds = new Set(ordersWithDetails.map(o => o._id));
+      const newOrdersDetected = [...currentOrderIds].some(id => !previousOrderIds.current.has(id));
+
+      if (newOrdersDetected && ordersWithDetails.length > previousOrderIds.current.size && !initialLoad) {
+        console.log('📦 ¡Nuevo pedido detectado! Mostrando toast.');
+        // playSound() eliminado
+        
+        toast.info('📦 ¡Nuevo pedido recibido!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            className: styles.newOrderToast
+        });
+      }
+
+      previousOrderIds.current = currentOrderIds;
+
       setOrders(ordersWithDetails);
     } catch (err: any) {
       console.error('Error al cargar los pedidos:', err);
@@ -122,14 +166,26 @@ const OrdersManagement: React.FC = () => {
         setError('No se pudieron cargar los pedidos. Verifica la conexión a internet.');
       }
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setIsFetching(false);
     }
   };
 
   const updateOrderStatus = async (orderId: string, newStatus: 'pending' | 'delivered' | 'cancelled') => {
     try {
-      await axios.put(`${API_BASE_URL}/api/orders/${orderId}/status`, { status: newStatus });
-      fetchOrders(); // Refrescar la lista de pedidos después de la actualización
+      const token = localStorage.getItem('adminToken');
+      await axios.put(`${API_BASE_URL}/api/orders/${orderId}/status`, { status: newStatus }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchOrders(false);
+      toast.success(`Pedido ${orderId.substring(0, 5)}... actualizado a ${newStatus}!`, {
+        position: "bottom-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (err: any) {
       console.error(`Error al actualizar el pedido ${orderId} a ${newStatus}:`, err);
       if (axios.isAxiosError(err) && err.response) {
@@ -138,40 +194,94 @@ const OrdersManagement: React.FC = () => {
           setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
         } else {
           setError(`Error al actualizar el pedido: ${err.response.data.message || err.message}`);
+          toast.error(`Error al actualizar pedido: ${err.response.data.message || err.message}`, {
+            position: "bottom-center",
+            autoClose: 5000,
+          });
         }
       } else {
-        setError('Error al actualizar el pedido. Verifica la conexión a internet.');
+        setError('Error de conexión al actualizar pedido.');
       }
     }
   };
 
   const handleOrderDelivered = (orderId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres marcar este pedido como ENTREGADO?')) {
-      updateOrderStatus(orderId, 'delivered');
-    }
+    toast.info(
+      <div className={styles.toastConfirmContent}>
+        <p>¿Marcar este pedido como ENTREGADO?</p>
+        <div className={styles.toastButtons}>
+          <button onClick={() => { updateOrderStatus(orderId, 'delivered'); toast.dismiss(); }} className={styles.toastConfirmButton}>Sí</button>
+          <button onClick={() => toast.dismiss()} className={styles.toastCancelButton}>No</button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: false,
+        closeButton: false,
+        closeOnClick: false,
+        draggable: false,
+        className: styles.customConfirmationToast,
+      }
+    );
   };
 
   const handleOrderCancelled = (orderId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres CANCELAR este pedido?')) {
-      updateOrderStatus(orderId, 'cancelled');
-    }
+    toast.info(
+      <div className={styles.toastConfirmContent}>
+        <p>¿CANCELAR este pedido?</p>
+        <div className={styles.toastButtons}>
+          <button onClick={() => { updateOrderStatus(orderId, 'cancelled'); toast.dismiss(); }} className={styles.toastConfirmButton}>Sí</button>
+          <button onClick={() => toast.dismiss()} className={styles.toastCancelButton}>No</button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: false,
+        closeButton: false,
+        closeOnClick: false,
+        draggable: false,
+        className: styles.customConfirmationToast,
+      }
+    );
   };
 
   const handleOrderRestore = (orderId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres RESTAURAR este pedido a PENDIENTE?')) {
-      updateOrderStatus(orderId, 'pending');
-    }
+    toast.info(
+      <div className={styles.toastConfirmContent}>
+        <p>¿RESTAURAR este pedido a PENDIENTE?</p>
+        <div className={styles.toastButtons}>
+          <button onClick={() => { updateOrderStatus(orderId, 'pending'); toast.dismiss(); }} className={styles.toastConfirmButton}>Sí</button>
+          <button onClick={() => toast.dismiss()} className={styles.toastCancelButton}>No</button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: false,
+        closeButton: false,
+        closeOnClick: false,
+        draggable: false,
+        className: styles.customConfirmationToast,
+      }
+    );
   };
 
-  // Filtra los pedidos según el filtro seleccionado
   const filteredOrders = filterStatus === 'all' ? orders : orders.filter(o => o.status === filterStatus);
 
-  if (loading) return <div className={styles.loading}>Cargando pedidos...</div>;
+  if (initialLoading && orders.length === 0) {
+    return <div className={styles.loading}>Cargando pedidos...</div>;
+  }
+  
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
     <div className={styles.ordersManagementContainer}>
+      <ToastContainer />
+
       <h1 className={styles.title}>Gestión de Pedidos</h1>
+
+      {/* Botón para probar el sonido eliminado */}
+      {/* Indicador de actualización sutil */}
+      {isFetching && <div className={styles.subtleLoading}>Actualizando pedidos...</div>}
 
       {/* Selector para filtrar pedidos por estado */}
       <div className={styles.filterContainer}>

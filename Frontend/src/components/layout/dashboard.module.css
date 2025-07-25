@@ -1,7 +1,7 @@
 .dashboardContainer {
   display: flex;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden; /* Por defecto, oculto para desktop */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -13,7 +13,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow-y: auto;
+  overflow-y: fixed; /* Permite scroll en la barra lateral si el contenido es largo */
 }
 
 .logo {
@@ -55,8 +55,8 @@
   flex: 1;
   padding: 2rem;
   background-color: #dddada;
-  overflow-y: auto;
-  max-height: 100vh;
+  overflow-y: auto; /* Permite scroll en el contenido principal en desktop */
+  max-height: 100vh; /* Limita la altura en desktop para que el scroll sea interno */
 }
 
 .cardsContainer {
@@ -98,7 +98,7 @@
   gap: 8px;
   transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-  position: relative;
+  position: relative; /* Mantener la posición relativa para desktop */
   top: -1rem;
   right: -53rem;
   z-index: 10;
@@ -116,55 +116,74 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  /* CRUCIAL: Anular las propiedades de altura y desbordamiento del html y body para móvil */
+  html, body {
+    height: auto !important; /* Permite que html/body crezcan con el contenido */
+    overflow: auto !important; /* Habilita el scroll en html/body */
+  }
+
+  /* Asegurarse de que body.dashboardPage también permita overflow */
+  body.dashboardPage {
+    overflow: auto !important;
+  }
+
   .dashboardContainer {
     flex-direction: column;
-    height: auto;
+    height: auto; /* Permite que el contenedor crezca con el contenido */
+    overflow: visible; /* Asegura que el contenedor no oculte el desbordamiento */
   }
 
   .sidebar {
     width: 100%;
-    padding: 0.3rem;
+    padding: 0.8rem 0.3rem; /* Aumentado el padding vertical */
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.1rem;
+    gap: 0.5rem; /* Ajustado el gap */
     height: auto;
+    overflow-y: visible; /* Sidebar content no debe tener scroll independiente en móvil */
   }
 
   .logo {
     margin-bottom: 0;
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Título un poco más chico */
     width: 100%;
     text-align: center;
     padding-bottom: 3px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
+  .admin {
+    font-size: 0.7rem; /* Ajustado el tamaño del texto "Admin" */
+  }
+
   .nav {
     flex-direction: row;
     justify-content: space-around;
     width: 100%;
-    margin-top: 0.3rem;
+    margin-top: 0.5rem; /* Un poco más de margen superior */
     margin-bottom: 0;
   }
 
   .navItem {
-    font-size: 0.7rem;
-    padding: 2px;
+    font-size: 0.85rem; /* Texto de navegación más chico */
+    padding: 4px; /* Un poco más de padding */
     flex-direction: column;
     gap: 2px;
     text-align: center;
+    margin-top: 25px;
   }
 
   .mainContent {
     padding: 0.5rem;
-    height: auto;
-    overflow-y: visible;
+    height: auto; /* Permite que el contenido principal crezca */
+    overflow-y: visible; /* Deja que el scroll lo maneje el body */
+    max-height: unset; /* Elimina la limitación de altura */
   }
 
   .logoutButton {
-    position: static;
+    position: static; /* Quita el posicionamiento absoluto en móvil */
     width: 100%;
     margin-bottom: 8px;
     justify-content: center;

@@ -247,32 +247,74 @@
         padding: 8px 12px; /* Ajuste para móviles */
         font-size: 0.9rem; /* Ajuste para móviles */
     }
+
+    /* Contenedor del filtro */
+    .filterContainer {
+        flex-wrap: wrap; /* Permite que el label y el select se envuelvan */
+        justify-content: center; /* Centra los elementos si se envuelven */
+        gap: 0.5rem; /* Reduce el espacio entre ellos */
+    }
+
+    /* Select del filtro */
+    .filterSelect {
+        padding: 0.3rem 0.5rem; /* Reducido el padding */
+        font-size: 0.9rem; /* Reducido el tamaño de fuente */
+        max-width: 90px; /* Limita el ancho del select */
+    }
+
+    /* --- CAMBIO CLAVE AQUÍ: Estilos para las opciones del select en móvil --- */
+    .filterSelect option {
+        font-size: 0.6rem !important; /* Fuerza el tamaño de fuente para las opciones */
+        padding: 0.2rem 0.5rem !important; /* Fuerza el padding para las opciones */
+    }
 }
 
-/* Contenedor del filtro */
+/* Contenedor del filtro (desktop/general) */
 .filterContainer {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 1.8rem;
-  font-weight: 600;
-  color: #374151; /* gris oscuro suave */
-  font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.8rem;
+    font-weight: 600;
+    color: #374151; /* gris oscuro suave */
+    font-size: 1rem;
 }
 
-/* Select del filtro */
+/* Select del filtro (desktop/general) */
 .filterSelect {
-  padding: 0.4rem 0.7rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1.8px solid #cbd5e1; /* gris claro */
-  background-color: white;
-  transition: border-color 0.3s ease;
-  cursor: pointer;
+    padding: 0.4rem 0.7rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1.8px solid #cbd5e1; /* gris claro */
+    background-color: white;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
 }
 
 .filterSelect:hover,
 .filterSelect:focus {
-  border-color: #2563eb; /* azul intenso al hover/focus */
-  outline: none;
+    border-color: #2563eb; /* azul intenso al hover/focus */
+    outline: none;
+}
+
+.subtleLoading {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 0.9rem;
+  color: #666;
+  opacity: 0.8;
+  animation: pulse 1.5s infinite alternate; /* Animación sutil */
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 0.5; }
+}
+
+/* Asegúrate de que .loading original siga existiendo para la carga inicial */
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2rem;
+  color: #555;
 }

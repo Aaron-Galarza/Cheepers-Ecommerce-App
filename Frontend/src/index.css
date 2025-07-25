@@ -58,7 +58,11 @@ body {
   line-height: 1.5; 
 }
 
-
+@media (min-width: 768px) {
+  body{
+  margin-top: 100px;
+  }
+}
 /* Asegura que padding y borde se incluyan en el tamaño de todos los elementos */
 *,
 *::before,

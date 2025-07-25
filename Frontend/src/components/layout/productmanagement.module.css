@@ -24,6 +24,8 @@
     border-radius: 10px;
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
     margin-bottom: 40px;
+    /* Basado en: altura del logo (70px) + padding superior (15px) + padding inferior (15px) = 100px */
+    /* Eliminado scroll-margin-top de aquí, ya que el scroll se maneja internamente en el mainContent */
 }
 
 .formTitle {
@@ -49,6 +51,7 @@
     font-size: 1rem;
     color: #4a5568;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* Asegura que padding no aumente el ancho */
 }
 
 .inputField:focus, .textareaField:focus, .selectField:focus {
@@ -365,25 +368,20 @@
         gap: 10px; /* Ajustado para móviles */
     }
 
-    .inputField, .textareaField, .selectField {
+    .inputField, .textareaField {
         padding: 10px; /* Ajustado para móviles */
     }
 
-    .formActions {
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 15px; /* Ajustado para móviles */
-    }
-
-    .saveButton, .cancelButton {
-        width: 100%;
-        justify-content: center;
-        padding: 10px 20px; /* Ajustado para móviles */
+    .selectField {
+        padding: 8px; /* Reduce el padding */
+        font-size: 0.7rem; /* Reduce el tamaño de la fuente */
+        max-width: 120px; /* <--- CAMBIO CLAVE: Limita el ancho máximo */
+        margin: 0 auto; /* Centra el select si el contenedor es más ancho */
     }
 
     .filterSection {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center; /* Cambiado de stretch a center para que los selects no se estiren al 100% */
         gap: 10px;
         padding: 15px;
         margin-bottom: 20px; /* Ajustado para móviles */
@@ -391,7 +389,7 @@
 
     .filterLabel {
         width: 100%;
-        text-align: left;
+        text-align: center; /* Centra el label también */
     }
 
     .listTitle {

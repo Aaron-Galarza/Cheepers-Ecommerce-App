@@ -4,14 +4,14 @@
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif;
-    /* --- AÑADIDO: Más margen inferior para separación --- */
-    margin-bottom: 50px;
+    margin: 20px;
+    margin-bottom: 80px;
 }
 
 .title {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #e53e3e; /* Rojo Cheepers */
+    color: #e53e3e;
     text-align: center;
     margin-bottom: 40px;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
@@ -48,6 +48,7 @@
     font-size: 1rem;
     color: #4a5568;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
 }
 
 .inputField:focus, .textareaField:focus, .selectField:focus {
@@ -61,28 +62,11 @@
     resize: vertical;
 }
 
-/* Manteniendo formGroup para el checkbox */
-.formGroup {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.formGroup label {
-    font-weight: bold;
-    color: #333;
-}
-
-.checkboxField {
-    transform: scale(1.2);
-    cursor: pointer;
-}
-
 .formActions {
     display: flex;
     gap: 15px;
-    justify-content: flex-end;
+    justify-content: center; /* Centra los botones en desktop */
+    flex-direction: row-reverse; /* Pone "Guardar" a la derecha */
     margin-top: 20px;
 }
 
@@ -123,6 +107,25 @@
     box-shadow: 0 6px 15px rgba(160, 174, 192, 0.4);
 }
 
+/* Filtro */
+.filterSection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filterLabel {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    text-align: left;
+}
+
 .noPromosMessage {
     text-align: center;
     font-size: 1.1rem;
@@ -149,6 +152,7 @@
 }
 
 .promoCard {
+    position: relative;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
@@ -157,13 +161,6 @@
     flex-direction: column;
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     border: 1px solid #e0e0e0;
-}
-
-/* Clase para promociones desactivadas (ahora .inactiveProduct para consistencia) */
-.inactiveProduct {
-    opacity: 0.7;
-    filter: grayscale(1%) brightness(1); /* Ajustado para ser más sutil */
-    transition: all 0.3s ease;
 }
 
 .promoCard:hover {
@@ -176,11 +173,15 @@
     height: 180px;
     object-fit: cover;
     border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    z-index: 2;
 }
 
 .promoInfo {
     padding: 15px;
     flex-grow: 1;
+    position: relative;
+    z-index: 2;
 }
 
 .promoInfo h3 {
@@ -196,40 +197,33 @@
     margin-bottom: 5px;
 }
 
-.promoDiscount {
+.promoPrice {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #28a745;
+    color: #e53e3e;
     margin-top: 10px;
 }
 
-/* Estilos para mostrar el estado de la promoción */
-.promoStatus {
-    font-size: 0.9em;
+.promoCategory {
+    font-size: 0.85rem;
+    color: #718096;
+    font-style: italic;
     margin-top: 5px;
-    font-weight: bold;
 }
 
-.activeStatus {
-    color: #28a745; /* Verde para activo */
-}
-
-.inactiveStatus {
-    color: #dc3545; /* Rojo para inactivo */
-}
-
-/* Ajuste de los botones de acción en la tarjeta */
 .promoActions {
+    position: relative;
+    z-index: 3;
     display: flex;
-    flex-direction: row; /* Cambiado a fila para alineación horizontal */
-    justify-content: flex-end; /* Alinea los botones a la derecha */
-    align-items: center; /* Centra verticalmente los botones */
+    justify-content: flex-end;
     padding: 15px;
-    border-top: 1px solid #e0e0e0; /* Cambiado de border-left a border-top */
-    gap: 10px; /* Espacio entre los botones */
+    border-top: 1px solid #e0e0e0;
+    gap: 10px;
 }
 
-.editButton, .deleteButton {
+.editButton, .deleteButton, .toggleActiveButton, .toggleInactiveButton {
+    position: relative;
+    z-index: 4;
     padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
@@ -239,6 +233,7 @@
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease, transform 0.2s ease;
+    background-color: #f5f5f5;
 }
 
 .editButton {
@@ -261,17 +256,9 @@
     transform: translateY(-1px);
 }
 
-/* Estilos para el botón de Activar/Desactivar */
 .toggleActiveButton {
-    background-color: #28a745; /* Verde para activar */
+    background-color: #28a745;
     color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease;
-    /* margin-right: 10px; -- Eliminado, el 'gap' del contenedor maneja el espacio */
 }
 
 .toggleActiveButton:hover {
@@ -279,146 +266,190 @@
 }
 
 .toggleInactiveButton {
-    background-color: #dc3545; /* Rojo para desactivar */
+    background-color: #dc3545;
     color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease;
-    /* margin-right: 10px; -- Eliminado, el 'gap' del contenedor maneja el espacio */
 }
 
 .toggleInactiveButton:hover {
     background-color: #c82333;
 }
 
-
-.filterSection {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 30px;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    font-size: 1.2rem;
-    color: #2d3748;
-}
-
-/* Estilo de la etiqueta del filtro */
-.filterLabel {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #2d3748;
-}
-
-/* Ya definida como selectField — solo mejoramos visualmente */
-.selectField {
-    width: 100%;
-    max-width: 300px;
-    padding: 10px 14px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: 1px solid #cbd5e0;
-    background-color: #fff;
-    color: #2d3748;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.selectField:focus {
-    outline: none;
-    border-color: #e53e3e;
-    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.3);
-}
-
-/* RESPONSIVE ajustado a móvil */
-@media (max-width: 768px) {
-    .filterSection {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .filterLabel {
-        font-size: 1rem;
-    }
-
-    .selectField {
-        width: 100%;
-    }
-}
-
-/* DESKTOP - horizontal alignment */
-@media (min-width: 769px) {
-    .filterSection {
-        flex-direction: row;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .selectField {
-        width: auto;
-    }
-}
-
-
-/* Capa gris para promos desactivadas (sin tapar botones) */
 .promoCardOverlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(128, 128, 128, 0.4);
+    background-color: rgba(160, 160, 160, 0.5);
     z-index: 1;
     border-radius: 10px;
     pointer-events: none;
 }
 
-/* Contenedor de botones siempre por encima del overlay gris */
-.promoActions {
-    position: relative;
-    z-index: 2;
+.inactivePromo {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Estado */
+.promoStatus {
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.activeStatus {
+    color: #28a745;
+}
+
+.inactiveStatus {
+    color: #dc3545;
+}
+
+/* Icon buttons */
+.iconButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1.2rem;
+    color: #333;
+    transition: color 0.2s ease;
+}
+
+.iconButton:hover {
+    color: #000;
+}
+
+/* FormGroup */
+.formGroup {
+    margin-bottom: 15px;
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
     align-items: center;
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
     gap: 10px;
 }
 
-.promoCard {
-    position: relative; /* necesario para que el overlay se posicione bien */
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border: 1px solid #e0e0e0;
+.formGroup label {
+    font-weight: bold;
+    color: #333;
 }
 
-.promoCardOverlay {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(160, 160, 160, 0.4); /* Gris suave */
-    z-index: 1;
-    pointer-events: none;
-    border-radius: 10px;
+.checkboxField {
+    transform: scale(1.2);
+    cursor: pointer;
 }
 
-/* Todo el contenido debe quedar encima del overlay */
-.promoInfo,
-.promoActions {
-    position: relative;
-    z-index: 2;
+/* Responsive */
+@media (max-width: 768px) {
+    .promoManagementContainer {
+        padding: 20px;
+        margin: 10px;
+        margin-bottom: 60px;
+    }
+
+    .title {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    .formSection {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .formTitle {
+        font-size: 1.5rem;
+    }
+
+    .promoForm {
+        gap: 10px;
+    }
+
+    .inputField, .textareaField {
+        padding: 10px;
+    }
+
+    .selectField {
+        padding: 8px;
+        font-size: 0.9rem;
+        max-width: 120px;
+        margin: 0 auto;
+    }
+
+    .filterSection {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .filterLabel {
+        width: 100%;
+        text-align: center;
+    }
+
+    .formActions {
+        flex-direction: column; /* Apila los botones en móvil */
+        width: 100%; /* Hace que los botones ocupen todo el ancho */
+        align-items: center; /* Centra los botones apilados */
+        justify-content: center; /* Centra los botones apilados */
+    }
+
+    .saveButton, .cancelButton {
+        width: 100%; /* Los botones ocupan todo el ancho en móvil */
+        justify-content: center; /* Centra el contenido del botón */
+        padding: 10px 15px; /* Ajusta el padding para móvil */
+    }
+
+    .listTitle {
+        font-size: 1.8rem;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    .promotionsList {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .promoCard {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .promoImage {
+        height: 150px;
+        width: 100%;
+    }
+
+    .promoInfo {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .promoInfo h3 {
+        font-size: 1.2rem;
+    }
+
+    .promoInfo p {
+        font-size: 0.9rem;
+    }
+
+    .promoPrice {
+        font-size: 1rem;
+    }
+
+    .promoActions {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 1rem;
+    }
+
+    .editButton, .deleteButton, .toggleActiveButton, .toggleInactiveButton {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+    }
 }

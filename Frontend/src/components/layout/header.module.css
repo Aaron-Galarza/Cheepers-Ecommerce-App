@@ -27,18 +27,21 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 }
 
-/* Estructura principal del header (Desktop First) */
+/* Estructura principal del header (Ahora fijo en todas las resoluciones) */
 .header {
   background-color: white;
-  padding: 15px 5%;
+  padding: 15px 5%; /* Padding para desktop */
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Espacia el logo y el grupo de acciones */
+  justify-content: space-between;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-  position: sticky; /* Se mantiene sticky en desktop */
-  top: 0;
+  position: fixed; /* Header fijo en todas las resoluciones */
+  width: 100%; /* Ocupa todo el ancho */
+  top: 0; /* Se pega a la parte superior */
+  left: 0; /* Se pega a la izquierda */
   z-index: 1000;
-  flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+  flex-wrap: wrap;
+  box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
 }
 
 /* Logo + texto "CHEEPERS" */
@@ -84,7 +87,7 @@
 
 .navLink:hover,
 .navLink.active {
-  color: var(--color-primary); /* Usa la variable de color */
+  color: var(--color-primary);
   font-weight: bold;
 }
 
@@ -92,7 +95,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espacio entre los botones de acción */
+  gap: 15px;
 }
 
 .action-button {
@@ -131,12 +134,12 @@
 
 /* Botón de usuario (solo visible en desktop por defecto) */
 .user-button-desktop {
-  display: flex; /* Visible en desktop */
+  display: flex;
 }
 
 /* Menú hamburguesa (oculto en desktop por defecto) */
 .menu-toggle {
-  display: none; /* Oculto en desktop */
+  display: none;
   background: none;
   border: none;
   font-size: 2rem;
@@ -148,22 +151,18 @@
 /* --- ESTILOS RESPONSIVOS (Mobile) --- */
 @media (max-width: 768px) {
   .header {
-    padding: var(--space-sm) 3%; /* Ajusta el padding para móvil */
-    position: fixed; /* ES FIJO EN MÓVIL */
-    width: 100%; /* Ocupa todo el ancho */
-    top: 0; /* Se pega a la parte superior */
-    left: 0; /* Se pega a la izquierda */
+    padding: var(--space-sm) 3%; /* Ajusta el padding para móvil, el position: fixed ya está arriba */
   }
 
   /* Ocultar la navegación principal en móvil */
   .nav-links {
     display: none;
-    width: 100%; /* Ocupa todo el ancho cuando está abierto */
+    width: 100%;
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    position: absolute; /* Posicionamiento absoluto para el menú desplegable */
-    top: 70px; /* Ajusta según la altura de tu header */
+    position: absolute;
+    top: 70px; /* Ajusta según la altura de tu header en móvil */
     left: 0;
     background-color: var(--color-white);
     box-shadow: var(--shadow-md);
@@ -174,44 +173,43 @@
   }
 
   .nav-links.open {
-    display: flex; /* Muestra el menú cuando está abierto */
+    display: flex;
   }
 
   .nav-links .navLink {
-    width: 100%; /* Los enlaces ocupan todo el ancho del menú desplegable */
+    width: 100%;
     text-align: center;
     padding: var(--space-sm) 0;
-    border-bottom: 1px solid var(--color-grey-background); /* Separador entre enlaces */
+    border-bottom: 1px solid var(--color-grey-background);
   }
 
   .nav-links .navLink:last-child {
-    border-bottom: none; /* No hay separador en el último enlace */
+    border-bottom: none;
   }
 
   /* Mostrar el menú hamburguesa en móvil */
   .menu-toggle {
-    display: block; /* Muestra el botón de hamburguesa */
+    display: block;
   }
 
   /* Ajustes para el logo y texto "CHEEPERS" en móvil */
   .logo-image {
-    height: 40px; /* Tamaño del logo más pequeño en móvil */
+    height: 40px;
     width: auto;
-    margin-right: 8px; /* Espacio más compacto */
+    margin-right: 8px;
   }
 
   .logo-text {
-    font-size: 1.8rem; /* Tamaño del texto "CHEEPERS" ajustado para móvil */
+    font-size: 1.8rem;
   }
 
   /* Ajustes para los botones de acción en móvil */
   .header-actions {
-    /* El `justify-content: space-between` en .header ya los empuja a la derecha */
-    margin-left: auto; /* Asegura que este grupo se alinee a la derecha */
-    gap: var(--space-sm); /* Espacio entre el carrito y el menú toggle */
+    margin-left: auto;
+    gap: var(--space-sm);
   }
 
   .user-button-desktop {
-    display: none; /* Oculta el botón de usuario en móvil */
+    display: none;
   }
 }

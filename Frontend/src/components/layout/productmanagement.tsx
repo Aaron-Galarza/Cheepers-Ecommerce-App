@@ -1,9 +1,10 @@
 // src/components/layout/ProductManagement.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import styles from './productmanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 import authService from '../../services/authservice';
+import { useLocation } from 'react-router-dom';
 
 export interface Product {
   _id: string;
@@ -35,9 +36,28 @@ const ProductManagement: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<string>('Todas');
   const [filterStatus, setFilterStatus] = useState<string>('Todos');
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const location = useLocation();
+  // Crea una referencia para el contenedor principal del componente
+  const productManagementContainerRef = useRef<HTMLDivElement>(null);
+
+  // Función para desplazar el elemento relevante al inicio, ahora en todos los casos
+  const scrollToTop = () => {
+    // Usamos setTimeout para asegurar que el scroll se ejecuta después del renderizado del DOM
+    setTimeout(() => {
+      // Intenta desplazar la ventana completa (para el caso más general)
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      // Si la ventana no es la que se desplaza, intenta desplazar el documento HTML
+      document.documentElement.scrollTop = 0;
+      // Y también el body, por si acaso (compatibilidad)
+      document.body.scrollTop = 0;
+
+      // Finalmente, si el scroll está en el contenedor de este componente, desplázalo
+      if (productManagementContainerRef.current) {
+        productManagementContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    }, 50); // Un pequeño retardo para asegurar que el DOM esté listo
+  };
 
   const fetchProducts = async () => {
     try {
@@ -48,6 +68,21 @@ const ProductManagement: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(response.data);
+
+      const queryParams = new URLSearchParams(location.search);
+      const editId = queryParams.get('editId');
+
+      if (editId) {
+        const productToEdit = response.data.find(p => p._id === editId);
+        if (productToEdit) {
+          setEditingProduct(productToEdit);
+          // Desplaza al inicio cuando se carga un producto para edición desde la URL
+          scrollToTop();
+        } else {
+          console.warn(`Producto con ID ${editId} no encontrado.`);
+        }
+      }
+
     } catch (err: any) {
       console.error('Error al cargar los productos:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
@@ -61,6 +96,10 @@ const ProductManagement: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    fetchProducts();
+  }, [location.search]);
+
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -70,6 +109,7 @@ const ProductManagement: React.FC = () => {
       });
       setNewProduct({ name: '', description: '', price: 0, imageUrl: '', category: 'Hamburguesas', isActive: true });
       fetchProducts();
+      scrollToTop(); // Desplaza al inicio después de crear un producto
     } catch (err: any) {
       console.error('Error al crear producto:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
@@ -83,6 +123,8 @@ const ProductManagement: React.FC = () => {
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
+    // Desplaza al inicio cuando se hace clic en editar
+    scrollToTop();
   };
 
   const handleUpdateProduct = async (e: React.FormEvent) => {
@@ -95,6 +137,7 @@ const ProductManagement: React.FC = () => {
       });
       setEditingProduct(null);
       fetchProducts();
+      scrollToTop(); // Desplaza al inicio después de actualizar un producto
     } catch (err: any) {
       console.error('Error al actualizar producto:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
@@ -107,18 +150,19 @@ const ProductManagement: React.FC = () => {
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
+    console.log('Confirmación de eliminación: ¿Estás seguro de que quieres eliminar este producto?');
     try {
       const token = localStorage.getItem('adminToken');
       await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchProducts();
+      scrollToTop(); // Desplaza al inicio después de eliminar un producto
     } catch (err: any) {
       console.error('Error al eliminar producto:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
         authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+        setError('Error al eliminar producto. Verifica tu sesión.');
       } else {
         setError('Error al eliminar producto. Verifica tu sesión.');
       }
@@ -158,10 +202,11 @@ const ProductManagement: React.FC = () => {
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
-    <div className={styles.productManagementContainer}>
+    // Adjunta la referencia al contenedor principal del componente
+    <div ref={productManagementContainerRef} className={styles.productManagementContainer}>
       <h1 className={styles.title}>Gestión de Productos</h1>
 
-      <div className={styles.formSection}>
+      <div id="product-form-section" className={styles.formSection}>
         <h2 className={styles.formTitle}>{editingProduct ? 'Editar Producto' : 'Crear Nuevo Producto'}</h2>
         <form onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct} className={styles.productForm}>
           <input

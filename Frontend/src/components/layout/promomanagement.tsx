@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Importa useRef
 import axios from 'axios';
 import styles from './promomanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
@@ -36,6 +36,42 @@ const PromoManagement: React.FC = () => {
   });
   const [filterStatus, setFilterStatus] = useState<string>('Todos');
 
+  // Crea una referencia para el contenedor principal del componente
+  const promoManagementContainerRef = useRef<HTMLDivElement>(null);
+  // Estado para detectar si es móvil
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Efecto para actualizar isMobile cuando la ventana cambia de tamaño
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Función para desplazar el elemento relevante al inicio, solo en móviles
+  const scrollToTopForMobile = () => {
+    if (isMobile) {
+      // Usamos setTimeout para asegurar que el scroll se ejecuta después del renderizado del DOM
+      setTimeout(() => {
+        // Intenta desplazar la ventana completa (para el caso más general)
+        window.scrollTo({ top: 0, behavior: 'instant' });
+
+        // Si la ventana no es la que se desplaza, intenta desplazar el documento HTML
+        document.documentElement.scrollTop = 0;
+        // Y también el body, por si acaso (compatibilidad)
+        document.body.scrollTop = 0;
+
+        // Finalmente, si el scroll está en el contenedor de este componente, desplázalo
+        if (promoManagementContainerRef.current) {
+          promoManagementContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      }, 50); // Un pequeño retardo para asegurar que el DOM esté listo
+    }
+  };
+
   useEffect(() => {
     fetchPromotions();
   }, []);
@@ -72,6 +108,7 @@ const PromoManagement: React.FC = () => {
       });
       setNewPromotion({ name: '', description: '', price: 0, imageUrl: '', category: 'Promos Solo en Efectivo', discountPercentage: 0, isActive: true });
       fetchPromotions();
+      scrollToTopForMobile(); // Desplaza al inicio después de crear una promoción (solo en móvil)
     } catch (err: any) {
       console.error('Error al crear promoción:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
@@ -85,6 +122,8 @@ const PromoManagement: React.FC = () => {
 
   const handleEditPromotion = (promotion: Promotion) => {
     setEditingPromotion(promotion);
+    // Desplazarse al formulario de edición (solo en móvil)
+    scrollToTopForMobile();
   };
 
   const handleUpdatePromotion = async (e: React.FormEvent) => {
@@ -97,6 +136,7 @@ const PromoManagement: React.FC = () => {
       });
       setEditingPromotion(null);
       fetchPromotions();
+      scrollToTopForMobile(); // Desplaza al inicio después de actualizar una promoción (solo en móvil)
     } catch (err: any) {
       console.error('Error al actualizar promoción:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
@@ -109,13 +149,14 @@ const PromoManagement: React.FC = () => {
   };
 
   const handleDeletePromotion = async (id: string) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar esta promoción?')) return;
+    console.log('Confirmación de eliminación: ¿Estás seguro de que quieres eliminar esta promoción?');
     try {
       const token = localStorage.getItem('adminToken');
       await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPromotions();
+      scrollToTopForMobile(); // Desplaza al inicio después de eliminar una promoción (solo en móvil)
     } catch (err: any) {
       console.error('Error al eliminar promoción:', err);
       if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
@@ -157,10 +198,12 @@ const PromoManagement: React.FC = () => {
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
-    <div className={styles.promoManagementContainer}>
+    // Adjunta la referencia al contenedor principal del componente
+    <div ref={promoManagementContainerRef} className={styles.promoManagementContainer}>
       <h1 className={styles.title}>Gestión de Promociones</h1>
 
-      <div className={styles.formSection}>
+      {/* Añade un ID a la sección del formulario para poder hacer scroll a ella */}
+      <div id="promo-form-section" className={styles.formSection}>
         <h2 className={styles.formTitle}>{editingPromotion ? 'Editar Promoción' : 'Crear Nueva Promoción'}</h2>
         <form onSubmit={editingPromotion ? handleUpdatePromotion : handleCreatePromotion} className={styles.promoForm}>
           <input
