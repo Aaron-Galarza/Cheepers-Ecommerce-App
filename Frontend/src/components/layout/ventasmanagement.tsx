@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Brush
 } from 'recharts';
 import authService from '../../services/authservice';
-import { SelectedAddOn, IAddOn } from './productlist';
+import { SelectedAddOn, IAddOn } from './productlist'; // Asegúrate de que esta ruta sea correcta
 
 export interface Order {
   _id: string;
@@ -44,12 +44,13 @@ interface SalesData {
   sales: number;
 }
 
-// INTERFAZ ACTUALIZADA para los datos de la tabla diaria (una fila por pedido)
+// INTERFAZ ACTUALIZADA para los datos de la tabla (una fila por pedido)
 interface DailySaleTableItem {
   orderId: string;
   orderSummary: string; // Resumen de productos y adicionales del pedido
   subtotal: number; // totalAmount del pedido
-  orderTime: string; // Hora del pedido
+  orderDate: string; // Fecha del pedido (DD/MM/YYYY)
+  orderTime: string; // Hora del pedido (HH:MM)
   fullOrderTime: Date; // Para ordenar
 }
 
@@ -67,12 +68,12 @@ const VentasManagement: React.FC = () => {
   const [endDate, setEndDate] = useState<string>('');
   const [triggerSearch, setTriggerSearch] = useState<number>(0);
 
-  const [selectedDailyDate, setSelectedDailyDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [dailySalesTableData, setDailySalesTableData] = useState<DailySaleTableItem[]>([]);
-  const [dailyTotalSales, setDailyTotalSales] = useState<number>(0);
-
+  // Estado para controlar cuántas filas se muestran en la tabla de detalle
+  const [rowsToShow, setRowsToShow] = useState(10);
+  const INITIAL_ROWS_LIMIT = 10; // Límite inicial de filas para "Ver más"
 
   useEffect(() => {
+    // Solo recargar datos si el filtro no es personalizado O si se activó la búsqueda personalizada
     if (timeRangeFilter !== 'custom' || triggerSearch > 0) {
       fetchData();
     }
@@ -83,10 +84,12 @@ const VentasManagement: React.FC = () => {
       setLoading(true);
       setError(null);
 
+      const token = localStorage.getItem('adminToken'); // Obtener el token de autenticación
+
       const [productsResponse, addOnsResponse, ordersResponse] = await Promise.all([
-        axios.get<Product[]>(`${API_BASE_URL}/api/products`),
-        axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`),
-        axios.get<Order[]>(`${API_BASE_URL}/api/orders`),
+        axios.get<Product[]>(`${API_BASE_URL}/api/products`, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.get<Order[]>(`${API_BASE_URL}/api/orders`, { headers: { Authorization: `Bearer ${token}` }}),
       ]);
 
       setAllProducts(productsResponse.data);
@@ -111,79 +114,13 @@ const VentasManagement: React.FC = () => {
 
   const handleCustomSearch = () => {
     if (startDate && endDate) {
-      setTriggerSearch(prev => prev + 1);
+      setTriggerSearch(prev => prev + 1); // Forzar re-ejecución de fetchData y useMemo
+      setRowsToShow(INITIAL_ROWS_LIMIT); // Resetear "Ver más" al buscar
     } else {
+      console.error('Error: Por favor, selecciona ambas fechas para el rango personalizado.');
       setError('Por favor, selecciona ambas fechas para el rango personalizado.');
     }
   };
-
-  // Función para procesar los datos de la tabla diaria (una fila por pedido)
-  const processDailySalesData = useCallback(() => {
-    const dailyData: DailySaleTableItem[] = [];
-    let currentDailyTotal = 0;
-
-    const selectedDateObj = new Date(selectedDailyDate + 'T00:00:00');
-    const productMap = new Map(allProducts.map(p => [p._id, p]));
-
-    allOrders.forEach(order => {
-      const orderCreatedAt = new Date(order.createdAt); 
-
-      const orderYear = orderCreatedAt.getFullYear();
-      const orderMonth = orderCreatedAt.getMonth();
-      const orderDay = orderCreatedAt.getDate();
-
-      const selectedYear = selectedDateObj.getFullYear();
-      const selectedMonth = selectedDateObj.getMonth();
-      const selectedDay = selectedDateObj.getDate();
-
-      // Filtrar por pedidos entregados y dentro del día seleccionado
-      if (order.status === 'delivered' &&
-          orderYear === selectedYear &&
-          orderMonth === selectedMonth &&
-          orderDay === selectedDay) {
-
-        // Construir el resumen de productos y adicionales para esta fila del pedido
-        let orderSummary = order.products.map(productInOrder => {
-          const productInfo = productMap.get(productInOrder.productId);
-          let productText = productInfo ? `${productInfo.name} (x${productInOrder.quantity})` : `Producto desconocido (x${productInOrder.quantity})`;
-
-          if (productInOrder.addOns && productInOrder.addOns.length > 0) {
-            const addOnsText = productInOrder.addOns.map(ao => {
-              const addOnDetail = allAddOns.get(ao._id);
-              const name = addOnDetail?.name || ao.name || 'Adicional desconocido';
-              return `+ ${name} (x${ao.quantity})`;
-            }).join(', ');
-            productText += ` [${addOnsText}]`;
-          }
-          return productText;
-        }).join('; '); // Separar los productos con punto y coma
-
-        dailyData.push({
-          orderId: order._id,
-          orderSummary: orderSummary,
-          subtotal: order.totalAmount, // Directamente el totalAmount del pedido
-          orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
-          fullOrderTime: orderCreatedAt
-        });
-        currentDailyTotal += order.totalAmount; // Sumar el totalAmount del pedido al total del día
-      }
-    });
-
-    dailyData.sort((a, b) => a.fullOrderTime.getTime() - b.fullOrderTime.getTime());
-
-    setDailySalesTableData(dailyData);
-    setDailyTotalSales(currentDailyTotal);
-  }, [selectedDailyDate, allOrders, allProducts, allAddOns]);
-
-  useEffect(() => {
-    if (selectedDailyDate && allOrders.length > 0 && allProducts.length > 0 && allAddOns.size > 0) {
-      processDailySalesData();
-    } else if (!selectedDailyDate) {
-      setDailySalesTableData([]);
-      setDailyTotalSales(0);
-    }
-  }, [selectedDailyDate, allOrders, allProducts, allAddOns, processDailySalesData]);
-
 
   const {
     totalSales,
@@ -193,7 +130,9 @@ const VentasManagement: React.FC = () => {
     promosSoldCount,
     bestSellingProducts,
     salesDataForChart,
-    topSellingPeriods
+    topSellingPeriods,
+    dailySalesTableData, // Añadido al retorno
+    dailyTotalSales // Añadido al retorno
   } = useMemo(() => {
     let currentOrders = [...allOrders];
     const now = new Date();
@@ -311,6 +250,43 @@ const VentasManagement: React.FC = () => {
       calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 5);
     }
 
+    // --- CÁLCULO DE DATOS PARA LA TABLA DE VENTAS POR RANGO (CON FECHA Y HORA) ---
+    const tableData: DailySaleTableItem[] = [];
+    let tableTotalSales = 0;
+    const productMapForTable = new Map(allProducts.map(p => [p._id, p]));
+
+    deliveredOrders.forEach(order => {
+      const orderCreatedAt = new Date(order.createdAt);
+
+      let orderSummary = order.products.map(productInOrder => {
+        const productInfo = productMapForTable.get(productInOrder.productId);
+        let productText = productInfo ? `${productInfo.name} (x${productInOrder.quantity})` : `Producto desconocido (x${productInOrder.quantity})`;
+
+        if (productInOrder.addOns && productInOrder.addOns.length > 0) {
+          const addOnsText = productInOrder.addOns.map(ao => {
+            const addOnDetail = allAddOns.get(ao._id);
+            const name = addOnDetail?.name || ao.name || 'Adicional desconocido';
+            return `+ ${name} (x${ao.quantity})`;
+          }).join(', ');
+          productText += ` [${addOnsText}]`;
+        }
+        return productText;
+      }).join('; ');
+
+      tableData.push({
+        orderId: order._id,
+        orderSummary: orderSummary,
+        subtotal: order.totalAmount,
+        orderDate: orderCreatedAt.toLocaleDateString('es-AR'), // Formato de fecha (DD/MM/YYYY)
+        orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+        fullOrderTime: orderCreatedAt
+      });
+      tableTotalSales += order.totalAmount;
+    });
+
+    tableData.sort((a, b) => a.fullOrderTime.getTime() - b.fullOrderTime.getTime());
+    // --- FIN CÁLCULO DE DATOS PARA LA TABLA ---
+
     return {
       totalSales: calculatedTotalSales,
       totalOrdersCount: calculatedTotalOrdersCount,
@@ -319,43 +295,57 @@ const VentasManagement: React.FC = () => {
       promosSoldCount: calculatedPromosSoldCount,
       bestSellingProducts: bestSellingWithPercentage,
       salesDataForChart: calculatedSalesDataForChart,
-      topSellingPeriods: calculatedTopSellingPeriods
+      topSellingPeriods: calculatedTopSellingPeriods,
+      dailySalesTableData: tableData, // Exportar los datos de la tabla
+      dailyTotalSales: tableTotalSales // Exportar el total de la tabla
     };
-  }, [allOrders, allProducts, timeRangeFilter, startDate, endDate]);
+  }, [allOrders, allProducts, allAddOns, timeRangeFilter, startDate, endDate]); // Dependencias actualizadas
 
   const exportDailySalesToCsv = () => {
     if (dailySalesTableData.length === 0) {
-      alert('No hay datos para exportar.');
+      console.log('No hay datos para exportar.');
       return;
     }
 
     const headers = [
+      'Fecha', // Nuevo encabezado
       'Hora',
       'Resumen del Pedido',
       'Subtotal'
     ];
 
     const rows = dailySalesTableData.map(item => [
+      `"${item.orderDate}"`, // Nuevo campo
       `"${item.orderTime}"`,
       `"${item.orderSummary.replace(/"/g, '""')}"`,
       `"${item.subtotal.toFixed(2)}"`
     ]);
 
-    rows.push(['', 'Total del Día:', `"${dailyTotalSales.toFixed(2)}"`]);
+    rows.push(['', '', 'Total del Período:', `"${dailyTotalSales.toFixed(2)}"`]); // Etiqueta de total ajustada, colSpan 2 para los dos primeros vacíos
 
     const csvContent = [
       headers.join(','),
       ...rows.map(row => row.join(','))
     ].join('\n');
 
-    // Añadir el BOM para UTF-8 al inicio del contenido del CSV
     const BOM = "\uFEFF"; // Byte Order Mark para UTF-8
     const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `ventas_diarias_${selectedDailyDate}.csv`);
+
+    // Nombre del archivo CSV dinámico según el filtro
+    let filename = 'ventas_';
+    if (timeRangeFilter === 'custom') {
+      filename += `personalizado_${startDate}_a_${endDate}.csv`;
+    } else if (timeRangeFilter === 'today') {
+      filename += `hoy_${new Date().toISOString().split('T')[0]}.csv`;
+    } else {
+      filename += `${timeRangeFilter}.csv`;
+    }
+    link.setAttribute('download', filename);
+
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -384,6 +374,7 @@ const VentasManagement: React.FC = () => {
             setStartDate('');
             setEndDate('');
             setTriggerSearch(0);
+            setRowsToShow(INITIAL_ROWS_LIMIT); // Resetear "Ver más" al cambiar filtro
           }}
           className={styles.selectField}
         >
@@ -494,9 +485,9 @@ const VentasManagement: React.FC = () => {
             <h3 className={styles.bestDaysTitle}>
               <span className={styles.trophyIcon}><FaTrophy /></span>
               {timeRangeFilter === 'year' ? 'Top 5 Meses de Ventas:' :
-               timeRangeFilter === 'month' ? 'Top 10 Días de Ventas:' :
-               timeRangeFilter === 'week' ? 'Top 3 Días de Ventas:' :
-               'Mejores Días de Ventas:'}
+                timeRangeFilter === 'month' ? 'Top 10 Días de Ventas:' :
+                timeRangeFilter === 'week' ? 'Top 3 Días de Ventas:' :
+                'Mejores Días de Ventas:'}
             </h3>
             {topSellingPeriods.length > 0 ? (
               <ul className={styles.bestDaysList}>
@@ -546,20 +537,12 @@ const VentasManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* NUEVA SECCIÓN: Tabla de Ventas Diarias */}
+      {/* SECCIÓN ACTUALIZADA: Tabla de Detalle de Ventas por Rango */}
       <div className={styles.dailySalesTableSection}>
         <h2 className={styles.sectionTitle}>
-          <FaCalendarDay /> Detalle de Ventas por Día
+          <FaCalendarDay /> Detalle de Ventas
         </h2>
-        <div className={styles.dailyDateFilter}>
-          <label htmlFor="dailyDate" className={styles.filterLabel}>Seleccionar Fecha:</label>
-          <input
-            type="date"
-            id="dailyDate"
-            value={selectedDailyDate}
-            onChange={(e) => setSelectedDailyDate(e.target.value)}
-            className={styles.inputField}
-          />
+        <div className={styles.dailyDateFilter}> {/* Mantengo el div por si hay otros elementos en el futuro */}
           <button onClick={exportDailySalesToCsv} className={styles.exportButton}>
             <FaFileCsv /> Exportar CSV
           </button>
@@ -570,14 +553,16 @@ const VentasManagement: React.FC = () => {
             <table className={styles.dailySalesTable}>
               <thead>
                 <tr>
+                  <th>Fecha</th> {/* Nueva columna de fecha */}
                   <th>Hora</th>
                   <th>Pedido</th>
                   <th>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                {dailySalesTableData.map((item, index) => (
+                {dailySalesTableData.slice(0, rowsToShow).map((item, index) => (
                   <tr key={index}>
+                    <td>{item.orderDate}</td> {/* Mostrar la fecha */}
                     <td>{item.orderTime}</td>
                     <td>{item.orderSummary}</td>
                     <td>${item.subtotal.toFixed(2)}</td>
@@ -586,14 +571,24 @@ const VentasManagement: React.FC = () => {
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={2} className={styles.totalRowLabel}>Total del Día:</td>
+                  <td colSpan={3} className={styles.totalRowLabel}>Total del Período:</td> {/* colSpan ajustado a 3 */}
                   <td className={styles.totalRowValue}>${dailyTotalSales.toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>
+            {dailySalesTableData.length > rowsToShow && (
+              <button onClick={() => setRowsToShow(dailySalesTableData.length)} className={styles.seeMoreButton}>
+                Ver más ({dailySalesTableData.length - rowsToShow} pedidos)
+              </button>
+            )}
+            {rowsToShow > INITIAL_ROWS_LIMIT && (
+              <button onClick={() => setRowsToShow(INITIAL_ROWS_LIMIT)} className={styles.seeLessButton}>
+                Ver menos
+              </button>
+            )}
           </div>
         ) : (
-          <p className={styles.noDataMessage}>No hay ventas registradas para la fecha seleccionada.</p>
+          <p className={styles.noDataMessage}>No hay ventas registradas para el rango seleccionado.</p>
         )}
       </div>
     </div>

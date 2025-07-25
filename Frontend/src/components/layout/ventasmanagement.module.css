@@ -3,12 +3,12 @@
 /* Variables de color y espaciado - ¡Con la paleta de colores azul y rojo Cheepers! */
 :root {
   --color-cheepers-red: #e53e3e; /* Rojo Cheepers para título, errores, exportar */
-  --color-primary-blue: #007bff; /* Azul primario para métricas, porcentajes, foco */
+  --color-primary-blue: #2c86ec; /* Azul primario para métricas, porcentajes, foco */
   --color-light-blue: #a0c4ff; /* Azul claro para bordes de input, scrollbar */
   --color-very-light-blue: #e7f3ff; /* Azul muy claro para fondos de iconos/porcentajes */
   --color-background-light: #f8f9fa; /* Fondo general más claro */
   --color-white: #ffffff;
-  --color-dark-text: #333; /* Gris oscuro para texto principal */
+  --color-dark-text: #333333; /* Gris oscuro para texto principal */
   --color-medium-text: #4a5568; /* Gris medio para texto secundario */
   --color-light-text: #6b7280; /* Gris claro para texto terciario */
   --color-border-subtle: #f0f0f0; /* Borde sutil */
@@ -478,13 +478,12 @@
         flex-direction: column;
         align-items: stretch;
         gap: var(--space-sm);
-        padding: var(--space-md);
+        padding: 1rem;
     }
 
     .customDateFilter {
         flex-direction: column;
         align-items: stretch;
-        gap: var(--space-sm);
     }
 
     .selectField, .inputField, .searchButton, .exportButton {
@@ -494,7 +493,7 @@
 
     .metricsGrid {
         grid-template-columns: 1fr;
-        gap: var(--space-md);
+        gap: 1rem;
     }
 
     .metricCard {
@@ -517,7 +516,7 @@
 
     .chartsContainer {
         grid-template-columns: 1fr;
-        gap: var(--space-md);
+        gap: 1.5rem;
     }
 
     .chartCard {
@@ -567,4 +566,46 @@
         font-size: 0.9rem; /* Más pequeño para móvil */
         padding: 8px 10px; /* Más pequeño para móvil */
     }
+}
+
+/* --- NUEVOS ESTILOS para "Ver más" / "Ver menos" --- */
+.seeMoreButton, .seeLessButton {
+  background-color: var(--color-primary-blue); /* Azul primario */
+  color: var(--color-white);
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  display: block; /* Para que ocupe su propia línea */
+  margin: 1rem auto; /* Centrar el botón */
+  width: fit-content; /* Ajustar ancho al contenido */
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2); /* Sombra suave */
+}
+
+.seeLessButton {
+  background-color: var(--color-medium-text); /* Gris para "Ver menos" */
+  box-shadow: 0 2px 8px rgba(74, 85, 104, 0.2); /* Sombra suave */
+}
+
+.seeMoreButton:hover {
+  background-color: #0056b3; /* Azul más oscuro */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.seeLessButton:hover {
+  background-color: #5a6268; /* Gris más oscuro */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+}
+
+@media (max-width: 768px) {
+  .seeMoreButton, .seeLessButton {
+    width: 100%; /* Ocupa todo el ancho en móviles */
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
