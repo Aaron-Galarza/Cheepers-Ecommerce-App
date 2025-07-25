@@ -173,7 +173,7 @@ const Inicio: React.FC = () => {
                   </span>
                   <p className={styles.contactText}>
                     Ubicados en Corrientes 1200, Resistencia - Chaco
-                    {' '} (<a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
+                    {' '} (<a href="https://maps.app.goo.gl/QppqFpF3aGCp6tnq9" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
                   </p>
               </div>
             </div> {/* Fin contactInfoBlock */}
@@ -192,7 +192,7 @@ const Inicio: React.FC = () => {
 
             {/* Botón "Abrir en Maps" */}
             <a
-              href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar"
+              href="https://maps.app.goo.gl/QppqFpF3aGCp6tnq9"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.openInMapsButton}
