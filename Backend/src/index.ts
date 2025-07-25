@@ -25,7 +25,6 @@ const allowedOrigins = [
     'http://localhost:3000', // Si usas Create React App local
     'http://localhost:5173', // Si usas Vite local (tu caso)
     'https://cheepersapp.vercel.app', // El dominio principal de tu frontend en Vercel
-    'https://cheepersapp-p27om5d6w-aaron-galarzas-projects.vercel.app', // El subdominio de Preview/Deployment específico de Vercel
     // Si quieres permitir cualquier subdominio de Vercel (menos seguro para producción):
     // Nota: Si descomentas esta línea, podrías quitar las dos líneas de Vercel anteriores
     // Esto es un string que representa una RegEx, no una RegEx directamente en el array de strings.
