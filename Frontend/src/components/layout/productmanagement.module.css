@@ -5,6 +5,8 @@
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif;
     margin: 20px;
+    /* --- AÑADIDO: Más margen inferior para separación --- */
+    margin-bottom: 80px; /* Puedes ajustar este valor si necesitas más o menos */
 }
 
 .title {
@@ -341,6 +343,8 @@
     .productManagementContainer {
         padding: 20px;
         margin: 10px;
+        /* AÑADIDO: Margen inferior para móviles */
+        margin-bottom: 60px; /* Ajusta este valor si es necesario */
     }
 
     .title {
@@ -350,27 +354,39 @@
 
     .formSection {
         padding: 20px;
+        margin-bottom: 20px; /* Ajustado para móviles */
     }
 
     .formTitle {
         font-size: 1.5rem;
     }
 
+    .productForm {
+        gap: 10px; /* Ajustado para móviles */
+    }
+
+    .inputField, .textareaField, .selectField {
+        padding: 10px; /* Ajustado para móviles */
+    }
+
     .formActions {
         flex-direction: column;
         gap: 10px;
+        margin-top: 15px; /* Ajustado para móviles */
     }
 
     .saveButton, .cancelButton {
         width: 100%;
         justify-content: center;
+        padding: 10px 20px; /* Ajustado para móviles */
     }
 
     .filterSection {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 10px;
         padding: 15px;
+        margin-bottom: 20px; /* Ajustado para móviles */
     }
 
     .filterLabel {
@@ -380,10 +396,52 @@
 
     .listTitle {
         font-size: 1.8rem;
-        margin-top: 40px;
+        margin-top: 30px; /* Ajustado para móviles */
+        margin-bottom: 20px; /* Ajustado para móviles */
     }
 
     .productsList {
         grid-template-columns: 1fr;
+        gap: 15px; /* Ajustado para móviles */
+    }
+
+    .productCard {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .productImage {
+        height: 150px;
+        width: 100%;
+    }
+
+    .productInfo {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .productInfo h3 {
+        font-size: 1.2rem; /* Ajustado para móviles */
+    }
+
+    .productInfo p {
+        font-size: 0.9rem; /* Ajustado para móviles */
+    }
+
+    .productPrice {
+        font-size: 1rem; /* Ajustado para móviles */
+    }
+
+    .productActions {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 1rem; /* Ajustado para móviles */
+    }
+
+    .editButton, .deleteButton, .toggleActiveButton, .toggleInactiveButton {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1rem; /* Ajustado para móviles */
+        font-size: 0.85rem; /* Ajustado para móviles */
     }
 }
