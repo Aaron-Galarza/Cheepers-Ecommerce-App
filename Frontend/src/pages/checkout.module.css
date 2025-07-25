@@ -303,11 +303,13 @@
     .pageContainer {
         margin: 15px; /* Reducido el margen exterior */
         padding: 15px; /* Reducido el padding exterior */
+        margin-top: 90px;
     }
 
     .pageTitle {
         font-size: 2rem; /* Ligeramente más pequeño para móviles */
-        margin-bottom: 25px;
+        margin-bottom: 25px; /* Ajustado para dar más espacio abajo */
+        margin-top: 40px; /* Aumentado para dar más espacio arriba */
     }
 
     .formSection, .summarySection {
