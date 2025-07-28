@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import styles from './ordersmanagement.module.css';
+import styles from './../management.styles/ordersmanagement.module.css';
 import { FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave, FaCheckCircle, FaTimesCircle, FaPhone, FaRedo } from 'react-icons/fa'; // FaVolumeUp eliminado
 import authService from '../../services/authservice';
-import { SelectedAddOn, IAddOn } from './productlist';
+import { SelectedAddOn, IAddOn } from '../../components/layout/checkout/productlist';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

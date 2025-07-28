@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import authService from '../../services/authservice'; // Importa el nuevo servicio
+import authService from '../../../services/authservice'; // Importa el nuevo servicio
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

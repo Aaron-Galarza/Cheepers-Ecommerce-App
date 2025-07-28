@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import styles from './ventasmanagement.module.css';
+import styles from './../management.styles/ventasmanagement.module.css';
 import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch, FaFileCsv } from 'react-icons/fa';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Brush
 } from 'recharts';
 import authService from '../../services/authservice';
-import { SelectedAddOn, IAddOn } from './productlist'; // Asegúrate de que esta ruta sea correcta
+import { SelectedAddOn, IAddOn } from '../../components/layout/checkout/productlist'; // Asegúrate de que esta ruta sea correcta
 
 export interface Order {
   _id: string;

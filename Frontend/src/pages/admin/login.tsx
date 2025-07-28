@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import styles from './adminlogin.module.css';
+import styles from './../css/adminlogin.module.css';
 import { useNavigate } from 'react-router-dom';
-import authService from '../services/authservice'; // Importa el nuevo servicio
+import authService from '../../services/authservice'; // Importa el nuevo servicio
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');

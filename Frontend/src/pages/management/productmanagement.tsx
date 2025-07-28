@@ -1,7 +1,7 @@
 // src/components/layout/ProductManagement.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import styles from './productmanagement.module.css';
+import styles from './../management.styles/productmanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 import authService from '../../services/authservice';
 import { useLocation } from 'react-router-dom';

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../components/layout/cartcontext';
-import styles from './checkout.module.css';
-import Button from '../components/layout/button';
+import { useCart } from '../../components/layout/checkout/cartcontext';
+import styles from './../css/checkout.module.css';
+import Button from '../../components/layout/design/button';
 import { FaUser, FaPhone, FaEnvelope, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
 import axios from 'axios';
 

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { cn } from '../../lib/utils'; // Importa la función cn (classnames)
+import { cn } from '../../../lib/utils'; // Importa la función cn (classnames)
 
 interface ButtonProps {
   variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link';

@@ -1,11 +1,11 @@
 // src/components/layout/Header.tsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import logo from '../../assets/images/logocheepers.png';
+import logo from '../../../assets/images/logocheepers.png';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import { useCart } from './cartcontext';
-import styles from './header.module.css';
+import { useCart } from '../checkout/cartcontext';
+import styles from './../css/header.module.css';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

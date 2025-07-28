@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'; // Importa useRef
 import axios from 'axios';
-import styles from './promomanagement.module.css';
+import styles from './../management.styles/promomanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 import authService from '../../services/authservice';
 

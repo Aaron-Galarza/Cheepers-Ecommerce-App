@@ -3,18 +3,18 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 
-import Header from './components/layout/header';
-import HomePage from './pages/inicio';
-import MenuPage from './pages/menu';
-import CarritoPage from './pages/carrito';
-import PromosPage from './pages/promos';
-import AdminLoginPage from './pages/login';
-import Dashboard from './components/layout/dashboard';
-import CheckoutPage from './pages/checkout';
-import OrderConfirmationPage from './components/layout/ordenconfirmation';
+import Header from '../components/layout/design/header';
+import HomePage from '../pages/home/inicio';
+import MenuPage from '../pages/menu/menu';
+import CarritoPage from '../pages/checkout/carrito';
+import PromosPage from '../pages/menu/promos';
+import AdminLoginPage from '../pages/admin/login';
+import Dashboard from '../components/layout/admin/dashboard';
+import CheckoutPage from '../pages/checkout/checkout';
+import OrderConfirmationPage from '../pages/checkout/ordenconfirmation';
 
 // Importa el nuevo ProtectedRoute
-import ProtectedRoute from './components/layout/protectedroute'; // CAMBIO AQUÍ
+import ProtectedRoute from '../components/layout/admin/protectedroute'; // CAMBIO AQUÍ
 
 function Footer() {
   return (

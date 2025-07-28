@@ -2,11 +2,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom'; // <--- ¡Esto es fundamental!
-import App from './App';
-import './index.css'; // O './App.css' si es tu archivo CSS principal
+import App from './global/App';
+import './global/index.css'; // O './App.css' si es tu archivo CSS principal
 
 // Importa tu CartProvider
-import { CartProvider } from './components/layout/cartcontext'; // Asegúrate de que la ruta sea correcta
+import { CartProvider } from './components/layout/checkout/cartcontext'; // Asegúrate de que la ruta sea correcta
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

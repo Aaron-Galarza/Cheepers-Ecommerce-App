@@ -1,12 +1,12 @@
 // src/components/layout/Inicio.tsx
 import React, { useState, useEffect } from 'react';
-import styles from './inicio.module.css';
+import styles from './../css/inicio.module.css';
 import { useNavigate } from 'react-router-dom';
 
 // Asegúrate de que las rutas de las imágenes sean correctas
-import baconcheep from '../assets/images/baconcheep.jpg';
-import barbacue from '../assets/images/cheddar.jpg';
-import cheddar from '../assets/images/barbacue.jpg';
+import baconcheep from '../../assets/images/baconcheep.jpg';
+import barbacue from '../../assets/images/cheddar.jpg';
+import cheddar from '../../assets/images/barbacue.jpg';
 
 // Importar FaClock además de los otros iconos
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';

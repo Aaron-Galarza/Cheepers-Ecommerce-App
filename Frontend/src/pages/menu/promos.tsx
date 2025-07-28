@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import styles from './menu.module.css';
-import { Product } from '../components/layout/productlist';
-import { useCart } from '../components/layout/cartcontext';
+import styles from '../css/menu.module.css';
+import { Product } from '../../components/layout/checkout/productlist';
+import { useCart } from '../../components/layout/checkout/cartcontext';
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 

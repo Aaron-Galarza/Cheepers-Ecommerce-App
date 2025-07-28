@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import styles from './dashboard.module.css';
+import styles from '../css/dashboard.module.css';
 import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import ProductManagement from './productmanagement';
-import OrdersManagement from './ordersmanagement'; // Importa el componente OrdersManagement
-import PromoManagement from './promomanagement'; // Gestión de promociones
-import VentasManagement from '../layout/ventasmanagement'; // Importa el componente VentasManagement
-import authService from '../../services/authservice'; // Servicio de autenticación
+import ProductManagement from '../../../pages/management/productmanagement';
+import OrdersManagement from '../../../pages/management/ordersmanagement'; // Importa el componente OrdersManagement
+import PromoManagement from '../../../pages/management/promomanagement'; // Gestión de promociones
+import VentasManagement from '../../../pages/management/ventasmanagement'; // Importa el componente VentasManagement
+import authService from '../../../services/authservice'; // Servicio de autenticación
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();

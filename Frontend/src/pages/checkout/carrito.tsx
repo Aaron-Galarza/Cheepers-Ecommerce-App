@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'; // Agregamos useEffect
-import { useCart } from '../components/layout/cartcontext';
-import styles from './carrito.module.css';
+import { useCart } from '../../components/layout/checkout/cartcontext';
+import styles from './../css/carrito.module.css';
 import { useNavigate } from 'react-router-dom';
-import Button from '../components/layout/button';
+import Button from '../../components/layout/design/button';
 import axios from 'axios'; // Para obtener los adicionales disponibles
-import { CartItem, IAddOn, SelectedAddOn } from '../components/layout/productlist'; // Importa las interfaces
+import { CartItem, IAddOn, SelectedAddOn } from '../../components/layout/checkout/productlist'; // Importa las interfaces
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 

@@ -1,10 +1,10 @@
 // src/components/layout/orderconfirmation.tsx
 import React, { useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom'; // Comentamos o eliminamos esto
-import { useCart } from './cartcontext';
+import { useCart } from '../../components/layout/checkout/cartcontext';
 import { FaCheckCircle } from 'react-icons/fa';
-import Button from './button';
-import styles from './ordenconfirmation.module.css';
+import Button from '../../components/layout/design/button';
+import styles from './../css/ordenconfirmation.module.css';
 
 const OrderConfirmationPage: React.FC = () => {
   // const navigate = useNavigate(); // Ya no lo necesitamos si usamos window.location
