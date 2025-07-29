@@ -1,195 +1,100 @@
-// src/components/layout/ProductManagement.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import styles from './../management.styles/productmanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
-import authService from '../../services/authservice';
-import { useLocation } from 'react-router-dom';
-
-export interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  isActive: boolean;
-}
-
-type NewProductData = Omit<Product, '_id'>;
-
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+import { useProductManagement, Product, NewProductData } from '../../hooks/useProductmanagement'; // Importa el custom hook
 
 const ProductManagement: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  // Usa el custom hook para obtener los datos y funciones de API
+  const {
+    products,
+    loading,
+    error,
+    editingProduct,
+    setEditingProduct, // Importado del hook para poder cambiar el estado de edición
+    filterCategory,
+    setFilterCategory,
+    filterStatus,
+    setFilterStatus,
+    handleCreateProduct,
+    handleUpdateProduct,
+    handleDeleteProduct,
+    handleToggleActive,
+    ALLOWED_CATEGORIES
+  } = useProductManagement();
+
+  // Estado local para el nuevo producto (cuando no estamos editando)
   const [newProduct, setNewProduct] = useState<NewProductData>({
     name: '',
     description: '',
-    price: 0,
+    price: 0, // Inicializado a 0
     imageUrl: '',
     category: 'Hamburguesas',
     isActive: true,
   });
-  const [filterCategory, setFilterCategory] = useState<string>('Todas');
-  const [filterStatus, setFilterStatus] = useState<string>('Todos');
 
-  const location = useLocation();
   // Crea una referencia para el contenedor principal del componente
   const productManagementContainerRef = useRef<HTMLDivElement>(null);
 
-  // Función para desplazar el elemento relevante al inicio, ahora en todos los casos
+  // Función para desplazar el elemento relevante al inicio
   const scrollToTop = () => {
-    // Usamos setTimeout para asegurar que el scroll se ejecuta después del renderizado del DOM
     setTimeout(() => {
-      // Intenta desplazar la ventana completa (para el caso más general)
       window.scrollTo({ top: 0, behavior: 'instant' });
-
-      // Si la ventana no es la que se desplaza, intenta desplazar el documento HTML
       document.documentElement.scrollTop = 0;
-      // Y también el body, por si acaso (compatibilidad)
       document.body.scrollTop = 0;
-
-      // Finalmente, si el scroll está en el contenedor de este componente, desplázalo
       if (productManagementContainerRef.current) {
         productManagementContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
       }
-    }, 50); // Un pequeño retardo para asegurar que el DOM esté listo
+    }, 50);
   };
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products?includeInactive=true`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(response.data);
-
-      const queryParams = new URLSearchParams(location.search);
-      const editId = queryParams.get('editId');
-
-      if (editId) {
-        const productToEdit = response.data.find(p => p._id === editId);
-        if (productToEdit) {
-          setEditingProduct(productToEdit);
-          // Desplaza al inicio cuando se carga un producto para edición desde la URL
-          scrollToTop();
-        } else {
-          console.warn(`Producto con ID ${editId} no encontrado.`);
-        }
-      }
-
-    } catch (err: any) {
-      console.error('Error al cargar los productos:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-      } else {
-        setError('No se pudieron cargar los productos. ¿Estás logueado?');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [location.search]);
-
-  const handleCreateProduct = async (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.post(`${API_BASE_URL}/api/products`, newProduct, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    const result = await handleCreateProduct(newProduct); // Pasa newProduct al hook
+    if (result.success) {
+      // Resetear el formulario después de crear
       setNewProduct({ name: '', description: '', price: 0, imageUrl: '', category: 'Hamburguesas', isActive: true });
-      fetchProducts();
-      scrollToTop(); // Desplaza al inicio después de crear un producto
-    } catch (err: any) {
-      console.error('Error al crear producto:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-      } else {
-        setError('Error al crear producto. Verifica los datos y tu sesión.');
-      }
+      scrollToTop();
+    } else {
+      console.error("Error al crear:", result.error);
+      // Opcional: mostrar un toast de error
     }
   };
 
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    // Desplaza al inicio cuando se hace clic en editar
+  const handleUpdateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    const result = await handleUpdateProduct(editingProduct._id, editingProduct); // Pasa editingProduct al hook
+    if (result.success) {
+      setEditingProduct(null); // Sale del modo edición
+      scrollToTop();
+    } else {
+      console.error("Error al actualizar:", result.error);
+      // Opcional: mostrar un toast de error
+    }
+  };
+
+  const handleEditProductClick = (product: Product) => {
+    setEditingProduct(product); // Establece el producto a editar en el estado del hook
     scrollToTop();
   };
 
-  const handleUpdateProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingProduct) return;
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(`${API_BASE_URL}/api/products/${editingProduct._id}`, editingProduct, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setEditingProduct(null);
-      fetchProducts();
-      scrollToTop(); // Desplaza al inicio después de actualizar un producto
-    } catch (err: any) {
-      console.error('Error al actualizar producto:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+  const handleDeleteProductClick = async (id: string) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      const result = await handleDeleteProduct(id);
+      if (result.success) {
+        // Opcional: mostrar un toast de éxito
       } else {
-        setError('Error al actualizar producto. Verifica los datos y tu sesión.');
+        console.error("Error al eliminar:", result.error);
+        // Opcional: mostrar un toast de error
       }
     }
   };
 
-  const handleDeleteProduct = async (id: string) => {
-    console.log('Confirmación de eliminación: ¿Estás seguro de que quieres eliminar este producto?');
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchProducts();
-      scrollToTop(); // Desplaza al inicio después de eliminar un producto
-    } catch (err: any) {
-      console.error('Error al eliminar producto:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Error al eliminar producto. Verifica tu sesión.');
-      } else {
-        setError('Error al eliminar producto. Verifica tu sesión.');
-      }
-    }
+  const handleCancelEdit = () => {
+    setEditingProduct(null); // Cancela la edición
   };
 
-  const handleToggleActive = async (id: string, currentStatus: boolean) => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.put(`${API_BASE_URL}/api/products/${id}/toggle-active`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log(`Producto ${id} cambiado a ${response.data.product.isActive}`);
-      fetchProducts();
-    } catch (err: any) {
-      console.error(`Error al cambiar estado de producto ${id}:`, err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-      } else {
-        setError('Error al cambiar estado de producto. ¿Estás logueado?');
-      }
-    }
-  };
-
-  const ALLOWED_CATEGORIES = ['Hamburguesas', 'Papas Fritas', 'Pizzas'];
-
+  // Los filtros ahora se aplican directamente al array 'products' que viene del hook
   const filteredProducts = products
     .filter(p => ALLOWED_CATEGORIES.includes(p.category))
     .filter(p => filterCategory === 'Todas' || p.category === filterCategory)
@@ -202,13 +107,13 @@ const ProductManagement: React.FC = () => {
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
-    // Adjunta la referencia al contenedor principal del componente
     <div ref={productManagementContainerRef} className={styles.productManagementContainer}>
       <h1 className={styles.title}>Gestión de Productos</h1>
 
+      {/* Formulario de Creación/Edición */}
       <div id="product-form-section" className={styles.formSection}>
         <h2 className={styles.formTitle}>{editingProduct ? 'Editar Producto' : 'Crear Nuevo Producto'}</h2>
-        <form onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct} className={styles.productForm}>
+        <form onSubmit={editingProduct ? handleUpdateSubmit : handleCreateSubmit} className={styles.productForm}>
           <input
             type="text"
             placeholder="Nombre del Producto"
@@ -227,8 +132,16 @@ const ProductManagement: React.FC = () => {
           <input
             type="number"
             placeholder="Precio"
-            value={editingProduct ? editingProduct.price : newProduct.price}
-            onChange={(e) => editingProduct ? setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) }) : setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
+            value={!editingProduct && newProduct.price === 0 ? '' : (editingProduct ? editingProduct.price : newProduct.price)}
+            onChange={(e) => {
+              const value = e.target.value;
+              const parsedValue = parseFloat(value);
+              // Si el valor es vacío o NaN, usar 0
+              const price = value === '' || isNaN(parsedValue) ? 0 : parsedValue;
+              editingProduct
+                ? setEditingProduct({ ...editingProduct, price: price })
+                : setNewProduct({ ...newProduct, price: price });
+            }}
             className={styles.inputField}
             step="0.01"
             required
@@ -236,7 +149,8 @@ const ProductManagement: React.FC = () => {
           <input
             type="text"
             placeholder="URL de la Imagen"
-            value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl}
+            // Asegúrate de que el valor sea string, si es null/undefined, usar ''
+            value={editingProduct ? editingProduct.imageUrl || '' : newProduct.imageUrl || ''}
             onChange={(e) => editingProduct ? setEditingProduct({ ...editingProduct, imageUrl: e.target.value }) : setNewProduct({ ...newProduct, imageUrl: e.target.value })}
             className={styles.inputField}
             required
@@ -254,9 +168,9 @@ const ProductManagement: React.FC = () => {
             className={styles.selectField}
             required
           >
-            <option value="Hamburguesas">Hamburguesas</option>
-            <option value="Papas Fritas">Papas Fritas</option>
-            <option value="Pizzas">Pizzas</option>
+            {ALLOWED_CATEGORIES.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
 
           <div className={styles.formGroup}>
@@ -275,7 +189,7 @@ const ProductManagement: React.FC = () => {
               <FaSave /> {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
             </button>
             {editingProduct && (
-              <button type="button" onClick={() => setEditingProduct(null)} className={styles.cancelButton}>
+              <button type="button" onClick={handleCancelEdit} className={styles.cancelButton}>
                 <FaTimes /> Cancelar
               </button>
             )}
@@ -292,9 +206,9 @@ const ProductManagement: React.FC = () => {
           className={styles.selectField}
         >
           <option value="Todas">Todas las Categorías</option>
-          <option value="Hamburguesas">Hamburguesas</option>
-          <option value="Papas Fritas">Papas Fritas</option>
-          <option value="Pizzas">Pizzas</option>
+          {ALLOWED_CATEGORIES.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
         </select>
 
         <label htmlFor="statusFilter" className={styles.filterLabel}>Filtrar por Estado:</label>
@@ -332,7 +246,6 @@ const ProductManagement: React.FC = () => {
                 </p>
               </div>
 
-              {/* Overlay para productos inactivos */}
               {!p.isActive && <div className={styles.productCardOverlay} />}
 
               <div className={styles.productActions}>
@@ -342,10 +255,10 @@ const ProductManagement: React.FC = () => {
                 >
                   {p.isActive ? 'Desactivar' : 'Activar'}
                 </button>
-                <button onClick={() => handleEditProduct(p)} className={styles.editButton}>
+                <button onClick={() => handleEditProductClick(p)} className={styles.editButton}>
                   <FaEdit />
                 </button>
-                <button onClick={() => handleDeleteProduct(p._id)} className={styles.deleteButton}>
+                <button onClick={() => handleDeleteProductClick(p._id)} className={styles.deleteButton}>
                   <FaTrash />
                 </button>
               </div>

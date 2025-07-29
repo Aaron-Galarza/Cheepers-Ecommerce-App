@@ -1,40 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react'; // Importa useRef
-import axios from 'axios';
-import styles from './../management.styles/promomanagement.module.css';
+import React, { useState, useEffect, useRef } from 'react';
+import styles from './../../pages/management.styles/promomanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
-import authService from '../../services/authservice';
-
-// Interfaz Promotion debe ser idéntica a Product del backend
-export interface Promotion {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  discountPercentage?: number;
-  isActive: boolean;
-}
-
-type NewPromotionData = Omit<Promotion, '_id'>;
-
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+import { usePromoManagement, Promotion, NewPromotionData } from '../../hooks/usePromomanagement'; // Importa el custom hook
 
 const PromoManagement: React.FC = () => {
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
+  // Usa el custom hook para obtener los datos y funciones de API
+  const {
+    promotions,
+    loading,
+    error,
+    editingPromotion,
+    setEditingPromotion, // Importado del hook para poder cambiar el estado de edición
+    filterStatus,
+    setFilterStatus,
+    handleCreatePromotion,
+    handleUpdatePromotion,
+    handleDeletePromotion,
+    handleToggleActive,
+  } = usePromoManagement();
+
+  // Estado local para la nueva promoción (cuando no estamos editando)
   const [newPromotion, setNewPromotion] = useState<NewPromotionData>({
     name: '',
     description: '',
-    price: 0,
+    price: 0, // Inicializado a 0
     imageUrl: '',
     category: 'Promos Solo en Efectivo',
-    discountPercentage: 0,
     isActive: true,
   });
-  const [filterStatus, setFilterStatus] = useState<string>('Todos');
 
   // Crea una referencia para el contenedor principal del componente
   const promoManagementContainerRef = useRef<HTMLDivElement>(null);
@@ -54,137 +47,62 @@ const PromoManagement: React.FC = () => {
   // Función para desplazar el elemento relevante al inicio, solo en móviles
   const scrollToTopForMobile = () => {
     if (isMobile) {
-      // Usamos setTimeout para asegurar que el scroll se ejecuta después del renderizado del DOM
       setTimeout(() => {
-        // Intenta desplazar la ventana completa (para el caso más general)
         window.scrollTo({ top: 0, behavior: 'instant' });
-
-        // Si la ventana no es la que se desplaza, intenta desplazar el documento HTML
         document.documentElement.scrollTop = 0;
-        // Y también el body, por si acaso (compatibilidad)
         document.body.scrollTop = 0;
-
-        // Finalmente, si el scroll está en el contenedor de este componente, desplázalo
         if (promoManagementContainerRef.current) {
           promoManagementContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
         }
-      }, 50); // Un pequeño retardo para asegurar que el DOM esté listo
+      }, 50);
     }
   };
 
-  useEffect(() => {
-    fetchPromotions();
-  }, []);
-
-  const fetchPromotions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.get<Promotion[]>(`${API_BASE_URL}/api/products?includeInactive=true`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const filteredPromos = response.data.filter(p => p.category === 'Promos Solo en Efectivo');
-      setPromotions(filteredPromos);
-    } catch (err: any) {
-      console.error('Error al cargar las promociones:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-      } else {
-        setError('No se pudieron cargar las promociones. Verifica la conexión o tu sesión.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreatePromotion = async (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.post(`${API_BASE_URL}/api/products`, newPromotion, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setNewPromotion({ name: '', description: '', price: 0, imageUrl: '', category: 'Promos Solo en Efectivo', discountPercentage: 0, isActive: true });
-      fetchPromotions();
-      scrollToTopForMobile(); // Desplaza al inicio después de crear una promoción (solo en móvil)
-    } catch (err: any) {
-      console.error('Error al crear promoción:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-      } else {
-        setError('Error al crear promoción. Verifica los datos y tu sesión.');
-      }
+    const result = await handleCreatePromotion(newPromotion); // Pasa newPromotion al hook
+    if (result.success) {
+      // Resetear el formulario después de crear
+      setNewPromotion({ name: '', description: '', price: 0, imageUrl: '', category: 'Promos Solo en Efectivo', isActive: true });
+      scrollToTopForMobile();
+    } else {
+      console.error("Error al crear:", result.error);
+      // Opcional: mostrar un toast de error
     }
   };
 
-  const handleEditPromotion = (promotion: Promotion) => {
-    setEditingPromotion(promotion);
-    // Desplazarse al formulario de edición (solo en móvil)
+  const handleUpdateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPromotion) return;
+    const result = await handleUpdatePromotion(editingPromotion._id, editingPromotion); // Pasa editingPromotion al hook
+    if (result.success) {
+      setEditingPromotion(null); // Sale del modo edición
+      scrollToTopForMobile();
+    } else {
+      console.error("Error al actualizar:", result.error);
+      // Opcional: mostrar un toast de error
+    }
+  };
+
+  const handleEditPromotionClick = (promo: Promotion) => {
+    setEditingPromotion(promo); // Establece la promoción a editar en el estado del hook
     scrollToTopForMobile();
   };
 
-  const handleUpdatePromotion = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingPromotion) return;
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(`${API_BASE_URL}/api/products/${editingPromotion._id}`, editingPromotion, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setEditingPromotion(null);
-      fetchPromotions();
-      scrollToTopForMobile(); // Desplaza al inicio después de actualizar una promoción (solo en móvil)
-    } catch (err: any) {
-      console.error('Error al actualizar promoción:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+  const handleDeletePromotionClick = async (id: string) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta promoción?')) {
+      const result = await handleDeletePromotion(id);
+      if (result.success) {
+        // Opcional: mostrar un toast de éxito
       } else {
-        setError('Error al actualizar promoción. Verifica los datos y tu sesión.');
+        console.error("Error al eliminar:", result.error);
+        // Opcional: mostrar un toast de error
       }
     }
   };
 
-  const handleDeletePromotion = async (id: string) => {
-    console.log('Confirmación de eliminación: ¿Estás seguro de que quieres eliminar esta promoción?');
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchPromotions();
-      scrollToTopForMobile(); // Desplaza al inicio después de eliminar una promoción (solo en móvil)
-    } catch (err: any) {
-      console.error('Error al eliminar promoción:', err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Error al eliminar promoción. Verifica tu sesión.');
-      } else {
-        setError('Error al eliminar promoción. Verifica tu sesión.');
-      }
-    }
-  };
-
-  const handleToggleActive = async (id: string, currentStatus: boolean) => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.put(`${API_BASE_URL}/api/products/${id}/toggle-active`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log(`Promoción ${id} cambiada a ${response.data.product.isActive}`);
-      fetchPromotions();
-    } catch (err: any) {
-      console.error(`Error al cambiar estado de promoción ${id}:`, err);
-      if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
-        authService.logout();
-        setError('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-      } else {
-        setError(`Error al cambiar estado de promoción. ¿Estás logueado?`);
-      }
-    }
+  const handleCancelEdit = () => {
+    setEditingPromotion(null); // Cancela la edición
   };
 
   const filteredPromotions = promotions.filter(promo => {
@@ -198,14 +116,13 @@ const PromoManagement: React.FC = () => {
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
-    // Adjunta la referencia al contenedor principal del componente
     <div ref={promoManagementContainerRef} className={styles.promoManagementContainer}>
       <h1 className={styles.title}>Gestión de Promociones</h1>
 
-      {/* Añade un ID a la sección del formulario para poder hacer scroll a ella */}
+      {/* Formulario de Creación/Edición */}
       <div id="promo-form-section" className={styles.formSection}>
         <h2 className={styles.formTitle}>{editingPromotion ? 'Editar Promoción' : 'Crear Nueva Promoción'}</h2>
-        <form onSubmit={editingPromotion ? handleUpdatePromotion : handleCreatePromotion} className={styles.promoForm}>
+        <form onSubmit={editingPromotion ? handleUpdateSubmit : handleCreateSubmit} className={styles.promoForm}>
           <input
             type="text"
             placeholder="Nombre de la Promoción"
@@ -223,20 +140,32 @@ const PromoManagement: React.FC = () => {
           />
           <input
             type="number"
-            placeholder="Precio Base de la Promoción"
-            value={editingPromotion ? editingPromotion.price : newPromotion.price}
-            onChange={(e) => editingPromotion ? setEditingPromotion({ ...editingPromotion, price: parseFloat(e.target.value) }) : setNewPromotion({ ...newPromotion, price: parseFloat(e.target.value) })}
+            placeholder="Precio"
+            
+            value={!editingPromotion && newPromotion.price === 0 ? '' : (editingPromotion ? editingPromotion.price : newPromotion.price)}
+            onChange={(e) => {
+              const value = e.target.value;
+              const parsedValue = parseFloat(value);
+              // Si el valor es vacío o NaN, usar 0
+              const price = value === '' || isNaN(parsedValue) ? 0 : parsedValue;
+              editingPromotion
+                ? setEditingPromotion({ ...editingPromotion, price: price })
+                : setNewPromotion({ ...newPromotion, price: price });
+            }}
             className={styles.inputField}
             step="0.01"
             required
           />
           <input
             type="text"
-            placeholder="URL de la Imagen (Opcional)"
+            placeholder="URL de la Imagen"
             value={editingPromotion ? editingPromotion.imageUrl || '' : newPromotion.imageUrl || ''}
             onChange={(e) => editingPromotion ? setEditingPromotion({ ...editingPromotion, imageUrl: e.target.value }) : setNewPromotion({ ...newPromotion, imageUrl: e.target.value })}
             className={styles.inputField}
+            required
           />
+          {/* Campo discountPercentage eliminado */}
+
           <div className={styles.formGroup}>
             <label htmlFor="promoIsActive">Activa:</label>
             <input
@@ -253,7 +182,7 @@ const PromoManagement: React.FC = () => {
               <FaSave /> {editingPromotion ? 'Actualizar Promoción' : 'Crear Promoción'}
             </button>
             {editingPromotion && (
-              <button type="button" onClick={() => setEditingPromotion(null)} className={styles.cancelButton}>
+              <button type="button" onClick={handleCancelEdit} className={styles.cancelButton}>
                 <FaTimes /> Cancelar
               </button>
             )}
@@ -290,6 +219,7 @@ const PromoManagement: React.FC = () => {
                 <h3>{promo.name}</h3>
                 <p>{promo.description}</p>
                 <p className={styles.promoPrice}>Precio: ${promo.price?.toFixed(2) || 'N/A'}</p>
+                {/* discountPercentage display removed */}
                 <p className={styles.promoStatus}>Estado: <span className={promo.isActive ? styles.activeStatus : styles.inactiveStatus}>{promo.isActive ? 'Activa' : 'Inactiva'}</span></p>
               </div>
               <div className={styles.promoActions}>
@@ -299,10 +229,10 @@ const PromoManagement: React.FC = () => {
                 >
                   {promo.isActive ? 'Desactivar' : 'Activar'}
                 </button>
-                <button onClick={() => handleEditPromotion(promo)} className={styles.editButton}>
+                <button onClick={() => handleEditPromotionClick(promo)} className={styles.editButton}>
                   <FaEdit />
                 </button>
-                <button onClick={() => handleDeletePromotion(promo._id)} className={styles.deleteButton}>
+                <button onClick={() => handleDeletePromotionClick(promo._id)} className={styles.deleteButton}>
                   <FaTrash />
                 </button>
               </div>
