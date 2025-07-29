@@ -1,3 +1,4 @@
+/* General Container for Orders Management Page */
 .ordersManagementContainer {
     padding: 30px;
     background-color: #f8f9fa;
@@ -7,6 +8,7 @@
     margin: 20px;
 }
 
+/* Page Title */
 .title {
     font-size: 2.5rem;
     font-weight: 800;
@@ -16,6 +18,227 @@
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
+/* --- FORMULARIO DE CREACIÓN DE PEDIDOS --- */
+.formSection {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    margin-bottom: 40px;
+    border: 1px solid #e0e0e0;
+}
+
+.formTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 15px;
+}
+
+.orderForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-weight: 600;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+.inputField,
+.selectField,
+.textareaField {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%; /* Asegura que ocupen todo el ancho */
+    box-sizing: border-box; /* Incluye padding y border en el ancho total */
+}
+
+.inputField:focus,
+.selectField:focus,
+.textareaField:focus {
+    border-color: #e53e3e; /* Rojo Cheepers en foco */
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+    outline: none;
+}
+
+.textareaField {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Product Item in Form */
+.productItem {
+    border: 1px dashed #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background-color: #fcfcfc;
+    display: grid;
+    grid-template-columns: 1fr auto; /* Para alinear select/input con botones */
+    gap: 10px;
+    align-items: center;
+}
+
+.productItem select,
+.productItem input[type="number"] {
+    margin-bottom: 0; /* Eliminar margen inferior de los campos dentro del item */
+}
+
+.productItem .inputField {
+    width: auto; /* Permite que el input de cantidad se ajuste */
+    flex-grow: 0;
+}
+
+.addAddOnButton,
+.removeButton {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.addAddOnButton {
+    background-color: #4CAF50; /* Verde */
+    color: white;
+}
+
+.addAddOnButton:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+}
+
+.removeButton {
+    background-color: #f44336; /* Rojo */
+    color: white;
+}
+
+.removeButton:hover {
+    background-color: #da190b;
+    transform: translateY(-1px);
+}
+
+.addProductButton {
+    background-color: #007bff; /* Azul */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.addProductButton:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+/* Add-ons Container within a Product Item */
+.addOnsContainer {
+    grid-column: 1 / -1; /* Ocupa todo el ancho de la grilla del producto */
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.addOnsContainer h4 {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #e9e9e9;
+    padding-bottom: 5px;
+}
+
+.addOnItemForm {
+    display: grid;
+    grid-template-columns: 1fr auto auto; /* Select, quantity, remove button */
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.addOnItemForm:last-child {
+    margin-bottom: 0;
+}
+
+.addOnItemForm select,
+.addOnItemForm input[type="number"] {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+}
+
+/* Total Amount Display */
+.totalAmountDisplay {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e53e3e; /* Rojo Cheepers */
+    text-align: right;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px dashed #f0f2f5;
+}
+
+/* Form Actions (for submit button) */
+.formActions {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.saveButton {
+    background-color: #e53e3e; /* Rojo Cheepers */
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 5px 15px rgba(229, 62, 62, 0.3);
+}
+
+.saveButton:hover {
+    background-color: #c53030;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(197, 48, 48, 0.4);
+}
+
+/* Existing styles for order list items */
 .ordersList {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
@@ -95,6 +318,18 @@
     font-size: 0.95rem;
     color: #555;
     margin-bottom: 5px;
+}
+
+.addOnsSublist {
+    list-style: none;
+    padding-left: 15px; /* Indent sublist */
+    margin-top: 5px;
+}
+
+.addOnItem {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 3px;
 }
 
 .orderDetails p {
@@ -225,6 +460,76 @@
         margin-bottom: 30px;
     }
 
+    /* Formulario */
+    .formSection {
+        padding: 15px;
+        margin-bottom: 30px;
+    }
+
+    .formTitle {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .inputField,
+    .selectField,
+    .textareaField {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .formGroup label {
+        font-size: 0.85rem;
+    }
+
+    .productItem {
+        grid-template-columns: 1fr; /* Una columna en móviles para productos */
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .productItem select,
+    .productItem input[type="number"] {
+        width: 100%; /* Asegura que ocupen todo el ancho */
+    }
+
+    .addAddOnButton,
+    .removeButton {
+        width: 100%; /* Estira los botones de añadir/quitar en móviles */
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .addOnItemForm {
+        grid-template-columns: 1fr auto; /* Select y botón de quitar */
+    }
+    .addOnItemForm select,
+    .addOnItemForm input[type="number"] {
+        width: 100%;
+    }
+
+    .addOnItemForm button {
+        width: auto; /* El botón de quitar adicional se ajusta */
+    }
+
+
+    .addProductButton {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+
+    .totalAmountDisplay {
+        font-size: 1.2rem;
+        text-align: center; /* Centrar en móviles */
+    }
+
+    .saveButton {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+
+    /* Existing order list styles */
     .ordersList {
         grid-template-columns: 1fr; /* Una columna en móviles */
     }
@@ -298,23 +603,22 @@
 }
 
 .subtleLoading {
-  text-align: center;
-  margin: 10px 0;
-  font-size: 0.9rem;
-  color: #666;
-  opacity: 0.8;
-  animation: pulse 1.5s infinite alternate; /* Animación sutil */
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #666;
+    opacity: 0.8;
+    animation: pulse 1.5s infinite alternate; /* Animación sutil */
 }
 
 @keyframes pulse {
-  0% { opacity: 0.8; }
-  100% { opacity: 0.5; }
+    0% { opacity: 0.8; }
+    100% { opacity: 0.5; }
 }
 
 /* Asegúrate de que .loading original siga existiendo para la carga inicial */
 .loading {
-  text-align: center;
-  padding: 20px;
-  font-size: 1.2rem;
-  color: #555;
-}
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+    color: #555}

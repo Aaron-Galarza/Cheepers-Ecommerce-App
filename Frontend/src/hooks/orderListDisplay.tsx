@@ -1,0 +1,123 @@
+import React from 'react';
+import {
+  FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave,
+  FaCheckCircle, FaTimesCircle, FaPhone, FaRedo
+} from 'react-icons/fa';
+import styles from './../pages/management.styles/ordersmanagement.module.css';
+import { OrderDisplay } from '../pages/management/ordersmanagement'; // Re-importar OrderDisplay
+
+interface OrderListDisplayProps {
+  filteredOrders: OrderDisplay[];
+  filterStatus: 'pending' | 'delivered' | 'cancelled' | 'all';
+  setFilterStatus: React.Dispatch<React.SetStateAction<'pending' | 'delivered' | 'cancelled' | 'all'>>;
+  handleOrderDelivered: (orderId: string) => void;
+  handleOrderCancelled: (orderId: string) => void;
+  handleOrderRestore: (orderId: string) => void;
+}
+
+const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
+  filteredOrders,
+  filterStatus,
+  setFilterStatus,
+  handleOrderDelivered,
+  handleOrderCancelled,
+  handleOrderRestore,
+}) => {
+  return (
+    <>
+      {/* Sección de Filtros */}
+      <div className={styles.filterContainer}>
+        <label htmlFor="statusFilter">Filtrar por estado: </label>
+        <select
+          id="statusFilter"
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value as any)}
+          className={styles.filterSelect}
+        >
+          <option value="all">Todos</option>
+          <option value="pending">Pendientes</option>
+          <option value="delivered">Entregados</option>
+          <option value="cancelled">Cancelados</option>
+        </select>
+      </div>
+
+      {/* Lista de Pedidos */}
+      <div className={styles.ordersList}>
+        {filteredOrders.length === 0 ? (
+          <p className={styles.noOrdersMessage}>No hay pedidos para mostrar.</p>
+        ) : (
+          filteredOrders.map((order) => (
+            <div key={order._id} className={styles.orderCard}>
+              <div className={styles.orderHeader}>
+                <p className={styles.orderDate}>
+                  <FaCalendarAlt /> {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} {/* CAMBIO AQUÍ: hour12: false */}
+                </p>
+                <p className={styles.customerName}><FaUser /> {order.guestName}</p>
+                <p className={styles.customerPhone}><FaPhone /> {order.guestPhone}</p>
+              </div>
+              <div className={styles.orderBody}>
+                <div className={styles.productsList}>
+                  <p className={styles.productsTitle}><FaBox /> Productos:</p>
+                  <ul>
+                    {order.products.map((item, index) => (
+                      <li key={index}>
+                        {item.name} (x{item.quantity})
+                        {item.addOns && item.addOns.length > 0 && (
+                          <ul className={styles.addOnsSublist}>
+                            {item.addOns.map((addOn, i) => (
+                              <li key={i} className={styles.addOnItem}>
+                                └ {addOn.name} (x{addOn.quantity}) - ${addOn.price.toFixed(2)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className={styles.orderDetails}>
+                  <p className={styles.totalAmount}><FaMoneyBillWave /> Total: ${order.totalAmount.toFixed(2)}</p>
+                  <p className={styles.deliveryType}>Tipo de entrega: {order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}</p>
+                  {order.deliveryType === 'delivery' && order.shippingAddress && (
+                    <p className={styles.shippingAddress}>Dirección: {order.shippingAddress.street}, {order.shippingAddress.city}</p>
+                  )}
+                  <p className={styles.paymentMethod}>Método de pago: {order.paymentMethod === 'cash' ? 'Efectivo' : order.paymentMethod === 'card' ? 'Mercado Pago' : 'Transferencia'}</p>
+                  <p className={styles.orderStatus}>Estado:
+                    <span className={
+                      order.status === 'pending' ? styles.statusPending :
+                      order.status === 'delivered' ? styles.statusDelivered :
+                      styles.statusCancelled
+                    }>
+                      {order.status === 'pending' ? ' Pendiente' :
+                        order.status === 'delivered' ? ' Entregado' :
+                        ' Cancelado'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div className={styles.orderActions}>
+                {order.status === 'pending' && (
+                  <>
+                    <button onClick={() => handleOrderDelivered(order._id)} className={styles.deliveredButton}>
+                      <FaCheckCircle /> Pedido Entregado
+                    </button>
+                    <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
+                      <FaTimesCircle /> Cancelar
+                    </button>
+                  </>
+                )}
+                {(order.status === 'delivered' || order.status === 'cancelled') && (
+                  <button onClick={() => handleOrderRestore(order._id)} className={styles.restoreButton}>
+                    <FaRedo /> Restaurar a Pendiente
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </>
+  );
+};
+
+export default OrderListDisplay;
