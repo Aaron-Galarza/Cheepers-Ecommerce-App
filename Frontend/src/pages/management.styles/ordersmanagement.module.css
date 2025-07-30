@@ -621,4 +621,68 @@
     text-align: center;
     padding: 20px;
     font-size: 1.2rem;
-    color: #555}
+    color: #555
+}
+
+/* ... estilos existentes ... */
+
+/* Estilo para el estado 'processing' */
+.statusProcessing {
+  color: #3c60ff; /* Un azul para indicar "en proceso" */
+  font-weight: bold;
+}
+
+/* Estilo para el botón "Aceptar Pedido" */
+.acceptButton {
+  background-color: #3c60ff; /* Un azul pero quizás un poco más claro/oscuro */
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.2s ease-in-out;
+  flex-grow: 1; /* Permite que el botón ocupe espacio si hay varios */
+  justify-content: center;
+  margin-top: 5px; /* Pequeño margen para separarlo de otros botones */
+}
+
+.acceptButton:hover {
+  background-color: #224bfd; /* Un azul mas oscuro al pasar el mouse */
+}
+
+/* Ajustes para que los botones de acción se vean bien juntos */
+.orderActions {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los botones salten de línea si no caben */
+    gap: 10px; /* Espacio entre los botones */
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    padding-top: 10px;
+    border-top: 1px solid #eee; /* Separador sutil */
+    margin-top: 10px;
+}
+/* Asegúrate que tus botones existentes .deliveredButton, .cancelButton, .restoreButton también tengan flex-grow: 1; y un gap si quieres que se distribuyan uniformemente */
+
+/* Por ejemplo, podrías agrupar estilos comunes de botones */
+.deliveredButton, .cancelButton, .restoreButton, .acceptButton {
+    /* ... propiedades comunes como padding, border, etc. ... */
+    flex-grow: 1;
+    max-width: 100%; /* Para que no se estiren demasiado en una sola fila si hay muchos */
+}
+
+/* Puedes ajustar el order de los botones si quieres que el "Aceptar Pedido" aparezca primero */
+.acceptButton {
+    order: 1;
+}
+.deliveredButton {
+    order: 2;
+}
+.cancelButton {
+    order: 3;
+}
+.restoreButton {
+    order: 4;
+}

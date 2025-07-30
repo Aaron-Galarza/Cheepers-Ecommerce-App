@@ -1,18 +1,19 @@
 import React from 'react';
 import {
   FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave,
-  FaCheckCircle, FaTimesCircle, FaPhone, FaRedo
+  FaCheckCircle, FaTimesCircle, FaPhone, FaRedo, FaPlayCircle
 } from 'react-icons/fa';
 import styles from './../pages/management.styles/ordersmanagement.module.css';
 import { OrderDisplay } from '../pages/management/ordersmanagement'; // Re-importar OrderDisplay
 
 interface OrderListDisplayProps {
   filteredOrders: OrderDisplay[];
-  filterStatus: 'pending' | 'delivered' | 'cancelled' | 'all';
-  setFilterStatus: React.Dispatch<React.SetStateAction<'pending' | 'delivered' | 'cancelled' | 'all'>>;
+  filterStatus: 'pending' | 'processing' | 'delivered' | 'cancelled' | 'all';
+  setFilterStatus: React.Dispatch<React.SetStateAction<'pending' | 'processing' | 'delivered' | 'cancelled' | 'all'>>;
   handleOrderDelivered: (orderId: string) => void;
   handleOrderCancelled: (orderId: string) => void;
   handleOrderRestore: (orderId: string) => void;
+  handleOrderAccept: (orderId: string) => void;
 }
 
 const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
@@ -22,6 +23,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   handleOrderDelivered,
   handleOrderCancelled,
   handleOrderRestore,
+  handleOrderAccept,
 }) => {
   return (
     <>
@@ -36,6 +38,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
         >
           <option value="all">Todos</option>
           <option value="pending">Pendientes</option>
+          <option value="processing">En proceso</option>
           <option value="delivered">Entregados</option>
           <option value="cancelled">Cancelados</option>
         </select>
@@ -85,26 +88,42 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                   <p className={styles.orderStatus}>Estado:
                     <span className={
                       order.status === 'pending' ? styles.statusPending :
+                      order.status === 'processing' ? styles.statusProcessing :
                       order.status === 'delivered' ? styles.statusDelivered :
                       styles.statusCancelled
                     }>
-                      {order.status === 'pending' ? ' Pendiente' :
+                      { 
+                        order.status === 'pending' ? ' Pendiente' :
+                        order.status === 'processing' ? ' En Proceso' :
                         order.status === 'delivered' ? ' Entregado' :
-                        ' Cancelado'}
+                        ' Cancelado'
+                      }
                     </span>
                   </p>
                 </div>
               </div>
               <div className={styles.orderActions}>
                 {order.status === 'pending' && (
+                  <button onClick={() => handleOrderAccept(order._id)} className={styles.acceptButton}>
+                    <FaPlayCircle /> Aceptar Pedido
+                  </button>
+                )}
+                {order.status === 'pending' && (
                   <>
-                    <button onClick={() => handleOrderDelivered(order._id)} className={styles.deliveredButton}>
-                      <FaCheckCircle /> Pedido Entregado
-                    </button>
                     <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
                       <FaTimesCircle /> Cancelar
                     </button>
                   </>
+                )}
+                {order.status === 'processing' && ( // Añade estos botones si quieres transicionar desde 'processing'
+                   <>
+                    <button onClick={() => handleOrderDelivered(order._id)} className={styles.deliveredButton}>
+                      <FaCheckCircle /> Marcar Entregado
+                    </button>
+                    <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
+                      <FaTimesCircle /> Cancelar
+                    </button>
+                   </>
                 )}
                 {(order.status === 'delivered' || order.status === 'cancelled') && (
                   <button onClick={() => handleOrderRestore(order._id)} className={styles.restoreButton}>

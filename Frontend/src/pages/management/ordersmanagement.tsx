@@ -1,3 +1,5 @@
+// Frontend/src/pages/management/ordersmanagement.tsx
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import styles from './../management.styles/ordersmanagement.module.css';
@@ -6,9 +8,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import Sound from '../../assets/sounds/sonido.mp3';
 import authService from '../../services/authservice';
 
-// Importar los nuevos componentes
+// Importar los componentes
 import OrderCreationForm from '../../components/layout/admin/ordercreationform';
 import OrderListDisplay from '../../hooks/orderListDisplay';
+
+// Importar la nueva utilidad de comanda
+import { generateComandaHTML } from '../../lib/generateComandaHTML';
 
 // Re-exportar interfaces para que los componentes hijos puedan importarlas desde aquí
 export interface SelectedAddOn {
@@ -18,15 +23,14 @@ export interface SelectedAddOn {
   price: number; // Precio del adicional al momento de la orden (para display en el frontend)
 }
 
-// INTERFAZ IAddOn ACTUALIZADA con las propiedades faltantes
+// INTERFAZ IAddOn ACTUALIZADA con las propiedades faltantes (asegurarse de que coincida con tu backend)
 export interface IAddOn {
   _id: string;
   name: string;
   price: number;
-  category: string; // Añadido
-  isActive: boolean; // Añadido
-  associatedProductCategories: string[]; // Añadido
-  // Otros campos de IAddOn si existen en tu backend
+  category: string;
+  isActive: boolean;
+  associatedProductCategories: string[];
 }
 
 export interface OrderProductRaw {
@@ -42,6 +46,7 @@ export interface OrderProductDisplay {
   addOns?: SelectedAddOn[];
 }
 
+// INTERFAZ ORDER ACTUALIZADA para incluir 'processing' y 'notes'
 export interface Order {
   _id: string;
   guestEmail: string;
@@ -56,7 +61,8 @@ export interface Order {
   };
   products: OrderProductRaw[];
   createdAt: string;
-  status: 'pending' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'delivered' | 'cancelled';
+  notes?: string; // Asegúrate de que esto esté aquí para que la comanda pueda usarlo
 }
 
 export interface OrderDisplay extends Omit<Order, 'products'> {
@@ -106,7 +112,7 @@ const OrdersManagement: React.FC = () => {
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<'pending' | 'delivered' | 'cancelled' | 'all'>('all');
+  const [filterStatus, setFilterStatus] = useState<'pending' | 'processing' | 'delivered' | 'cancelled' | 'all'>('all');
 
   const [newOrderForm, setNewOrderForm] = useState<Omit<NewOrderData, 'totalAmount' | 'products' | 'status' | 'shippingAddress'> & {
     shippingStreet: string;
@@ -129,6 +135,33 @@ const OrdersManagement: React.FC = () => {
 
   const previousOrderIds = useRef<Set<string>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // NUEVA FUNCIÓN: Para imprimir la comanda
+  const handlePrintComanda = (order: OrderDisplay) => {
+    const comandaHtml = generateComandaHTML(order);
+    const printWindow = window.open('', '_blank');
+
+    if (printWindow) {
+      printWindow.document.write(comandaHtml);
+      printWindow.document.close(); // Cierra el documento para asegurar que todo el HTML se ha cargado
+
+      // Espera un momento para que el navegador cargue el contenido y luego imprime
+      printWindow.onload = () => { // Asegura que el contenido se cargó antes de imprimir
+        printWindow.focus(); // Enfoca la ventana de impresión
+        printWindow.print(); // Abre el diálogo de impresión
+        // Puedes cerrar la ventana automáticamente después de la impresión si lo deseas
+        // setTimeout(() => {
+        //     printWindow.close();
+        // }, 500);
+      };
+    } else {
+      toast.error('No se pudo abrir la ventana de impresión. Por favor, asegúrate de que los pop-ups estén permitidos.', {
+        position: "bottom-center",
+        autoClose: 5000,
+      });
+    }
+  };
+
 
   const fetchOrders = useCallback(async (initialLoad: boolean) => {
     try {
@@ -233,21 +266,39 @@ const OrdersManagement: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchOrders]);
 
-  const updateOrderStatus = async (orderId: string, newStatus: 'pending' | 'delivered' | 'cancelled') => {
+  const updateOrderStatus = async (orderId: string, newStatus: 'pending' | 'processing' | 'delivered' | 'cancelled') => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(`${API_BASE_URL}/api/orders/${orderId}/status`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchOrders(false);
-      toast.success(`Pedido ${orderId.substring(0, 5)}... actualizado a ${newStatus}!`, {
-        position: "bottom-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      fetchOrders(false); // Refresca la lista de pedidos para ver el cambio de estado
+
+      // LÓGICA CLAVE: Si el estado se actualizó a 'processing', imprimir la comanda
+      if (newStatus === 'processing') {
+        const orderToPrint = orders.find(o => o._id === orderId);
+        if (orderToPrint) {
+          handlePrintComanda(orderToPrint);
+          toast.success('Pedido confirmado y comanda enviada a cocina!', { // Feedback visual opcional
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      } else { // Mensaje de éxito para otros cambios de estado
+        toast.success(`Pedido ${orderId.substring(0, 5)}... actualizado a ${newStatus}!`, {
+          position: "bottom-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+
     } catch (err: any) {
       console.error(`Error al actualizar el pedido ${orderId}:`, err);
       if (axios.isAxiosError(err) && err.response) {
@@ -395,6 +446,25 @@ const OrdersManagement: React.FC = () => {
     }
   };
 
+  // FUNCIÓN EXISTENTE PARA ACEPTAR PEDIDO (ahora llama a updateOrderStatus que maneja la impresión)
+  const handleOrderAccept = (orderId: string) => {
+    toast.info(
+      <div className={styles.toastConfirmContent}>
+        <p>¿Aceptar este pedido y enviarlo a cocina?</p>
+        <div className={styles.toastButtons}>
+          <button onClick={() => { updateOrderStatus(orderId, 'processing'); toast.dismiss(); }} className={styles.toastConfirmButton}>Sí, Aceptar</button>
+          <button onClick={() => toast.dismiss()} className={styles.toastCancelButton}>No</button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: false,
+        closeButton: false,
+        draggable: false,
+        className: styles.customConfirmationToast,
+      }
+    );
+  };
 
   const handleOrderDelivered = (orderId: string) => {
     toast.info(
@@ -486,6 +556,7 @@ const OrdersManagement: React.FC = () => {
         handleOrderDelivered={handleOrderDelivered}
         handleOrderCancelled={handleOrderCancelled}
         handleOrderRestore={handleOrderRestore}
+        handleOrderAccept={handleOrderAccept}
       />
     </div>
   );
