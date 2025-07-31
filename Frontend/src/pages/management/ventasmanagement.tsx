@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Se mantiene para axios.isAxiosError si es necesario en el error global
 import styles from './../management.styles/ventasmanagement.module.css';
-import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch } from 'react-icons/fa';
+import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch, FaTruck } from 'react-icons/fa'; // Importar FaTruck
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Brush
 } from 'recharts';
@@ -38,7 +38,8 @@ const VentasManagement: React.FC = () => {
     topSellingPeriods,
     dailySalesTableData,
     dailyTotalSales,
-    exportDailySalesToCsv
+    exportDailySalesToCsv,
+    deliveryPercentage // NUEVO: Importar el porcentaje de pedidos a domicilio
   } = useSalesData();
 
   // Estado local para controlar cuántas filas se muestran en la tabla de detalle
@@ -144,6 +145,14 @@ const VentasManagement: React.FC = () => {
           </div>
           <h3>Promos Vendidas</h3>
           <p>{promosSoldCount}</p>
+        </div>
+        {/* NUEVO CUADRO DE MÉTRICA: Porcentaje de Pedidos a Domicilio */}
+        <div className={styles.metricCard}>
+          <div className={styles.metricIconContainer}>
+            <FaTruck /> {/* Icono para delivery */}
+          </div>
+          <h3>Pedidos a Domicilio</h3>
+          <p>{deliveryPercentage.toFixed(1)}%</p> {/* Mostrar el porcentaje */}
         </div>
       </div>
 

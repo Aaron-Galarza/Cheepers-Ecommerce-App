@@ -430,16 +430,26 @@
         font-size: 1rem; /* Ajustado para móviles */
     }
 
+    /* CAMBIO CLAVE AQUÍ: Botones de acción de producto en fila para móvil */
     .productActions {
-        flex-direction: column;
-        gap: 0.8rem;
-        padding: 1rem; /* Ajustado para móviles */
+        flex-direction: row; /* Ahora los botones se alinearán horizontalmente */
+        flex-wrap: wrap; /* Permitir que los botones envuelvan si no hay espacio */
+        justify-content: center; /* Centrar los botones horizontalmente */
+        gap: 8px; /* Espaciado entre los botones */
+        padding: 1rem; /* Mantenemos el padding */
     }
 
     .editButton, .deleteButton, .toggleActiveButton, .toggleInactiveButton {
-        width: 100%;
-        justify-content: center;
-        padding: 0.7rem 1rem; /* Ajustado para móviles */
-        font-size: 0.85rem; /* Ajustado para móviles */
+        /* Eliminamos width: 100% para que se ajusten al contenido */
+        /* Eliminamos justify-content: center; ya que el contenedor padre los centrará */
+        padding: 0.7rem 1rem; /* Mantenido, ya es adecuado para móvil */
+        font-size: 0.85rem; /* Mantenido, ya es adecuado para móvil */
+    }
+
+    /* CAMBIO MÍNIMO AQUÍ: Para que los botones del formulario se apilen */
+    .formActions {
+        flex-direction: column; /* Apila los elementos en una columna */
+        align-items: center;  /* Centra los elementos horizontalmente */
+        gap: 10px; /* Espacio entre los botones apilados */
     }
 }

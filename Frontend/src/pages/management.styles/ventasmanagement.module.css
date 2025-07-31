@@ -1,6 +1,3 @@
-/* src/components/layout/ventasmanagement.module.css */
-
-/* Variables de color y espaciado - ¡Con la paleta de colores azul y rojo Cheepers! */
 :root {
   --color-cheepers-red: #e53e3e; /* Rojo Cheepers para título, errores, exportar */
   --color-primary-blue: #2c86ec; /* Azul primario para métricas, porcentajes, foco */
@@ -183,7 +180,7 @@
     background-color: var(--color-white);
     border-radius: var(--border-radius-md);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Sombra más suave y extendida */
-    padding: 25px;
+    padding: 8px; /* REDUCIDO: de 25px a 20px */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -198,13 +195,13 @@
 }
 
 .metricIconContainer {
-    font-size: 2.2rem;
+    font-size: 1.9rem; /* REDUCIDO: de 2.2rem a 2rem */
     color: var(--color-primary-blue); /* Azul primario para el ícono */
-    margin-bottom: 18px;
+    margin-bottom: 10px; /* REDUCIDO: de 18px a 15px */
     background-color: var(--color-very-light-blue); /* Fondo azul muy claro para el ícono */
     border-radius: var(--border-radius-full);
-    width: 65px;
-    height: 65px;
+    width: 55px; /* REDUCIDO: de 65px a 60px */
+    height: 55px; /* REDUCIDO: de 65px a 60px */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -212,14 +209,14 @@
 }
 
 .metricCard h3 {
-    font-size: 1.35rem;
+    font-size: 1.2rem; /* REDUCIDO: de 1.35rem a 1.2rem */
     font-weight: 700;
     color: var(--color-dark-text);
-    margin-bottom: 12px;
+    margin-bottom: 10px; /* REDUCIDO: de 12px a 10px */
 }
 
 .metricCard p {
-    font-size: 2.2rem;
+    font-size: 2rem; /* REDUCIDO: de 2.2rem a 2rem */
     font-weight: 800;
     color: var(--color-primary-blue); /* Azul primario para los valores */
 }
@@ -407,7 +404,7 @@
 
 .dailySalesTable th,
 .dailySalesTable td {
-    padding: 10px 15px; /* Reducido el padding para celdas */
+    padding: 12px 15px; /* Reducido el padding para celdas */
     text-align: left;
     font-size: 0.9rem; /* Ligeramente más pequeño para más espacio */
     color: var(--color-dark-text);
@@ -497,21 +494,23 @@
     }
 
     .metricCard {
-        padding: var(--space-md);
+        padding: var(--space-md); /* Mantenido, ya es responsive */
     }
 
     .metricIconContainer {
-        font-size: 2rem;
-        width: 60px;
-        height: 60px;
+        font-size: 1.8rem; /* REDUCIDO para móvil */
+        width: 50px; /* REDUCIDO para móvil */
+        height: 50px; /* REDUCIDO para móvil */
+        margin-bottom: 10px; /* REDUCIDO para móvil */
     }
 
     .metricCard h3 {
-        font-size: 1.1rem;
+        font-size: 1rem; /* REDUCIDO para móvil */
+        margin-bottom: 8px; /* REDUCIDO para móvil */
     }
 
     .metricCard p {
-        font-size: 1.8rem;
+        font-size: 1.6rem; /* REDUCIDO para móvil */
     }
 
     .chartsContainer {

@@ -6,6 +6,7 @@
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif;
     margin: 20px;
+    margin-bottom: 45px;
 }
 
 /* Page Title */
@@ -476,6 +477,7 @@
     .textareaField {
         padding: 10px 12px;
         font-size: 0.9rem;
+        width: 85%;
     }
 
     .formGroup label {
@@ -490,7 +492,7 @@
 
     .productItem select,
     .productItem input[type="number"] {
-        width: 100%; /* Asegura que ocupen todo el ancho */
+        width: 90%; /* Asegura que ocupen todo el ancho */
     }
 
     .addAddOnButton,

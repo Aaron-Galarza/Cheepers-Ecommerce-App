@@ -301,15 +301,16 @@
 
 @media (max-width: 768px) {
     .pageContainer {
-        margin: 15px; /* Reducido el margen exterior */
+        margin: 90px 0 15px 0; /* Ajustado: margin-top fijo, horizontal a 0, bottom 15px */
         padding: 15px; /* Reducido el padding exterior */
-        margin-top: 90px;
+        width: 100%; /* Asegura que ocupe todo el ancho disponible */
+        box-sizing: border-box; /* Fundamental para que padding no cause overflow */
     }
 
     .pageTitle {
         font-size: 2rem; /* Ligeramente más pequeño para móviles */
         margin-bottom: 25px; /* Ajustado para dar más espacio abajo */
-        margin-top: 40px; /* Aumentado para dar más espacio arriba */
+        margin-top: 0; /* Eliminado margin-top duplicado */
     }
 
     .formSection, .summarySection {

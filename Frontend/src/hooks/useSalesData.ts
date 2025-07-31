@@ -121,7 +121,8 @@ export const useSalesData = () => {
     salesDataForChart,
     topSellingPeriods,
     dailySalesTableData,
-    dailyTotalSales
+    dailyTotalSales,
+    deliveryPercentage 
   } = useMemo(() => {
     let currentOrders = [...allOrders];
     const now = new Date();
@@ -156,8 +157,13 @@ export const useSalesData = () => {
     const deliveredOrders = currentOrders.filter(order => order.status === 'delivered');
 
     const calculatedTotalSales = deliveredOrders.reduce((sum, order) => sum + order.totalAmount, 0);
-    const calculatedTotalOrdersCount = currentOrders.length;
+    const calculatedTotalOrdersCount = currentOrders.length; 
     const calculatedCompletedOrdersCount = deliveredOrders.length;
+
+    const deliveredOrdersForDeliveryPercentage = deliveredOrders.filter(order => order.deliveryType === 'delivery');
+    const calculatedDeliveryPercentage = calculatedCompletedOrdersCount > 0
+      ? (deliveredOrdersForDeliveryPercentage.length / calculatedCompletedOrdersCount) * 100
+      : 0;
 
     const calculatedActiveProductsCount = allProducts.filter(p => p.isActive).length;
 
@@ -267,7 +273,7 @@ export const useSalesData = () => {
         orderSummary: orderSummary,
         subtotal: order.totalAmount,
         orderDate: orderCreatedAt.toLocaleDateString('es-AR'),
-        orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+        orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }), // CAMBIO AQUÍ: hour12: false
         fullOrderTime: orderCreatedAt
       });
       tableTotalSales += order.totalAmount;
@@ -286,7 +292,8 @@ export const useSalesData = () => {
       salesDataForChart: calculatedSalesDataForChart,
       topSellingPeriods: calculatedTopSellingPeriods,
       dailySalesTableData: tableData,
-      dailyTotalSales: tableTotalSales
+      dailyTotalSales: tableTotalSales,
+      deliveryPercentage: calculatedDeliveryPercentage 
     };
   }, [allOrders, allProducts, allAddOns, timeRangeFilter, startDate, endDate]);
 
@@ -362,6 +369,7 @@ export const useSalesData = () => {
     topSellingPeriods,
     dailySalesTableData,
     dailyTotalSales,
-    exportDailySalesToCsv
+    exportDailySalesToCsv,
+    deliveryPercentage 
   };
 };
