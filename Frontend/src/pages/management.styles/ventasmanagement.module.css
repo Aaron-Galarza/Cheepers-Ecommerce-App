@@ -170,8 +170,9 @@
 
 /* Métricas Resumen Grid */
 .metricsGrid {
+    /* CAMBIO CLAVE: Usa un grid explícito de 3 columnas para PC */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* Fuerza 3 columnas de igual ancho */
     gap: 30px;
     margin-bottom: 45px;
 }
@@ -180,7 +181,7 @@
     background-color: var(--color-white);
     border-radius: var(--border-radius-md);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Sombra más suave y extendida */
-    padding: 8px; /* REDUCIDO: de 25px a 20px */
+    padding: 7px; /* REDUCIDO: de 25px a 20px */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -465,108 +466,108 @@
         padding: var(--space-md);
         margin: var(--space-sm);
     }
-
+    
     .title {
         font-size: 2.2rem;
         margin-bottom: var(--space-lg);
     }
-
+    
     .filterSection {
         flex-direction: column;
         align-items: stretch;
         gap: var(--space-sm);
         padding: 1rem;
     }
-
+    
     .customDateFilter {
         flex-direction: column;
         align-items: stretch;
     }
-
+    
     .selectField, .inputField, .searchButton, .exportButton {
         width: 100%;
         min-width: unset;
     }
-
+    
     .metricsGrid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Una columna en móvil */
         gap: 1rem;
     }
-
+    
     .metricCard {
         padding: var(--space-md); /* Mantenido, ya es responsive */
     }
-
+    
     .metricIconContainer {
         font-size: 1.8rem; /* REDUCIDO para móvil */
         width: 50px; /* REDUCIDO para móvil */
         height: 50px; /* REDUCIDO para móvil */
         margin-bottom: 10px; /* REDUCIDO para móvil */
     }
-
+    
     .metricCard h3 {
         font-size: 1rem; /* REDUCIDO para móvil */
         margin-bottom: 8px; /* REDUCIDO para móvil */
     }
-
+    
     .metricCard p {
         font-size: 1.6rem; /* REDUCIDO para móvil */
     }
-
+    
     .chartsContainer {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-
+    
     .chartCard {
         padding: var(--space-md);
         min-height: 380px;
     }
-
+    
     .chartTitle {
         font-size: 1.4rem;
     }
-
+    
     .bestDaysTitle {
         font-size: 1.2rem;
     }
-
+    
     .bestDaysItem {
         font-size: 0.95rem;
         padding: 8px 0;
     }
-
+    
     .bestSellingItem {
         flex-direction: column;
         align-items: flex-start;
         padding: 10px;
         margin-bottom: 8px;
     }
-
+    
     .bestSellingName, .bestSellingQuantity, .bestSellingPercentage {
         flex-basis: auto;
         width: 100%;
         text-align: left;
         margin-bottom: 5px;
     }
-
+    
     .bestSellingPercentage {
         text-align: left;
         margin-top: 5px;
     }
-
+    
     .dailySalesTable th,
     .dailySalesTable td {
         padding: 8px 10px; /* Más pequeño para móvil */
         font-size: 0.8rem; /* Más pequeño para móvil */
     }
-
+    
     .dailySalesTable tfoot td {
         font-size: 0.9rem; /* Más pequeño para móvil */
         padding: 8px 10px; /* Más pequeño para móvil */
     }
 }
-
+    
 /* --- NUEVOS ESTILOS para "Ver más" / "Ver menos" --- */
 .seeMoreButton, .seeLessButton {
   background-color: var(--color-primary-blue); /* Azul primario */

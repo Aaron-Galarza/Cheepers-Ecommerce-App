@@ -1,4 +1,4 @@
-/* General Container for Orders Management Page */
+
 .ordersManagementContainer {
     padding: 30px;
     background-color: #f8f9fa;
@@ -66,14 +66,14 @@
     font-size: 1rem;
     color: #333;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    width: 100%; /* Asegura que ocupen todo el ancho */
-    box-sizing: border-box; /* Incluye padding y border en el ancho total */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .inputField:focus,
 .selectField:focus,
 .textareaField:focus {
-    border-color: #e53e3e; /* Rojo Cheepers en foco */
+    border-color: #e53e3e;
     box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
     outline: none;
 }
@@ -91,18 +91,18 @@
     margin-bottom: 15px;
     background-color: #fcfcfc;
     display: grid;
-    grid-template-columns: 1fr auto; /* Para alinear select/input con botones */
+    grid-template-columns: 1fr auto;
     gap: 10px;
     align-items: center;
 }
 
 .productItem select,
 .productItem input[type="number"] {
-    margin-bottom: 0; /* Eliminar margen inferior de los campos dentro del item */
+    margin-bottom: 0;
 }
 
 .productItem .inputField {
-    width: auto; /* Permite que el input de cantidad se ajuste */
+    width: auto;
     flex-grow: 0;
 }
 
@@ -121,7 +121,7 @@
 }
 
 .addAddOnButton {
-    background-color: #4CAF50; /* Verde */
+    background-color: #4CAF50;
     color: white;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .removeButton {
-    background-color: #f44336; /* Rojo */
+    background-color: #f44336;
     color: white;
 }
 
@@ -141,7 +141,7 @@
 }
 
 .addProductButton {
-    background-color: #007bff; /* Azul */
+    background-color: #007bff;
     color: white;
     padding: 12px 20px;
     border: none;
@@ -165,7 +165,7 @@
 
 /* Add-ons Container within a Product Item */
 .addOnsContainer {
-    grid-column: 1 / -1; /* Ocupa todo el ancho de la grilla del producto */
+    grid-column: 1 / -1;
     background-color: #f9f9f9;
     border: 1px solid #eee;
     border-radius: 6px;
@@ -183,7 +183,7 @@
 
 .addOnItemForm {
     display: grid;
-    grid-template-columns: 1fr auto auto; /* Select, quantity, remove button */
+    grid-template-columns: 1fr auto auto;
     gap: 8px;
     align-items: center;
     margin-bottom: 8px;
@@ -203,7 +203,7 @@
 .totalAmountDisplay {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #e53e3e; /* Rojo Cheepers */
+    color: #e53e3e;
     text-align: right;
     margin-top: 20px;
     padding-top: 15px;
@@ -218,7 +218,7 @@
 }
 
 .saveButton {
-    background-color: #e53e3e; /* Rojo Cheepers */
+    background-color: #e53e3e;
     color: white;
     padding: 15px 30px;
     border: none;
@@ -242,7 +242,7 @@
 /* Existing styles for order list items */
 .ordersList {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px;
 }
 
@@ -271,8 +271,8 @@
     align-items: center;
     font-size: 0.95rem;
     color: #555;
-    flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
-    gap: 10px; /* Espacio entre los elementos del encabezado */
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .orderHeader p {
@@ -282,7 +282,7 @@
     font-weight: 600;
 }
 
-.orderDate, .customerName, .customerPhone { /* Añadido .customerPhone */
+.orderDate, .customerName, .customerPhone {
     color: #333;
 }
 
@@ -323,7 +323,7 @@
 
 .addOnsSublist {
     list-style: none;
-    padding-left: 15px; /* Indent sublist */
+    padding-left: 15px;
     margin-top: 5px;
 }
 
@@ -345,7 +345,7 @@
 .totalAmount {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #e53e3e; /* Rojo Cheepers */
+    color: #e53e3e;
     margin-top: 10px;
 }
 
@@ -354,28 +354,28 @@
 }
 
 .statusPending {
-    color: #ffc107; /* Amarillo para pendiente */
+    color: #ffc107;
 }
 
-.statusDelivered { /* Nuevo estado para "Entregado" */
-    color: #28a745; /* Verde para entregado */
+.statusDelivered {
+    color: #28a745;
 }
 
-.statusCancelled { /* Nuevo estado para "Cancelado" */
-    color: #dc3545; /* Rojo para cancelado */
+.statusCancelled {
+    color: #dc3545;
 }
 
 .orderActions {
     display: flex;
-    justify-content: flex-end; /* Alinea los botones a la derecha */
+    justify-content: flex-end;
     padding: 15px;
     border-top: 1px solid #e0e0e0;
-    gap: 10px; /* Espacio entre los botones */
-    flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .deliveredButton {
-    background-color: #28a745; /* Verde para entregado */
+    background-color: #28a745;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -396,8 +396,8 @@
     box-shadow: 0 6px 15px rgba(33, 136, 56, 0.4);
 }
 
-.cancelButton { /* Estilo para el botón de cancelar */
-    background-color: #dc3545; /* Rojo para cancelar */
+.cancelButton {
+    background-color: #dc3545;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -418,26 +418,26 @@
     box-shadow: 0 6px 15px rgba(200, 35, 51, 0.4);
 }
 
-.restoreButton { /* Nuevo estilo para el botón de restaurar */
-    background-color: #007bff; /* Azul para restaurar */
+.restoreButton {
+    background-color: #007bff;
     color: white;
-    padding: 6px 10px; /* Reducido el padding */
+    padding: 6px 10px;
     border: none;
-    border-radius: 6px; /* Reducido el border-radius */
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem; /* Reducido el tamaño de fuente */
-    font-weight: 500; /* Menos negrita */
+    font-size: 0.85rem;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 5px; /* Reducido el espacio entre icono y texto */
+    gap: 5px;
     transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2); /* Reducida la sombra */
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
 }
 
 .restoreButton:hover {
     background-color: #0056b3;
-    transform: translateY(-1px); /* Reducido el efecto de elevación */
-    box-shadow: 0 3px 8px rgba(0, 86, 179, 0.3); /* Reducida la sombra en hover */
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 86, 179, 0.3);
 }
 
 
@@ -485,26 +485,26 @@
     }
 
     .productItem {
-        grid-template-columns: 1fr; /* Una columna en móviles para productos */
+        grid-template-columns: 1fr;
         gap: 8px;
         padding: 10px;
     }
 
     .productItem select,
     .productItem input[type="number"] {
-        width: 90%; /* Asegura que ocupen todo el ancho */
+        width: 90%;
     }
 
     .addAddOnButton,
     .removeButton {
-        width: 100%; /* Estira los botones de añadir/quitar en móviles */
+        width: 100%;
         justify-content: center;
         padding: 8px 10px;
         font-size: 0.85rem;
     }
 
     .addOnItemForm {
-        grid-template-columns: 1fr auto; /* Select y botón de quitar */
+        grid-template-columns: 1fr auto;
     }
     .addOnItemForm select,
     .addOnItemForm input[type="number"] {
@@ -512,7 +512,7 @@
     }
 
     .addOnItemForm button {
-        width: auto; /* El botón de quitar adicional se ajusta */
+        width: auto;
     }
 
 
@@ -523,7 +523,7 @@
 
     .totalAmountDisplay {
         font-size: 1.2rem;
-        text-align: center; /* Centrar en móviles */
+        text-align: center;
     }
 
     .saveButton {
@@ -533,7 +533,7 @@
 
     /* Existing order list styles */
     .ordersList {
-        grid-template-columns: 1fr; /* Una columna en móviles */
+        grid-template-columns: 1fr;
     }
 
     .orderHeader {
@@ -544,35 +544,35 @@
 
     .orderActions {
         flex-direction: column;
-        align-items: stretch; /* Estira el botón a lo ancho */
+        align-items: stretch;
         gap: 8px;
     }
 
-    .deliveredButton, .cancelButton, .restoreButton { /* Aplica a todos los botones de acción */
-        width: 100%; /* Ocupa todo el ancho disponible */
+    .deliveredButton, .cancelButton, .restoreButton {
+        width: 100%;
         justify-content: center;
-        padding: 8px 12px; /* Ajuste para móviles */
-        font-size: 0.9rem; /* Ajuste para móviles */
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
 
     /* Contenedor del filtro */
     .filterContainer {
-        flex-wrap: wrap; /* Permite que el label y el select se envuelvan */
-        justify-content: center; /* Centra los elementos si se envuelven */
-        gap: 0.5rem; /* Reduce el espacio entre ellos */
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     /* Select del filtro */
     .filterSelect {
-        padding: 0.3rem 0.5rem; /* Reducido el padding */
-        font-size: 0.9rem; /* Reducido el tamaño de fuente */
-        max-width: 90px; /* Limita el ancho del select */
+        padding: 0.3rem 0.5rem;
+        font-size: 0.9rem;
+        max-width: 90px;
     }
 
     /* --- CAMBIO CLAVE AQUÍ: Estilos para las opciones del select en móvil --- */
     .filterSelect option {
-        font-size: 0.6rem !important; /* Fuerza el tamaño de fuente para las opciones */
-        padding: 0.2rem 0.5rem !important; /* Fuerza el padding para las opciones */
+        font-size: 0.6rem !important;
+        padding: 0.2rem 0.5rem !important;
     }
 }
 
@@ -583,7 +583,7 @@
     gap: 0.7rem;
     margin-bottom: 1.8rem;
     font-weight: 600;
-    color: #374151; /* gris oscuro suave */
+    color: #374151;
     font-size: 1rem;
 }
 
@@ -592,7 +592,7 @@
     padding: 0.4rem 0.7rem;
     font-size: 1rem;
     border-radius: 6px;
-    border: 1.8px solid #cbd5e1; /* gris claro */
+    border: 1.8px solid #cbd5e1;
     background-color: white;
     transition: border-color 0.3s ease;
     cursor: pointer;
@@ -600,7 +600,7 @@
 
 .filterSelect:hover,
 .filterSelect:focus {
-    border-color: #2563eb; /* azul intenso al hover/focus */
+    border-color: #2563eb;
     outline: none;
 }
 
@@ -610,7 +610,7 @@
     font-size: 0.9rem;
     color: #666;
     opacity: 0.8;
-    animation: pulse 1.5s infinite alternate; /* Animación sutil */
+    animation: pulse 1.5s infinite alternate;
 }
 
 @keyframes pulse {
@@ -626,53 +626,49 @@
     color: #555
 }
 
-/* ... estilos existentes ... */
-
 /* Estilo para el estado 'processing' */
 .statusProcessing {
-  color: #3c60ff; /* Un azul para indicar "en proceso" */
-  font-weight: bold;
+    color: #3c60ff;
+    font-weight: bold;
 }
 
 /* Estilo para el botón "Aceptar Pedido" */
 .acceptButton {
-  background-color: #3c60ff; /* Un azul pero quizás un poco más claro/oscuro */
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9em;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: background-color 0.2s ease-in-out;
-  flex-grow: 1; /* Permite que el botón ocupe espacio si hay varios */
-  justify-content: center;
-  margin-top: 5px; /* Pequeño margen para separarlo de otros botones */
+    background-color: #3c60ff;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s ease-in-out;
+    flex-grow: 1;
+    justify-content: center;
+    margin-top: 5px;
 }
 
 .acceptButton:hover {
-  background-color: #224bfd; /* Un azul mas oscuro al pasar el mouse */
+    background-color: #224bfd;
 }
 
 /* Ajustes para que los botones de acción se vean bien juntos */
 .orderActions {
     display: flex;
-    flex-wrap: wrap; /* Permite que los botones salten de línea si no caben */
-    gap: 10px; /* Espacio entre los botones */
-    justify-content: flex-end; /* Alinea los botones a la derecha */
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
     padding-top: 10px;
-    border-top: 1px solid #eee; /* Separador sutil */
+    border-top: 1px solid #eee;
     margin-top: 10px;
 }
-/* Asegúrate que tus botones existentes .deliveredButton, .cancelButton, .restoreButton también tengan flex-grow: 1; y un gap si quieres que se distribuyan uniformemente */
 
 /* Por ejemplo, podrías agrupar estilos comunes de botones */
 .deliveredButton, .cancelButton, .restoreButton, .acceptButton {
-    /* ... propiedades comunes como padding, border, etc. ... */
     flex-grow: 1;
-    max-width: 100%; /* Para que no se estiren demasiado en una sola fila si hay muchos */
+    max-width: 100%;
 }
 
 /* Puedes ajustar el order de los botones si quieres que el "Aceptar Pedido" aparezca primero */
@@ -687,4 +683,215 @@
 }
 .restoreButton {
     order: 4;
+}
+
+/* Nuevo contenedor para los botones de acción global (Exportar y Limpiar) */
+.actionButtonsContainer {
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    gap: 15px; /* Espacio entre los botones */
+    margin-bottom: 20px;
+}
+
+/* Estilo para el botón de exportar (AHORA VERDE) */
+.exportButton {
+    background-color: #28a745; /* Verde para la acción de exportar */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
+}
+
+.exportButton:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilo para el botón de limpiar (AHORA ROJO) */
+.cleanButton {
+    background-color: #dc3545; /* Rojo para la acción de limpiar */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cleanButton:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el encabezado de la gestión que puede contener los botones */
+.managementHeader {
+    display: flex;
+    justify-content: right; /* Alinea el título a la izquierda y los botones a la derecha */
+    align-items: center;
+    margin-bottom: 20px;
+}
+/* ------------------------------------- */
+/* ESTILOS PERSONALIZADOS PARA TOASTIFY */
+/* ------------------------------------- */
+
+/* Clases principales para las toasts */
+.Toastify__toast-container {
+    padding: 15px;
+}
+
+.Toastify__toast {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #333;
+    min-height: 60px;
+    line-height: 1.4;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+.Toastify__toast--info {
+    background: #f0f2f5;
+    color: #444;
+}
+
+.Toastify__toast--success {
+    background: #e6f7d9;
+    color: #218838;
+}
+
+.Toastify__toast--warning {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+.Toastify__toast--error {
+    background: #fce4e4;
+    color: #d32f2f;
+}
+
+/* Iconos de Toastify */
+.Toastify__toast-icon svg {
+    fill: currentColor;
+    width: 25px;
+    height: 25px;
+}
+.Toastify__toast--success .Toastify__toast-icon {
+    color: #28a745;
+}
+.Toastify__toast--error .Toastify__toast-icon {
+    color: #dc3545;
+}
+.Toastify__toast--info .Toastify__toast-icon {
+    color: #007bff;
+}
+.Toastify__toast--warning .Toastify__toast-icon {
+    color: #ffc107;
+}
+
+/* Barra de progreso */
+.Toastify__progress-bar {
+    border-radius: 8px;
+}
+
+/* Estilos para las alertas de confirmación (botones) */
+.customConfirmationToast {
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border-radius: 10px;
+}
+
+.toastConfirmContent p {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.toastButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.toastConfirmButton,
+.toastCancelButton {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.toastConfirmButton {
+    background-color: #28a745;
+    color: white;
+}
+
+.toastConfirmButton:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+.toastCancelButton {
+    background-color: #dc3545;
+    color: white;
+}
+
+.toastCancelButton:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
+.newOrderToast {
+    background: #e5f5e0;
+    color: #28a745;
+    border: 1px solid #c8e6c9;
+}
+
+/* Estilos para la alerta de confirmación de Exportar y Limpiar */
+.exportCleanConfirmationToast .toastConfirmContent p {
+    color: #e53e3e;
+    font-weight: 700;
+}
+
+.exportCleanConfirmationToast .toastConfirmButton {
+    background-color: #e53e3e;
+}
+
+.exportCleanConfirmationToast .toastConfirmButton:hover {
+    background-color: #c53030;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+}
+
+.exportCleanConfirmationToast .toastCancelButton {
+    background-color: #9ca3af;
+    color: white;
+}
+
+.exportCleanConfirmationToast .toastCancelButton:hover {
+    background-color: #6b7280;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(107, 114, 128, 0.3);
 }
