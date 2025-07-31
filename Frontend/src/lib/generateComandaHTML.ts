@@ -5,9 +5,10 @@ import { OrderDisplay } from "../pages/management/ordersmanagement"; // Importa 
 /**
  * Genera una cadena HTML para una comanda de pedido con un diseño de ticket de cocina.
  * @param order Los datos del pedido a incluir en la comanda.
+ * @param shippingCost El costo de envío, opcional, para pedidos a domicilio.
  * @returns Una cadena de texto HTML.
  */
-export const generateComandaHTML = (order: OrderDisplay): string => {
+export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number): string => {
     // Formatear la fecha y hora
     const orderDate = new Date(order.createdAt).toLocaleDateString('es-AR', {
         year: 'numeric',
@@ -40,12 +41,19 @@ export const generateComandaHTML = (order: OrderDisplay): string => {
     ` : '';
 
     // Determinar las notas si existen
-    // (Asumiendo que 'notes' puede venir en OrderDisplay, aunque no esté explícitamente en la interfaz actual)
-    const notesHtml = (order as any).notes ? `
+    const notesHtml = order.notes ? `
         <div style="margin-top: 15px; padding-top: 5px; border-top: 1px dashed #333;">
             <p style="margin: 0; font-weight: bold;">Notas:</p>
-            <p style="margin: 5px 0 0 0; font-style: italic;">${(order as any).notes}</p>
+            <p style="margin: 5px 0 0 0; font-style: italic; white-space: pre-wrap;">${order.notes}</p>
         </div>
+    ` : '';
+    
+    // Calcular el total final si hay costo de envío
+    const totalFinal = shippingCost !== undefined ? order.totalAmount + shippingCost : order.totalAmount;
+    
+    // Crear el bloque HTML para el costo de envío si existe
+    const shippingCostHtml = shippingCost !== undefined ? `
+        <p>Costo de Envío: $${shippingCost.toFixed(2)}</p>
     ` : '';
 
     return `
@@ -150,7 +158,9 @@ export const generateComandaHTML = (order: OrderDisplay): string => {
                 <div class="separator"></div>
                 <div class="total-section">
                     <p><strong>Método de Pago:</strong> ${order.paymentMethod === 'cash' ? 'Efectivo' : order.paymentMethod === 'card' ? 'Tarjeta' : 'Transferencia'}</p>
-                    <p>TOTAL: $${order.totalAmount.toFixed(2)}</p>
+                    <p>Subtotal: $${order.totalAmount.toFixed(2)}</p>
+                    ${shippingCostHtml}
+                    <p><strong>Total Final: $${totalFinal.toFixed(2)}</strong></p>
                 </div>
                 ${notesHtml}
                 <div class="separator"></div>
