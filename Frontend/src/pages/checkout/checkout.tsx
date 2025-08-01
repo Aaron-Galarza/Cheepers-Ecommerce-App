@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// C:\Users\Usuario\Desktop\Aaron\Cheepers-Ecommerce-App\Frontend\src\pages\checkout\checkout.tsx
+
+import React, { useState, useEffect } from 'react'; // Importamos `useEffect` para la lógica del descuento
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import styles from './../css/checkout.module.css';
@@ -11,24 +13,64 @@ const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 
 const CheckoutPage: React.FC = () => {
     const [email, setEmail] = useState('');
-    const [name, setName] = useState(''); // Estado para el nombre
+    const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
     const [street, setStreet] = useState('');
     const [city, setCity] = useState('');
+    
+    // El estado del método de pago sigue siendo el mismo.
     const [metodo, setMetodo] = useState<'efectivo' | 'mercadopago'>('efectivo');
+    
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     const { cart, clearCart, calculateCartTotal } = useCart();
-    const total = calculateCartTotal();
+    
+    // Usamos `subtotal` para el total original del carrito antes del descuento
+    const subtotal = calculateCartTotal();
+
+    // NUEVO: Estados para manejar el descuento y el total final
+    const [finalTotal, setFinalTotal] = useState<number>(subtotal);
+    const [discountAmount, setDiscountAmount] = useState<number>(0);
+
+    // NUEVO: `useEffect` para calcular el descuento cada vez que el carrito o el método de pago cambien
+    useEffect(() => {
+        // Filtramos los productos que no son promos ni combos
+        const itemsEligibleForDiscount = cart.filter(item => 
+            item.category !== 'Promos' && item.category !== 'Promos Solo en Efectivo'
+        );
+
+        // Sumamos el total solo de los productos elegibles para el descuento
+        const totalEligibleForDiscount = itemsEligibleForDiscount.reduce((sum, item) => {
+            // Calculamos el subtotal de cada ítem (producto + adicionales)
+            let itemSubtotal = item.price * item.quantity;
+            if (item.addOns && item.addOns.length > 0) {
+                itemSubtotal += item.addOns.reduce((addOnsSum, addOn) => 
+                    addOnsSum + (addOn.price * addOn.quantity), 0
+                );
+            }
+            return sum + itemSubtotal;
+        }, 0);
+
+        // Si el método de pago es efectivo, aplicamos el descuento
+        if (metodo === 'efectivo') {
+            const calculatedDiscount = totalEligibleForDiscount * 0.10; // 10% de descuento
+            setDiscountAmount(calculatedDiscount);
+            setFinalTotal(subtotal - calculatedDiscount);
+        } else {
+            // Si el método es otro, no hay descuento
+            setDiscountAmount(0);
+            setFinalTotal(subtotal);
+        }
+    }, [metodo, subtotal, cart]); // Dependencias: el efecto se ejecuta cuando estos valores cambian
 
     const handleConfirm = async () => {
         setErrorMessage('');
         setIsLoading(true);
 
-        if (!email || !name || !phone || !metodo || !deliveryType) { // Asegurarse de que 'name' también esté validado
+        if (!email || !name || !phone || !metodo || !deliveryType) {
             setErrorMessage('Por favor, completá todos los campos generales y de pago.');
             setIsLoading(false);
             return;
@@ -57,11 +99,11 @@ const CheckoutPage: React.FC = () => {
             })) || [],
         }));
 
-        let backendPaymentMethod: 'cash' | 'card' | 'transfer'; // Asumiendo estos tipos en el backend
+        let backendPaymentMethod: 'cash' | 'card' | 'transfer';
         if (metodo === 'efectivo') {
             backendPaymentMethod = 'cash';
         } else if (metodo === 'mercadopago') {
-            backendPaymentMethod = 'card'; // O 'transfer' si Mercado Pago implica transferencia
+            backendPaymentMethod = 'card';
         } else {
             setErrorMessage('Método de pago no válido.');
             setIsLoading(false);
@@ -70,14 +112,14 @@ const CheckoutPage: React.FC = () => {
 
         const orderData: any = {
             products: productsForOrder,
-            // AÑADIDO: Conectamos el estado 'name' con 'guestName' para el backend
-            guestName: name, 
+            guestName: name,
             guestEmail: email,
             guestPhone: phone,
-            totalAmount: total,
+            // IMPORTANTE: Aquí enviamos el total final con el descuento aplicado
+            totalAmount: finalTotal, 
             paymentMethod: backendPaymentMethod,
             deliveryType: deliveryType,
-            notes: '', // Asumo que `notes` se mantendrá vacío o se añadiría un input para ello
+            notes: '',
         };
 
         if (deliveryType === 'delivery') {
@@ -89,12 +131,9 @@ const CheckoutPage: React.FC = () => {
 
         try {
             const response = await axios.post(`${API_BASE_URL}/api/orders`, orderData);
-
             console.log('Pedido creado exitosamente:', response.data.order);
-
             clearCart();
             navigate('/order-confirmation');
-
         } catch (error: any) {
             console.error('Hubo un error al confirmar el pedido:', error.response?.data?.message || error.message);
             setErrorMessage(error.response?.data?.message || 'Ocurrió un error inesperado al procesar tu pedido. Por favor, intenta de nuevo.');
@@ -110,6 +149,7 @@ const CheckoutPage: React.FC = () => {
             <div className={styles.gridContainer}>
                 {/* Formulario de Datos */}
                 <div className={styles.formSection}>
+                    {/* ... (el resto de tu formulario de datos) ... */}
                     <h2 className={styles.sectionTitle}>
                         <span className={styles.iconWrapper}><FaUser /></span> Datos Generales
                     </h2>
@@ -226,16 +266,18 @@ const CheckoutPage: React.FC = () => {
                                 type="radio"
                                 value="efectivo"
                                 checked={metodo === 'efectivo'}
+                                // Al cambiar el radio, actualizamos el estado
                                 onChange={() => setMetodo('efectivo')}
                                 className={styles.radioInput}
                             />
-                            <span className={styles.radioText}>Efectivo</span>
+                            <span className={styles.radioText}>Efectivo (10% de descuento)</span>
                         </label>
                         <label className={styles.radioLabel}>
                             <input
                                 type="radio"
                                 value="mercadopago"
                                 checked={metodo === 'mercadopago'}
+                                // Al cambiar el radio, actualizamos el estado
                                 onChange={() => setMetodo('mercadopago')}
                                 className={styles.radioInput}
                             />
@@ -282,13 +324,25 @@ const CheckoutPage: React.FC = () => {
                         )}
                     </div>
                     <hr className={styles.summaryDivider} />
+                    
+                    {/* NUEVO: Fila para mostrar el subtotal */}
                     <div className={styles.summaryTotalRow}>
                         <p className={styles.summaryTotalLabel}>Subtotal:</p>
-                        <p className={styles.summaryTotalValue}>${total.toFixed(2)}</p>
+                        <p className={styles.summaryTotalValue}>${subtotal.toFixed(2)}</p>
                     </div>
+                    
+                    {/* NUEVO: Fila para mostrar el descuento, solo si es efectivo y el descuento es mayor a 0 */}
+                    {metodo === 'efectivo' && discountAmount > 0 && (
+                        <div className={styles.summaryDiscountRow}>
+                            <p className={styles.summaryDiscountLabel}>Descuento por Efectivo (10%):</p>
+                            <p className={styles.summaryDiscountValue}>-${discountAmount.toFixed(2)}</p>
+                        </div>
+                    )}
+                    
+                    {/* La fila del total final ahora muestra el valor de `finalTotal` */}
                     <div className={styles.summaryGrandTotalRow}>
                         <p className={styles.summaryGrandTotalLabel}>Total:</p>
-                        <p className={styles.summaryGrandTotalValue}>${total.toFixed(2)}</p>
+                        <p className={styles.summaryGrandTotalValue}>${finalTotal.toFixed(2)}</p>
                     </div>
                 </div>
             </div>

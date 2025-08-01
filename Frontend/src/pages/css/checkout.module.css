@@ -417,3 +417,24 @@
     padding: 8px 12px;
     border-radius: 4px;
 }
+
+/* ... (otros estilos existentes) ... */
+
+.summaryDiscountRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 5px 0;
+  border-top: 1px dashed #ccc;
+}
+
+.summaryDiscountLabel {
+  color: #e53e3e; /* Un color rojo para indicar el descuento */
+  font-weight: bold;
+}
+
+.summaryDiscountValue {
+  color: #e53e3e;
+  font-weight: bold;
+}
