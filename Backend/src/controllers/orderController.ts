@@ -3,13 +3,11 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Pedido, { IOrder, IProductItem, ISelectedAddOn, IShippingAddress } from '../models/Pedido';
-import AddOn, { IAddOn } from '../models/AddOn'; // ADICIÓN: Importa el modelo AddOn
-// <--- CAMBIO IMPORTANTE AQUÍ: Importa 'IProduct' de tu modelo 'Product'
+import AddOn, { IAddOn } from '../models/AddOn'; 
 import Product, { IProduct } from '../models/Product';
 import asyncHandler from 'express-async-handler';
 
-// No necesitamos esto si solo los admins están logueados para ver pedidos
-// Si otras rutas en tu backend (no de pedidos) usan req.user, mantén esta declaración
+// Definición de tipos para la interfaz de solicitud
 declare module 'express-serve-static-core' {
     interface Request {
         user?: {
@@ -19,20 +17,19 @@ declare module 'express-serve-static-core' {
     }
 }
 
-// Nueva interfaz para el cuerpo de la solicitud de creación de pedido (MODIFICADO)
 interface CreateOrderRequestBody {
-    products: {
-        productId: string;
-        quantity: number;
-        addOns?: { addOnId: string; quantity: number }[]; // ADICIÓN: Espera array de addOns
-    }[];
-    guestEmail: string;
-    guestPhone: string;
-    guestName: string;
-    paymentMethod: 'cash' | 'card' | 'transfer';
-    deliveryType: 'delivery' | 'pickup';
-    shippingAddress?: { street: string; city: string };
-    notes?: string;
+    products: {
+        productId: string;
+        quantity: number;
+        addOns?: { addOnId: string; quantity: number }[];
+    }[];
+    guestEmail: string;
+    guestPhone: string;
+    guestName: string;
+    paymentMethod: 'cash' | 'card' | 'transfer';
+    deliveryType: 'delivery' | 'pickup';
+    shippingAddress?: { street: string; city: string };
+    notes?: string;
 }
 
 // @desc      Crear un nuevo pedido
@@ -69,83 +66,79 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
     }
 
     let totalAmount = 0;
-    const productsForOrder: IProductItem[] = []; 
+    let discountableAmount = 0;
+    const productsForOrder: IProductItem[] = [];
+
+    // --- CAMBIO DE OPTIMIZACIÓN: CONSULTAS FUERA DEL BUCLE ---
+    const productIds = products.map(p => p.productId);
+    const addOnIds = products.flatMap(p => p.addOns ? p.addOns.map(a => a.addOnId) : []);
+
+    const productDocuments = await Product.find({ _id: { $in: productIds } }).lean();
+    const addOnDocuments = await AddOn.find({ _id: { $in: addOnIds } }).lean();
 
     for (const item of products) {
-        if (!item.productId || typeof item.quantity !== 'number' || item.quantity < 1) {
-            res.status(400);
-            throw new Error('Datos de producto inválidos. Cada ítem debe tener "productId" y "quantity" (mínimo 1).');
-        }
-
-        // <--- CAMBIO AQUÍ: Tipa 'product' con 'IProduct' para que TypeScript sepa que tiene 'isActive'
-        const product: IProduct | null = await Product.findById(item.productId);
+        const product = productDocuments.find(p => p._id.toString() === item.productId);
         if (!product) {
             res.status(404);
             throw new Error(`Producto con ID ${item.productId} no encontrado.`);
         }
-
-        // <--- CAMBIO CLAVE AQUÍ: AÑADE LA VALIDACIÓN DE 'isActive'
-        if (!product.isActive) {
+        if (product.isActive === false) {
             res.status(400);
             throw new Error(`El producto "${product.name}" (ID: ${item.productId}) no está disponible para la venta actualmente.`);
         }
-        // No se necesita lógica de stock, solo esta validación de isActive
 
-let itemPrice = product.price; // Precio base del producto
+        let itemPrice = product.price;
+        const selectedAddOnsForProduct: ISelectedAddOn[] = [];
 
-        const selectedAddOnsForProduct: ISelectedAddOn[] = [];
+        if (item.addOns && item.addOns.length > 0) {
+            for (const addOnRequest of item.addOns) {
+                const addOn = addOnDocuments.find(a => a._id.toString() === addOnRequest.addOnId);
+                if (!addOn || addOn.isActive === false) {
+                    res.status(400);
+                    throw new Error(`Adicional con ID ${addOnRequest.addOnId} no está disponible o no existe.`);
+                }
 
-        // ADICIÓN: Procesar los adicionales si existen
-        if (item.addOns && item.addOns.length > 0) {
-            for (const addOnRequest of item.addOns) {
-                if (!addOnRequest.addOnId || typeof addOnRequest.quantity !== 'number' || addOnRequest.quantity < 1) {
-                    res.status(400);
-                    throw new Error('Datos de adicional inválidos. Cada adicional debe tener "addOnId" y "quantity" (mínimo 1).');
-                }
+                itemPrice += addOn.price * addOnRequest.quantity;
 
-                const addOn: IAddOn | null = await AddOn.findById(addOnRequest.addOnId);
-                if (!addOn) {
-                    res.status(404);
-                    throw new Error(`Adicional con ID ${addOnRequest.addOnId} no encontrado.`);
-                }
+                selectedAddOnsForProduct.push({
+                    addOnId: new mongoose.Types.ObjectId(addOn._id.toString()),
+                    name: addOn.name,
+                    quantity: addOnRequest.quantity,
+                    priceAtOrder: addOn.price,
+                });
+            }
+        }
 
-                if (!addOn.isActive) {
-                    res.status(400);
-                    throw new Error(`El adicional "${addOn.name}" (ID: ${addOnRequest.addOnId}) no está disponible actualmente.`);
-                }
+        const itemTotal = itemPrice * item.quantity;
+        totalAmount += itemTotal;
 
-                // Sumar el precio del adicional al total del ítem
-                itemPrice += addOn.price * addOnRequest.quantity;
+        // Lógica de descuento, exactamente como la propusiste
+        const isDiscountable = !['Promos', 'Promos Solo en Efectivo'].includes(product.category);
+        if (isDiscountable) {
+            discountableAmount += itemTotal;
+        }
 
-                selectedAddOnsForProduct.push({
-                    addOnId: new mongoose.Types.ObjectId(addOnRequest.addOnId),
-                    name: addOn.name,
-                    quantity: addOnRequest.quantity,
-                    priceAtOrder: addOn.price, // Guardamos el precio del adicional en el momento del pedido
-                });
-            }
-        }
+        productsForOrder.push({
+            productId: new mongoose.Types.ObjectId(product._id.toString()),
+            name: product.name,
+            imageUrl: product.imageUrl || '',
+            quantity: item.quantity,
+            priceAtOrder: product.price,
+            addOns: selectedAddOnsForProduct,
+        });
+    }
 
-        // El totalAmount acumula el precio total de cada item (base + adicionales) multiplicado por su cantidad principal
-        totalAmount += itemPrice * item.quantity;
+    // Calcular el descuento final y el total
+    const discount = paymentMethod === 'cash' ? discountableAmount * 0.10 : 0;
+    const finalTotalAmount = totalAmount - discount;
 
-        productsForOrder.push({
-            productId: new mongoose.Types.ObjectId(item.productId),
-            name: product.name,
-            imageUrl: product.imageUrl || '',
-            quantity: item.quantity,
-            priceAtOrder: product.price, // Esto es el precio BASE del producto, no su subtotal con adicionales
-            addOns: selectedAddOnsForProduct, // ADICIÓN: Añadimos los adicionales procesados
-        });
-    }
-
-    // 3. Crear el nuevo pedido, pasando el 'deliveryType' y la 'shippingAddress' condicional
+    // 3. Crear el nuevo pedido
     const newOrder: IOrder = new Pedido({
         guestEmail: guestEmail,
         guestPhone: guestPhone,
-        guestName: guestName,
+        guestName: guestName,
         products: productsForOrder,
-        totalAmount: totalAmount,
+        totalAmount: finalTotalAmount,
         paymentMethod: paymentMethod,
         deliveryType: deliveryType,
         shippingAddress: finalShippingAddress,

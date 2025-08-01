@@ -7,7 +7,7 @@ export interface IProduct extends Document {
   description?: string; // El '?' indica que este campo es opcional
   price: number;
   imageUrl?: string; // URL de la imagen, opcional
-  category?: string; // Categoría del producto, opcional
+  category: string; // Categoría del producto
   isActive: boolean;
   // Aquí podríamos añadir un campo 'businessId' en el futuro para multi-tenancy
   // businessId: mongoose.Types.ObjectId;
