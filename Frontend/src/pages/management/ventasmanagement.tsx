@@ -18,6 +18,8 @@ const INITIAL_ROWS_LIMIT = 10; // Límite inicial de filas para "Ver más"
 
 const VentasManagement: React.FC = () => {
   // Usamos el custom hook para obtener todos los datos y funciones
+  // NOTA: Se ha añadido `soldProductsCount` a la desestructuración, asumiendo
+  // que ahora este valor es retornado por el hook `useSalesData`.
   const {
     loading,
     error,
@@ -31,7 +33,8 @@ const VentasManagement: React.FC = () => {
     totalSales,
     totalOrdersCount,
     completedOrdersCount,
-    activeProductsCount,
+    // Eliminamos `activeProductsCount`
+    soldProductsCount, // NUEVO: Conteo de productos vendidos (sin promos)
     promosSoldCount,
     bestSellingProducts,
     salesDataForChart,
@@ -39,7 +42,7 @@ const VentasManagement: React.FC = () => {
     dailySalesTableData,
     dailyTotalSales,
     exportDailySalesToCsv,
-    deliveryPercentage // NUEVO: Importar el porcentaje de pedidos a domicilio
+    deliveryPercentage
   } = useSalesData();
 
   // Estado local para controlar cuántas filas se muestran en la tabla de detalle
@@ -132,12 +135,16 @@ const VentasManagement: React.FC = () => {
           <h3>Pedidos Completados</h3>
           <p>{completedOrdersCount}</p>
         </div>
+        {/*
+          Este es el cuadro de métrica modificado.
+          Ahora muestra el conteo de productos vendidos (excluyendo promos).
+        */}
         <div className={styles.metricCard}>
           <div className={styles.metricIconContainer}>
             <FaBox />
           </div>
-          <h3>Productos Activos</h3>
-          <p>{activeProductsCount}</p>
+          <h3>Productos Vendidos</h3>
+          <p>{soldProductsCount}</p>
         </div>
         <div className={styles.metricCard}>
           <div className={styles.metricIconContainer}>
@@ -257,3 +264,4 @@ const VentasManagement: React.FC = () => {
   );
 };
 export default VentasManagement;
+

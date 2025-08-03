@@ -95,7 +95,7 @@ export const useSalesData = () => {
     } finally {
       setLoading(false);
     }
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (timeRangeFilter !== 'custom' || triggerSearch > 0) {
@@ -115,14 +115,14 @@ export const useSalesData = () => {
     totalSales,
     totalOrdersCount,
     completedOrdersCount,
-    activeProductsCount,
+    soldProductsCount, // NUEVO: productos vendidos (sin promos)
     promosSoldCount,
     bestSellingProducts,
     salesDataForChart,
     topSellingPeriods,
     dailySalesTableData,
     dailyTotalSales,
-    deliveryPercentage 
+    deliveryPercentage
   } = useMemo(() => {
     let currentOrders = [...allOrders];
     const now = new Date();
@@ -157,7 +157,7 @@ export const useSalesData = () => {
     const deliveredOrders = currentOrders.filter(order => order.status === 'delivered');
 
     const calculatedTotalSales = deliveredOrders.reduce((sum, order) => sum + order.totalAmount, 0);
-    const calculatedTotalOrdersCount = currentOrders.length; 
+    const calculatedTotalOrdersCount = currentOrders.length;
     const calculatedCompletedOrdersCount = deliveredOrders.length;
 
     const deliveredOrdersForDeliveryPercentage = deliveredOrders.filter(order => order.deliveryType === 'delivery');
@@ -165,17 +165,24 @@ export const useSalesData = () => {
       ? (deliveredOrdersForDeliveryPercentage.length / calculatedCompletedOrdersCount) * 100
       : 0;
 
-    const calculatedActiveProductsCount = allProducts.filter(p => p.isActive).length;
-
+    // --- NUEVA LÓGICA: Calcular productos vendidos (excluyendo promos) ---
+    let calculatedSoldProductsCount = 0;
     let calculatedPromosSoldCount = 0;
+
     deliveredOrders.forEach(order => {
       order.products.forEach(item => {
         const product = allProducts.find(p => p._id === item.productId);
-        if (product && product.category === 'Promos Solo en Efectivo') {
-          calculatedPromosSoldCount += item.quantity;
+        if (product) {
+          if (product.category === 'Promos Solo en Efectivo') {
+            calculatedPromosSoldCount += item.quantity;
+          } else {
+            // Este es el nuevo contador para productos NO promo
+            calculatedSoldProductsCount += item.quantity;
+          }
         }
       });
     });
+    // --- FIN NUEVA LÓGICA ---
 
     const productSalesMap = new Map<string, { quantity: number; totalAmount: number }>();
     deliveredOrders.forEach(order => {
@@ -286,14 +293,15 @@ export const useSalesData = () => {
       totalSales: calculatedTotalSales,
       totalOrdersCount: calculatedTotalOrdersCount,
       completedOrdersCount: calculatedCompletedOrdersCount,
-      activeProductsCount: calculatedActiveProductsCount,
+      // Se ha reemplazado 'activeProductsCount' por 'soldProductsCount'
+      soldProductsCount: calculatedSoldProductsCount, 
       promosSoldCount: calculatedPromosSoldCount,
       bestSellingProducts: bestSellingWithPercentage,
       salesDataForChart: calculatedSalesDataForChart,
       topSellingPeriods: calculatedTopSellingPeriods,
       dailySalesTableData: tableData,
       dailyTotalSales: tableTotalSales,
-      deliveryPercentage: calculatedDeliveryPercentage 
+      deliveryPercentage: calculatedDeliveryPercentage
     };
   }, [allOrders, allProducts, allAddOns, timeRangeFilter, startDate, endDate]);
 
@@ -348,7 +356,7 @@ export const useSalesData = () => {
     URL.revokeObjectURL(url);
   }, [dailySalesTableData, dailyTotalSales, timeRangeFilter, startDate, endDate]);
 
-
+  // Se ha actualizado el objeto de retorno para incluir 'soldProductsCount'
   return {
     loading,
     error,
@@ -362,7 +370,7 @@ export const useSalesData = () => {
     totalSales,
     totalOrdersCount,
     completedOrdersCount,
-    activeProductsCount,
+    soldProductsCount,
     promosSoldCount,
     bestSellingProducts,
     salesDataForChart,
@@ -370,6 +378,6 @@ export const useSalesData = () => {
     dailySalesTableData,
     dailyTotalSales,
     exportDailySalesToCsv,
-    deliveryPercentage 
+    deliveryPercentage
   };
 };
