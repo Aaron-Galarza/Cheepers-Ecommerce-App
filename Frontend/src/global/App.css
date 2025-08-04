@@ -1,0 +1,110 @@
+/* Contenedor principal */
+.footer-container {
+  background-color: #2e2e2e;
+  color: #d1d5db;
+  padding: 0.4rem 0.3rem; /* Menor padding */
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem; /* Menor font-size */
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem; /* Menor espacio entre elementos */
+  text-align: center;
+}
+
+/* Estilos de las columnas */
+.footer-column {
+  width: 100%;
+}
+
+.copyright-text, .footer-title {
+  font-size: 1rem; /* Menor font-size */
+  font-weight: 600;
+  color: #ff9800; /* Naranja para el texto resaltado */
+  margin-bottom: 0.3rem; /* Menor margen */
+}
+
+.footer-text, .footer-contact, .footer-developer, .footer-support-title {
+  font-size: 0.9rem; /* Menor font-size */
+  opacity: 0.8;
+  margin: 0;
+}
+
+/* Redes Sociales */
+.social-media-icons {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem; /* Menor espacio */
+  margin-bottom: 0.3rem; /* Menor margen */
+}
+
+.icon-link {
+  color: #d1d5db;
+  transition: color 0.3s ease;
+}
+
+.icon-link:hover {
+  color: #fff;
+}
+
+/* Contacto del desarrollador */
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem; /* Menor espacio */
+  margin-top: 0;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.75rem; /* Menor font-size */
+  transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+  color: #fff;
+}
+
+/* Estilos para escritorio */
+@media (min-width: 768px) {
+  .footer-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+
+  .footer-left {
+    flex-grow: 1;
+    text-align: left;
+  }
+  
+  .footer-center {
+    flex-grow: 1;
+    text-align: center;
+    align-self: center;
+    margin-top: 0;
+  }
+
+  .footer-right {
+    flex-grow: 1;
+    text-align: right;
+  }
+  
+  .social-media-icons {
+    justify-content: flex-start;
+  }
+
+  .contact-links {
+    align-items: flex-end;
+  }
+}
