@@ -32,7 +32,7 @@ const OrderConfirmationPage: React.FC = () => {
       </span>
       <h1 className={styles.title}>¡Pedido Finalizado!</h1>
       <p className={styles.message}>
-        Gracias por tu compra. Recibirás una confirmación en tu correo electrónico.
+        Gracias por tu compra. Recibirás una confirmación por WhatsApp o correo electrónico.
       </p>
       <div className={styles.buttonsContainer}>
         <Button className={styles.buttonDefault} onClick={handleGoHome}>
