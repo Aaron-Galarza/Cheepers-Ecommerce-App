@@ -1,7 +1,6 @@
-
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import authService from '../../../services/authservice'; // Importa el nuevo servicio
+import authService from '../../../services/authservice';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -18,6 +17,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!isAuthenticated) {
     console.log(`ProtectedRoute: Not authenticated. Redirecting to /admin/login from ${location.pathname}`);
+    // No necesitamos pasar el estado aquí directamente, ya que authService.logout()
+    // ya guarda el motivo en sessionStorage.
     return <Navigate to="/admin/login" replace />;
   }
 

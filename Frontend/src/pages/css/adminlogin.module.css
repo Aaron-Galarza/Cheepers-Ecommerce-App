@@ -22,7 +22,8 @@
 .title {
   margin-bottom: 1.5rem;
   color: #243b55;
-  font-size: 1.8rem;
+  font-size: 1.9rem;
+ justify-content: center;
 }
 
 .input {

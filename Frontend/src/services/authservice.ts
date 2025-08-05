@@ -4,10 +4,6 @@ import axios from 'axios';
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
 const ADMIN_TOKEN_KEY = 'adminToken'; // Clave para el token en localStorage
 
-// Configurar una instancia de Axios para la API, si es necesario,
-// o configurar el interceptor directamente en la instancia global de Axios.
-// Para simplificar, lo haremos directamente en la instancia global de Axios.
-
 // Interceptor de solicitudes de Axios: Adjunta el token a cada request saliente
 axios.interceptors.request.use(
   (config) => {
@@ -21,6 +17,28 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * @function decodeJwt
+ * @description Decodifica la parte del payload de un JWT sin verificar la firma.
+ * Esto es seguro para obtener claims públicos como 'exp'.
+ * @param {string} token - El JWT completo.
+ * @returns {any | null} El payload decodificado del JWT o null si hay un error.
+ */
+const decodeJwt = (token: string): any | null => {
+  try {
+    const base64Url = token.split('.')[1]; // Obtener la parte del payload
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Error decodificando JWT en frontend:", e);
+    return null;
+  }
+};
+
 
 const authService = {
   /**
@@ -51,11 +69,15 @@ const authService = {
   /**
    * Cierra la sesión del administrador.
    * Elimina el token de localStorage.
+   * @param {string} [reason] - Un motivo opcional para el cierre de sesión (ej. 'expired').
    */
-  logout: (): void => {
+  logout: (reason?: string): void => { // <-- CAMBIO AQUÍ: Añade 'reason'
     localStorage.removeItem(ADMIN_TOKEN_KEY);
-    // Opcional: Si tu backend tiene un endpoint de logout para invalidar el token en el servidor,
-    // lo llamarías aquí. Por ahora, solo es logout del lado del cliente.
+    if (reason) {
+      // Puedes almacenar el motivo en sessionStorage para que persista UNA VEZ
+      // y sea leído por la página de login.
+      sessionStorage.setItem('logoutReason', reason);
+    }
   },
 
   /**
@@ -67,11 +89,46 @@ const authService = {
   },
 
   /**
-   * Verifica si el administrador está autenticado.
-   * @returns true si el token existe, false en caso contrario.
+   * Verifica si el administrador está autenticado y si el token no ha expirado.
+   * @returns true si el token existe y es válido (no expirado), false en caso contrario.
    */
   isAuthenticated: (): boolean => {
-    return !!localStorage.getItem(ADMIN_TOKEN_KEY);
+    const adminToken = localStorage.getItem(ADMIN_TOKEN_KEY);
+
+    if (!adminToken) {
+      return false; // No hay token, no autenticado
+    }
+
+    try {
+      const decodedToken = decodeJwt(adminToken);
+
+      // Si no se pudo decodificar o no tiene la propiedad 'exp' (expiración)
+      if (!decodedToken || typeof decodedToken.exp !== 'number') {
+        console.warn("JWT en localStorage es inválido o sin 'exp' claim. Eliminando token.");
+        authService.logout('invalid'); // <-- CAMBIO AQUÍ: Llama a logout con motivo 'invalid'
+        return false;
+      }
+
+      // 'exp' es una marca de tiempo Unix en segundos.
+      // Date.now() devuelve milisegundos, así que dividimos por 1000.
+      const currentTimeInSeconds = Date.now() / 1000;
+
+      if (decodedToken.exp < currentTimeInSeconds) {
+        // El token ha expirado
+        console.log("JWT expirado en el frontend. Eliminando token.");
+        authService.logout('expired'); // <-- CAMBIO AQUÍ: Llama a logout con motivo 'expired'
+        return false;
+      }
+
+      // El token existe y no ha expirado (según la verificación del frontend)
+      return true;
+
+    } catch (error) {
+      // En caso de cualquier otro error al procesar el token, asumimos que es inválido
+      console.error("Error al verificar la validez del JWT en frontend:", error);
+      authService.logout('invalid'); // <-- CAMBIO AQUÍ: Llama a logout con motivo 'invalid'
+      return false;
+    }
   },
 };
 
