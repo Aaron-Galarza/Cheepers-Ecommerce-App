@@ -36,7 +36,10 @@ const Footer: FC = () => {
               <FaWhatsapp size={20} />
             </a>
           </div>
-          <p className="footer-contact">TEL: +54 3624063011</p>
+                      <a href="https://wa.me/543624063011" target="_blank" rel="noopener noreferrer" className="contact-link">
+              <FaWhatsapp size={16} />
+              <span>+54 3624063011</span>
+            </a>
         </div>
 
         {/* Columna Central */}
@@ -50,11 +53,8 @@ const Footer: FC = () => {
           <p className="footer-developer">Desarrollada por AFdevelopers:</p>
           <p className="footer-support-title">Contacto:</p>
           <div className="contact-links">
-            <a href="https://wa.me/543624063011" target="_blank" rel="noopener noreferrer" className="contact-link">
-              <FaWhatsapp size={16} />
-              <span>+54 3624250501</span>
-            </a>
-            <a href="mailto:tucorreo@ejemplo.com" className="contact-link">
+          <p className="footer-contact">+54 3624250501</p>
+            <a href="mailto:AFdevelopers12@gmail.com" className="contact-link">
               <FaEnvelope size={16} />
               <span>AFdevelopers12@gmail.com</span>
             </a>
