@@ -1,6 +1,6 @@
 /* Contenedor principal */
 .footer-container {
-  background-color: #4b240e;
+  background-color: #1b1b1b;
   color: #d1d5db;
   padding: 0.4rem 0.3rem; /* Menor padding */
   font-family: Arial, sans-serif;
@@ -25,7 +25,7 @@
   font-size: 1rem; /* Menor font-size */
   font-weight: 600;
   color: #ff9800; /* Naranja para el texto resaltado */
-  margin-bottom: 0.3rem; /* Menor margen */
+  margin-bottom: 0.2rem; /* Menor margen */
 }
 
 .footer-text, .footer-contact, .footer-developer, .footer-support-title {
@@ -39,7 +39,7 @@
   display: flex;
   justify-content: center;
   gap: 0.8rem; /* Menor espacio */
-  margin-bottom: 0.3rem; /* Menor margen */
+  margin-bottom: 0.4rem; /* Menor margen */
 }
 
 .icon-link {

@@ -39,10 +39,8 @@ const Footer: FC = () => {
               <FaWhatsapp size={20} />
             </a>
           </div>
-                      <a href="https://wa.me/543624063011" target="_blank" rel="noopener noreferrer" className="contact-link">
-              <FaWhatsapp size={16} />
+                 
               <span>+54 3624063011</span>
-            </a>
         </div>
 
         {/* Columna Central */}

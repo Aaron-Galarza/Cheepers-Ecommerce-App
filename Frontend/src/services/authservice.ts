@@ -1,10 +1,11 @@
 // src/services/authService.ts
 import axios from 'axios';
+import { toast } from 'react-toastify'; // Importa toast para mostrar mensajes
 
 const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
-const ADMIN_TOKEN_KEY = 'adminToken'; // Clave para el token en localStorage
+const ADMIN_TOKEN_KEY = 'adminToken';
 
-// Interceptor de solicitudes de Axios: Adjunta el token a cada request saliente
+// Interceptor de solicitudes (ya lo tienes)
 axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
@@ -18,29 +19,62 @@ axios.interceptors.request.use(
   }
 );
 
-/**
- * @function decodeJwt
- * @description Decodifica la parte del payload de un JWT sin verificar la firma.
- * Esto es seguro para obtener claims públicos como 'exp'.
- * @param {string} token - El JWT completo.
- * @returns {any | null} El payload decodificado del JWT o null si hay un error.
- */
-const decodeJwt = (token: string): any | null => {
-  try {
-    const base64Url = token.split('.')[1]; // Obtener la parte del payload
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error("Error decodificando JWT en frontend:", e);
-    return null;
-  }
-};
+// =========================================================================
+// NUEVO: Interceptor de respuestas para manejar errores HTTP
+// =========================================================================
+axios.interceptors.response.use(
+  (response) => response, // Si la respuesta es exitosa, la pasa
+  (error) => {
+    // Si hay un error en la respuesta
+    if (axios.isAxiosError(error)) {
+      const statusCode = error.response?.status;
+      const errorMessage = error.response?.data?.message || 'Ocurrió un error inesperado.';
 
+      switch (statusCode) {
+        case 400:
+          // Bad Request (ej. validación de input fallida en backend)
+          toast.error(`Error de datos: ${errorMessage}`, { position: "top-center" });
+          break;
+        case 401:
+          // Unauthorized (ej. token inválido o expirado)
+          // La lógica de authService.isAuthenticated() ya maneja la redirección y toast para 'expired'/'invalid'
+          // Si llega aquí, es un 401 de otra API.
+          console.error("Error 401 en solicitud API:", error.config?.url);
+          // authService.logout('expired'); // Podrías forzar el logout aquí también si no lo hace isAuthenticated()
+          // toast.error('Tu sesión ha expirado o es inválida. Por favor, inicia sesión nuevamente.', { position: "top-center" });
+          break;
+        case 403:
+          // Forbidden (ej. usuario no tiene permisos para esa acción)
+          toast.error(`Acceso denegado: ${errorMessage}`, { position: "top-center" });
+          break;
+        case 404:
+          // Not Found
+          toast.error(`Recurso no encontrado: ${errorMessage}`, { position: "top-center" });
+          break;
+        case 500:
+          // Internal Server Error
+          toast.error(`Error del servidor: ${errorMessage}. Por favor, intenta más tarde.`, { position: "top-center" });
+          break;
+        default:
+          // Otros errores HTTP o de red
+          toast.error(`Error de conexión: ${errorMessage}`, { position: "top-center" });
+          break;
+      }
+    } else {
+      // Errores que no son de Axios (ej. problemas de red antes de la solicitud)
+      toast.error('Ocurrió un error de red. Por favor, revisa tu conexión.', { position: "top-center" });
+    }
+    
+    // Es importante rechazar la promesa para que el bloque catch del componente que hizo la llamada
+    // pueda seguir manejando el error si es necesario.
+    return Promise.reject(error);
+  }
+);
+
+// ... el resto de tu authService (login, logout, isAuthenticated, etc.) ...
 
 const authService = {
+  // ... tus funciones login, logout, getToken, isAuthenticated ...
   /**
    * Inicia sesión del administrador.
    * @param email - El correo electrónico del administrador.
@@ -58,11 +92,13 @@ const authService = {
         localStorage.setItem(ADMIN_TOKEN_KEY, response.data.token);
         return response.data.token;
       } else {
+        // Si el backend no devuelve un error HTTP sino un success:false
         throw new Error(response.data.message || 'Credenciales inválidas');
       }
     } catch (error) {
-      console.error('Error en authService.login:', error);
-      throw error; // Re-lanza el error para que el componente que llama lo maneje
+      // El interceptor de respuesta ya mostrará el toast para errores Axios
+      // Aquí solo re-lanzamos para que el componente que llama pueda manejarlo si quiere
+      throw error; 
     }
   },
 
@@ -71,11 +107,9 @@ const authService = {
    * Elimina el token de localStorage.
    * @param {string} [reason] - Un motivo opcional para el cierre de sesión (ej. 'expired').
    */
-  logout: (reason?: string): void => { // <-- CAMBIO AQUÍ: Añade 'reason'
+  logout: (reason?: string): void => {
     localStorage.removeItem(ADMIN_TOKEN_KEY);
     if (reason) {
-      // Puedes almacenar el motivo en sessionStorage para que persista UNA VEZ
-      // y sea leído por la página de login.
       sessionStorage.setItem('logoutReason', reason);
     }
   },
@@ -96,40 +130,48 @@ const authService = {
     const adminToken = localStorage.getItem(ADMIN_TOKEN_KEY);
 
     if (!adminToken) {
-      return false; // No hay token, no autenticado
+      return false;
     }
 
     try {
       const decodedToken = decodeJwt(adminToken);
 
-      // Si no se pudo decodificar o no tiene la propiedad 'exp' (expiración)
       if (!decodedToken || typeof decodedToken.exp !== 'number') {
         console.warn("JWT en localStorage es inválido o sin 'exp' claim. Eliminando token.");
-        authService.logout('invalid'); // <-- CAMBIO AQUÍ: Llama a logout con motivo 'invalid'
+        authService.logout('invalid');
         return false;
       }
 
-      // 'exp' es una marca de tiempo Unix en segundos.
-      // Date.now() devuelve milisegundos, así que dividimos por 1000.
       const currentTimeInSeconds = Date.now() / 1000;
 
       if (decodedToken.exp < currentTimeInSeconds) {
-        // El token ha expirado
         console.log("JWT expirado en el frontend. Eliminando token.");
-        authService.logout('expired'); // <-- CAMBIO AQUÍ: Llama a logout con motivo 'expired'
+        authService.logout('expired');
         return false;
       }
 
-      // El token existe y no ha expirado (según la verificación del frontend)
       return true;
 
     } catch (error) {
-      // En caso de cualquier otro error al procesar el token, asumimos que es inválido
       console.error("Error al verificar la validez del JWT en frontend:", error);
-      authService.logout('invalid'); // <-- CAMBIO AQUÍ: Llama a logout con motivo 'invalid'
+      authService.logout('invalid');
       return false;
     }
   },
+};
+
+// Helper para decodificar la parte del payload de un JWT
+const decodeJwt = (token: string): any | null => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
 };
 
 export default authService;
