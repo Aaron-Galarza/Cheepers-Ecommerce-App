@@ -135,7 +135,7 @@ export const useOrderExport = ({ API_BASE_URL, productMapRef, fetchOrders }: Use
                             try {
                                 const token = localStorage.getItem('adminToken');
                                 // Clean the database (Delete all orders)
-                                await axios.delete(`${API_BASE_URL}/api/orders`, { headers: { Authorization: `Bearer ${token}` } });
+                                await axios.delete(`${API_BASE_URL}/api/orders/all`, { headers: { Authorization: `Bearer ${token}` } });
                                 
                                 // Update the UI
                                 await fetchOrders(false);
