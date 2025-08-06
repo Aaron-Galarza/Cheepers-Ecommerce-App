@@ -138,24 +138,24 @@ const PromoManagement: React.FC = () => {
             className={styles.textareaField}
             required
           />
-          <input
-            type="number"
-            placeholder="Precio"
-            
-            value={!editingPromotion && newPromotion.price === 0 ? '' : (editingPromotion ? editingPromotion.price : newPromotion.price)}
-            onChange={(e) => {
-              const value = e.target.value;
-              const parsedValue = parseFloat(value);
-              // Si el valor es vacío o NaN, usar 0
-              const price = value === '' || isNaN(parsedValue) ? 0 : parsedValue;
-              editingPromotion
-                ? setEditingPromotion({ ...editingPromotion, price: price })
-                : setNewPromotion({ ...newPromotion, price: price });
-            }}
-            className={styles.inputField}
-            step="0.01"
-            required
-          />
+      <input
+  type="text"
+  placeholder="Precio"
+  value={!editingPromotion && newPromotion.price === 0 ? '' : (editingPromotion ? editingPromotion.price.toString() : newPromotion.price.toString())}
+  onChange={(e) => {
+    const value = e.target.value;
+    const cleanedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+    const parsedValue = parseFloat(cleanedValue);
+    const price = cleanedValue === '' || isNaN(parsedValue) ? 0 : parsedValue;
+
+    editingPromotion
+      ? setEditingPromotion({ ...editingPromotion, price })
+      : setNewPromotion({ ...newPromotion, price });
+  }}
+  className={styles.inputField}
+  required
+/>
+
           <input
             type="text"
             placeholder="URL de la Imagen"

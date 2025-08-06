@@ -3,6 +3,10 @@ import styles from './../management.styles/productmanagement.module.css';
 import { FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 import { useProductManagement, Product, NewProductData } from '../../hooks/useProductmanagement'; // Importa el custom hook
 
+// Importaciones de React-Toastify para mensajes de alerta
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const ProductManagement: React.FC = () => {
   // Usa el custom hook para obtener los datos y funciones de API
   const {
@@ -49,27 +53,41 @@ const ProductManagement: React.FC = () => {
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar que el precio sea mayor a 0
+    if (newProduct.price <= 0) {
+      toast.error('El precio debe ser mayor a 0.', { position: "top-center" });
+      return;
+    }
+
     const result = await handleCreateProduct(newProduct); // Pasa newProduct al hook
     if (result.success) {
+      toast.success('Producto creado exitosamente!', { position: "top-center" });
       // Resetear el formulario después de crear
       setNewProduct({ name: '', description: '', price: 0, imageUrl: '', category: 'Hamburguesas', isActive: true });
       scrollToTop();
     } else {
-      console.error("Error al crear:", result.error);
-      // Opcional: mostrar un toast de error
+      toast.error(`Error al crear producto: ${result.error}`, { position: "top-center" });
     }
   };
 
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProduct) return;
+
+    // Validar que el precio sea mayor a 0
+    if (editingProduct.price <= 0) {
+      toast.error('El precio debe ser mayor a 0.', { position: "top-center" });
+      return;
+    }
+
     const result = await handleUpdateProduct(editingProduct._id, editingProduct); // Pasa editingProduct al hook
     if (result.success) {
+      toast.success('Producto actualizado exitosamente!', { position: "top-center" });
       setEditingProduct(null); // Sale del modo edición
       scrollToTop();
     } else {
-      console.error("Error al actualizar:", result.error);
-      // Opcional: mostrar un toast de error
+      toast.error(`Error al actualizar producto: ${result.error}`, { position: "top-center" });
     }
   };
 
@@ -78,17 +96,18 @@ const ProductManagement: React.FC = () => {
     scrollToTop();
   };
 
-  const handleDeleteProductClick = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      const result = await handleDeleteProduct(id);
-      if (result.success) {
-        // Opcional: mostrar un toast de éxito
-      } else {
-        console.error("Error al eliminar:", result.error);
-        // Opcional: mostrar un toast de error
-      }
-    }
-  };
+ const handleDeleteProductClick = async (id: string) => {
+  const confirmed = window.confirm('¿Estás seguro de que querés eliminar este producto? Esta acción no se puede deshacer.');
+  if (!confirmed) return;
+
+  const result = await handleDeleteProduct(id);
+  if (result.success) {
+    toast.success('Producto eliminado exitosamente!', { position: "top-center" });
+  } else {
+    toast.error(`Error al eliminar producto: ${result.error}`, { position: "top-center" });
+  }
+};
+
 
   const handleCancelEdit = () => {
     setEditingProduct(null); // Cancela la edición
@@ -108,6 +127,7 @@ const ProductManagement: React.FC = () => {
 
   return (
     <div ref={productManagementContainerRef} className={styles.productManagementContainer}>
+      <ToastContainer /> {/* Agrega ToastContainer aquí para que los toasts se muestren */}
       <h1 className={styles.title}>Gestión de Productos</h1>
 
       {/* Formulario de Creación/Edición */}
@@ -130,20 +150,24 @@ const ProductManagement: React.FC = () => {
             required
           />
           <input
-            type="number"
+            type="text" // Cambiado de "number" a "text" para quitar las flechas
             placeholder="Precio"
-            value={!editingProduct && newProduct.price === 0 ? '' : (editingProduct ? editingProduct.price : newProduct.price)}
+            // Muestra vacío si es 0 en modo creación, de lo contrario muestra el valor
+            value={!editingProduct && newProduct.price === 0 ? '' : (editingProduct ? editingProduct.price.toString() : newProduct.price.toString())}
             onChange={(e) => {
               const value = e.target.value;
-              const parsedValue = parseFloat(value);
-              // Si el valor es vacío o NaN, usar 0
-              const price = value === '' || isNaN(parsedValue) ? 0 : parsedValue;
+              // Permite solo dígitos y un punto decimal
+              const cleanedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+              const parsedValue = parseFloat(cleanedValue);
+              
+              // Si el valor es vacío o NaN, usar 0 internamente para el estado
+              const price = cleanedValue === '' || isNaN(parsedValue) ? 0 : parsedValue;
+              
               editingProduct
                 ? setEditingProduct({ ...editingProduct, price: price })
                 : setNewProduct({ ...newProduct, price: price });
             }}
             className={styles.inputField}
-            step="0.01"
             required
           />
           <input
