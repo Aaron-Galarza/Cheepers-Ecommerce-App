@@ -13,6 +13,7 @@ declare module 'express-serve-static-core' {
         user?: {
             _id: string;
             isAdmin: boolean;
+            isOwner: boolean;
         };
     }
 }
@@ -212,4 +213,14 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
         res.status(404);
         throw new Error('Pedido no encontrado');
     }
+});
+
+// @desc      Eliminar todos los pedidos
+// @route     DELETE /api/orders/all
+// @access    Private/Admin
+export const deleteAllOrders = asyncHandler(async (req: Request, res: Response) => {
+    const result = await Pedido.deleteMany({});
+    res.status(200).json({ 
+        message: `Se eliminaron ${result.deletedCount} pedidos del historial.` 
+    });
 });

@@ -12,6 +12,7 @@ declare module 'express-serve-static-core' {
         user?: {
             _id: string;
             isAdmin: boolean;
+            isOwner: boolean;
         };
     }
 }

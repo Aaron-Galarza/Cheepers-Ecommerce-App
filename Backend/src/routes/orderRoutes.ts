@@ -6,8 +6,9 @@ import {
   getOrders,
   getOrderById,
   updateOrderStatus,
+  deleteAllOrders,
 } from '../controllers/orderController';
-import { protect, admin } from '../middleware/authMiddleware'; // Aseg\u00FArate que estas rutas est\u00E1n correctas
+import { protect, admin, owner } from '../middleware/authMiddleware'; // Aseg\u00FArate que estas rutas est\u00E1n correctas
 
 const router = Router();
 
@@ -24,5 +25,8 @@ router.get('/:id', protect, admin, getOrderById);
 
 // Actualizar el estado de un pedido (solo para administradores)
 router.put('/:id/status', protect, admin, updateOrderStatus);
+
+router.route('/all').delete(protect, owner, deleteAllOrders); 
+
 
 export default router;

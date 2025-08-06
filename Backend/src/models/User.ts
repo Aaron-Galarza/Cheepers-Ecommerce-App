@@ -11,6 +11,7 @@ export interface IUser extends Document {
   password: string;
   // Puedes a\u00F1adir otros campos si el "negocio" los necesita, como nombre, rol, etc.
   isAdmin: boolean; // Para diferenciar entre usuarios normales y administradores del negocio
+  isOwner: boolean;
   comparePassword(candidatePassword: string): Promise<boolean>; // M\u00E9todo para comparar contrase\u00F1as
 }
 
@@ -39,7 +40,11 @@ const UserSchema: Schema = new Schema({
   isAdmin: {
     type: Boolean,
     default: false // Por defecto, los nuevos usuarios no son administradores
-  }
+  },
+  isOwner: {
+    type: Boolean,
+    default: false
+  },
 }, {
   timestamps: true // A\u00F1ade campos createdAt y updatedAt autom\u00E1ticamente
 });

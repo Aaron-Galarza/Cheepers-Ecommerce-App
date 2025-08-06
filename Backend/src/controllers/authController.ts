@@ -7,9 +7,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Helper para generar el token JWT (si no lo tienes, a\u00F1adelo)
-const generateToken = (id: string, email: string, isAdmin: boolean) => {
+const generateToken = (id: string, email: string, isAdmin: boolean, isOwner: boolean) => {
     return jwt.sign(
-        { id, email, isAdmin }, // Incluimos isAdmin en el payload del token
+        { id, email, isAdmin, isOwner }, // Incluimos isAdmin en el payload del token
         process.env.JWT_SECRET as string,
         { expiresIn: '1h' } // El token expirar\u00E1 en 1 hora
     );
@@ -44,7 +44,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
         res.status(201).json({
             success: true,
             message: 'Usuario registrado exitosamente',
-            token: generateToken(user._id, user.email, user.isAdmin), // Genera el token con isAdmin
+            token: generateToken(user._id, user.email, user.isAdmin, user.isOwner), // Genera el token con isAdmin
             user: {
                 _id: user._id,
                 username: user.username,
@@ -73,7 +73,7 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     // 3. Verificar si el usuario existe y si la contrase\u00F1a es correcta
     if (user && (await user.comparePassword(password))) {
         // 4. Si las credenciales son v\u00E1lidas, generar JWT (incluyendo isAdmin)
-        const token = generateToken(user._id, user.email, user.isAdmin);
+        const token = generateToken(user._id, user.email, user.isAdmin, user.isOwner);
 
         // 5. Enviar respuesta de \u00E9xito
         res.status(200).json({
