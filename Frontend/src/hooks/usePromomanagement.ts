@@ -15,7 +15,7 @@ export interface Promotion {
 
 export type NewPromotionData = Omit<Promotion, '_id'>;
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const usePromoManagement = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);

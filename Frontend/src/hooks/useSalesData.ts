@@ -49,7 +49,7 @@ export interface DailySaleTableItem { // Exportada para el componente de tabla
   fullOrderTime: Date;
 }
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useSalesData = () => {
   const [allOrders, setAllOrders] = useState<Order[]>([]);

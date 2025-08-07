@@ -6,7 +6,7 @@ import Button from '../../components/layout/design/button';
 import axios from 'axios'; // Para obtener los adicionales disponibles
 import { CartItem, IAddOn, SelectedAddOn } from '../../components/layout/checkout/productlist'; // Importa las interfaces
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const CarritoPage: React.FC = () => {
     const { cart, removeFromCart, clearCart, calculateCartTotal, updateCartItemAddOns } = useCart();

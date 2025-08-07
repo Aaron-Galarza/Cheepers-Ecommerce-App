@@ -107,7 +107,7 @@ interface FormProduct {
   }>;
 }
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const OrdersManagement: React.FC = () => {
   const [orders, setOrders] = useState<OrderDisplay[]>([]);

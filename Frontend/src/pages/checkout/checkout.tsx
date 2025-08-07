@@ -6,8 +6,7 @@ import Button from '../../components/layout/design/button';
 import { FaUser, FaPhone, FaEnvelope, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
-
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 // Función para normalizar y limpiar el nombre de la ciudad
 const normalizeCityName = (cityName: string) => {
   const accentsMap: Record<string, string> = {
@@ -186,7 +185,8 @@ const CheckoutPage: React.FC = () => {
                 onChange={e => setName(e.target.value)}
                 className={styles.inputField}
                 required
-                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]+$"
+                // CAMBIO AQUÍ: \\s a \s para permitir espacios correctamente
+                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
                 maxLength={40}
                 title="El nombre no puede contener números ni símbolos."
               />

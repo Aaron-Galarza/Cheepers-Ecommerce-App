@@ -1,8 +1,7 @@
 // src/services/authService.ts
 import axios from 'axios';
 import { toast } from 'react-toastify'; // Importa toast para mostrar mensajes
-
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 const ADMIN_TOKEN_KEY = 'adminToken';
 
 // Interceptor de solicitudes (ya lo tienes)

@@ -15,7 +15,7 @@ export interface Product {
 
 export type NewProductData = Omit<Product, '_id'>;
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
