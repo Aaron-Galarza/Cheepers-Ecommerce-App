@@ -6,6 +6,8 @@ import Pedido, { IOrder, IProductItem, ISelectedAddOn, IShippingAddress } from '
 import AddOn, { IAddOn } from '../models/AddOn'; 
 import Product, { IProduct } from '../models/Product';
 import asyncHandler from 'express-async-handler';
+import { isStoreOpen } from '../utils/schedule'; // <-- IMPORTA EL ESTADO
+
 
 // Definición de tipos para la interfaz de solicitud
 declare module 'express-serve-static-core' {
@@ -37,7 +39,13 @@ interface CreateOrderRequestBody {
 // @route     POST /api/orders
 // @access    Public (solo invitados)
 export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderRequestBody>, res: Response) => {
-    const { products, shippingAddress, paymentMethod, notes, guestEmail, guestName, guestPhone, deliveryType } = req.body;
+      // --- VERIFICACIÓN DE HORARIOS ---
+  if (!isStoreOpen) {
+    res.status(400);
+    throw new Error('Lo sentimos, estamos fuera del horario de atención. Vuelva más tarde.');
+  }
+    
+    const { products, shippingAddress, paymentMethod, notes, guestEmail, guestName, guestPhone, deliveryType } = req.body;
 
     // 1. Validaciones básicas iniciales
     if (!products || products.length === 0 || !paymentMethod || !guestEmail || !guestPhone || !guestName || !deliveryType) {
