@@ -97,7 +97,7 @@ const ProductManagement: React.FC = () => {
   };
 
  const handleDeleteProductClick = async (id: string) => {
-  const confirmed = window.confirm('¿Estás seguro de que querés eliminar este producto? Esta acción no se puede deshacer.');
+  const confirmed = window.confirm('¿Estás seguro de que quieres eliminar este producto? Esto puede eliminar el producto del historial de pedidos y afectarlo');
   if (!confirmed) return;
 
   const result = await handleDeleteProduct(id);

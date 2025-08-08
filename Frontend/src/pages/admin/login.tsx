@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './../css/adminlogin.module.css';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authservice'; // Importa el servicio de autenticación
-import { ToastContainer, toast } from 'react-toastify'; // Importa ToastContainer y toast
-import 'react-toastify/dist/ReactToastify.css'; // Importa los estilos de react-toastify
-import axios from 'axios'; // Importa axios para manejar errores de red específicos de Axios
+import authService from '../../services/authservice';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+
+const MAX_FAILED_ATTEMPTS = 5; // Límite de intentos fallidos (igual que en el backend)
+const LOCKOUT_TIME_MINUTES = 15; // Tiempo de bloqueo en minutos (para el mensaje)
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +15,11 @@ const AdminLogin: React.FC = () => {
   const [error, setError] = useState(''); // Mantenemos este estado para errores de login directos
   const [loading, setLoading] = useState(false); // Añadido estado de carga para el botón
   const navigate = useNavigate();
+
+  // NUEVOS ESTADOS PARA LA LÓGICA DE INTENTOS FALLIDOS
+  const [failedAttempts, setFailedAttempts] = useState<number>(0);
+  // isLockedOut solo se usará para el mensaje, no para deshabilitar inputs/botón en el frontend
+  const [isLockedOut, setIsLockedOut] = useState<boolean>(false);
 
   useEffect(() => {
     // Verifica si hay un motivo de cierre de sesión en sessionStorage
@@ -37,6 +45,7 @@ const AdminLogin: React.FC = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
+          progress: undefined,
         });
       }
       // Limpia el motivo de sessionStorage para que no se muestre de nuevo en futuras visitas
@@ -58,13 +67,37 @@ const AdminLogin: React.FC = () => {
     try {
       await authService.login(email, password); // Usa el servicio de autenticación
       toast.success('¡Inicio de sesión exitoso!', { position: "top-center" }); // Mensaje de éxito
+      setFailedAttempts(0); // Resetear intentos al éxito
+      setIsLockedOut(false); // Asegurarse de que no esté bloqueado
       navigate('/admin/dashboard', { replace: true }); // Redirige al dashboard después del login
     } catch (err: any) { // Captura el error para mostrarlo
       console.error('Error al iniciar sesión:', err);
-      // Determina el mensaje de error basado en el tipo de error
-      const errorMessage = axios.isAxiosError(err) && err.response
-        ? err.response.data.message || 'Credenciales inválidas.' // Mensaje del backend o genérico
-        : 'Error de conexión. Intenta de nuevo.'; // Error de red
+      
+      // Incrementar el contador de intentos fallidos
+      const newFailedAttempts = failedAttempts + 1;
+      setFailedAttempts(newFailedAttempts);
+
+      let errorMessage: string;
+
+      // Determina el mensaje de error basado en el tipo de error y los intentos
+      if (axios.isAxiosError(err) && err.response) {
+        // Si el backend ya indica un bloqueo (ej. 429 Too Many Requests o mensaje específico)
+        if (err.response.status === 429 || err.response.data.message?.includes('bloqueada temporalmente')) {
+          errorMessage = err.response.data.message; // Usar el mensaje del backend si ya indica bloqueo
+          setIsLockedOut(true); // Actualizar estado local para el mensaje
+        } else if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+          // Si alcanzamos el límite de intentos en el frontend
+          setIsLockedOut(true); // Activar el estado de bloqueo para el mensaje
+          errorMessage = `Demasiados intentos fallidos. Tu cuenta estará bloqueada por ${LOCKOUT_TIME_MINUTES} minutos.`;
+        } else {
+          // Mensaje de intentos restantes
+          const attemptsLeft = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+          errorMessage = `Credenciales inválidas. Te quedan ${attemptsLeft} intento${attemptsLeft !== 1 ? 's' : ''}.`;
+        }
+      } else {
+        // Error de conexión o desconocido
+        errorMessage = 'Error de conexión. Intenta de nuevo.';
+      }
       
       setError(errorMessage); // Muestra el error en el párrafo existente
       toast.error(`Error: ${errorMessage}`, { position: "top-center" }); // También muestra el error con toast
@@ -76,11 +109,12 @@ const AdminLogin: React.FC = () => {
   return (
     <div className={styles.loginContainer}>
       {/* ToastContainer debe estar presente en tu componente raíz o en este 
-        para que los toasts se muestren. No afecta tus estilos de formulario.
+          para que los toasts se muestren. No afecta tus estilos de formulario.
       */}
       <ToastContainer /> 
       <form onSubmit={handleLogin} className={styles.loginForm}>
         <h2 className={styles.title}>Login Administrador</h2>
+        {/* El mensaje de error se mostrará aquí y también en el toast */}
         {error && <p className={styles.error}>{error}</p>} 
         <input
           type="email"
@@ -89,6 +123,7 @@ const AdminLogin: React.FC = () => {
           onChange={(e) => setEmail(e.target.value)}
           className={styles.input}
           required
+          disabled={loading} // Solo deshabilitado si está cargando
         />
         <input
           type="password"
@@ -97,6 +132,7 @@ const AdminLogin: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           className={styles.input}
           required
+          disabled={loading} // Solo deshabilitado si está cargando
         />
         <button type="submit" className={styles.button} disabled={loading}>
           {loading ? 'Ingresando...' : 'Ingresar'} {/* Cambia el texto del botón según el estado de carga */}

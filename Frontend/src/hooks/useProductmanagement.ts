@@ -112,7 +112,7 @@ export const useProductManagement = () => {
   }, [fetchProducts]);
 
   const handleDeleteProduct = useCallback(async (id: string) => {
-    console.log('Confirmación de eliminación: ¿Estás seguro de que quieres eliminar este producto?');
+    console.log('¿Estás seguro de que quieres eliminar este producto? Esto puede eliminar el producto del historial de pedidos y afectarlo');
     try {
       const token = localStorage.getItem('adminToken');
       await axios.delete(`${API_BASE_URL}/api/products/${id}`, {

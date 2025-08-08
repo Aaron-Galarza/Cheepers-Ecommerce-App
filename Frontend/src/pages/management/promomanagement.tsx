@@ -90,7 +90,7 @@ const PromoManagement: React.FC = () => {
   };
 
   const handleDeletePromotionClick = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta promoción?')) {
+    if (window.confirm('Estás seguro de que quieres eliminar esta promo? Esto puede eliminar el producto del historial de pedidos y afectarlo')) {
       const result = await handleDeletePromotion(id);
       if (result.success) {
         // Opcional: mostrar un toast de éxito
