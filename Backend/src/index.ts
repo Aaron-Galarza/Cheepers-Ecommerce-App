@@ -6,6 +6,8 @@ import cors from 'cors';
 import helmet from 'helmet'; // Importamos helmet
 import rateLimit from 'express-rate-limit'; // Importamos rateLimit
 import mongoSanitize from 'express-mongo-sanitize'; // Importamos express-mongo-sanitize
+import { setupSchedule } from './utils/schedule'; // <-- IMPORTA LA FUNCIÓN
+
 
 // Importamos tus rutas
 import orderRoutes from './routes/orderRoutes';
@@ -27,6 +29,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize()); // Esto se encarga de las inyecciones de Mongo
+setupSchedule();
 
 // --- CONFIGURACIÓN DE CORS ---
 const allowedOrigins = [
