@@ -9,6 +9,14 @@
     margin-bottom: 45px;
 }
 
+a{
+text-decoration: none;
+color: #333;
+}
+a:hover{
+    color: #000000;
+}
+
 /* Page Title */
 .title {
     font-size: 2.5rem;

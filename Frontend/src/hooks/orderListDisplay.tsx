@@ -16,6 +16,65 @@ interface OrderListDisplayProps {
   handleOrderAccept: (orderId: string) => void;
 }
 
+// Función para formatear el número de teléfono para WhatsApp y generar el enlace
+const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
+  // Limpia el número de cualquier caracter que no sea dígito
+  let cleanedPhoneNumber = order.guestPhone.replace(/\D/g, '');
+
+  // Elimina un posible cero inicial para números locales (ej. 011 -> 11),
+  // pero solo si no es parte de un prefijo de país ya incluido (como '540...')
+  // y si el número tiene más de un dígito para no eliminar un '0' único.
+  if (cleanedPhoneNumber.length > 1 && cleanedPhoneNumber.startsWith('0') && !cleanedPhoneNumber.startsWith('540')) {
+    cleanedPhoneNumber = cleanedPhoneNumber.substring(1);
+  }
+
+  // Ajuste para números de Argentina (código de país 54, prefijo 9 para móvil)
+  let formattedNumber = cleanedPhoneNumber;
+  if (!cleanedPhoneNumber.startsWith('54')) {
+    formattedNumber = `549${cleanedPhoneNumber}`;
+  } else if (cleanedPhoneNumber.startsWith('54') && !cleanedPhoneNumber.startsWith('549')) {
+    // Si ya empieza con 54 pero no con 549 (ej. es un fijo o le falta el 9 para móvil)
+    // Asumimos que para WhatsApp móvil en Argentina necesita el 9.
+    formattedNumber = `549${cleanedPhoneNumber.substring(2)}`;
+  }
+  // Si ya tiene 549, o si después de la limpieza y ajuste ya es un número válido.
+
+  // Determinar el nombre legible del método de pago
+  const paymentMethodDisplay = order.paymentMethod === 'cash' ? 'Efectivo' :
+                                order.paymentMethod === 'card' ? 'Mercado Pago' :
+                                'Transferencia';
+
+
+  // Construye el mensaje automático (sin el ID del pedido completo)
+  let message = `¡Hola ${order.guestName}!`;
+  message += `\nTu pedido Cheepers ha sido CONFIRMADO y está siendo preparado.`; // Mensaje simplificado
+  message += `\n\nDetalles de tu pedido:`;
+  message += `\nProductos:`;
+  order.products.forEach(p => {
+    message += `\n- ${p.name} (x${p.quantity})`;
+    if (Array.isArray(p.addOns) && p.addOns.length > 0) {
+      p.addOns.forEach(ao => {
+        message += `\n  + ${ao.name} (x${ao.quantity})`;
+      });
+    }
+  });
+
+  message += `\nTotal: $${order.totalAmount.toFixed(2)}`;
+  message += `\nMétodo de pago: ${paymentMethodDisplay}`; // AÑADIDO: Método de pago
+  message += `\nTipo de entrega: ${order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}`;
+  if (order.deliveryType === 'delivery' && order.shippingAddress) {
+    message += `\nDirección: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
+  }
+  message += `\n\n¡Gracias por tu compra!`;
+
+  // Codifica el mensaje para que pueda ir en la URL
+  const encodedMessage = encodeURIComponent(message);
+
+  // Construye el enlace de WhatsApp
+  return `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+};
+
+
 const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   filteredOrders,
   filterStatus,
@@ -53,10 +112,21 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
             <div key={order._id} className={styles.orderCard}>
               <div className={styles.orderHeader}>
                 <p className={styles.orderDate}>
-                  <FaCalendarAlt /> {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} {/* CAMBIO AQUÍ: hour12: false */}
+                  <FaCalendarAlt /> {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 </p>
                 <p className={styles.customerName}><FaUser /> {order.guestName}</p>
-                <p className={styles.customerPhone}><FaPhone /> {order.guestPhone}</p>
+                {/* CAMBIO CLAVE AQUÍ: Usar la nueva función para el enlace de WhatsApp con mensaje */}
+                <p className={styles.customerPhone}>
+                  <FaPhone />{' '}
+                  <a
+                    href={generateWhatsAppMessageLink(order)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.whatsappLink} // Puedes definir esta clase en ordersmanagement.module.css para estilo
+                  >
+                    {order.guestPhone}
+                  </a>
+                </p>
               </div>
               <div className={styles.orderBody}>
                 <div className={styles.productsList}>
@@ -92,7 +162,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                       order.status === 'delivered' ? styles.statusDelivered :
                       styles.statusCancelled
                     }>
-                      { 
+                      {
                         order.status === 'pending' ? ' Pendiente' :
                         order.status === 'processing' ? ' En Proceso' :
                         order.status === 'delivered' ? ' Entregado' :
@@ -115,7 +185,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                     </button>
                   </>
                 )}
-                {order.status === 'processing' && ( // Añade estos botones si quieres transicionar desde 'processing'
+                {order.status === 'processing' && (
                    <>
                     <button onClick={() => handleOrderDelivered(order._id)} className={styles.deliveredButton}>
                       <FaCheckCircle /> Marcar Entregado
