@@ -385,7 +385,7 @@ body {
 @media (max-width: 768px) {
   .heroSection {
     height: auto;
-    min-height: 580px; /* Ajustado para dar más espacio en móvil */
+    min-height: 605px; /* Ajustado para dar más espacio en móvil */
     flex-direction: column;
     padding: var(--space-md);
     margin-top: 55px;
@@ -399,8 +399,8 @@ body {
   }
 
   .heroImageContainer {
-    width: 95%; /* La imagen ocupa un 90% del ancho disponible */
-    height: 280px; /* Altura fija para la imagen en móvil */
+    width: 90%; /* La imagen ocupa un 90% del ancho disponible */
+    height: 290px; /* Altura fija para la imagen en móvil */
     margin-bottom: var(--space-md); /* Espacio entre imagen y texto */
     max-width: none; /* Elimina la limitación de max-width para que el 90% sea efectivo */
     margin-top: 0px;
@@ -431,7 +431,7 @@ body {
   }
 
   .bannerDots {
-    bottom: 3px;
+    bottom: 6px;
     gap: var(--space-xs);
   }
 

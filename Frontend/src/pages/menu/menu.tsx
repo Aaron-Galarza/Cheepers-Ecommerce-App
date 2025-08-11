@@ -6,7 +6,7 @@ import styles from '../css/menu.module.css';
 import { Product } from '../../components/layout/checkout/productlist';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 
-const API_BASE_URL = 'https://cheepers-ecommerce-app.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const MenuPage: React.FC = () => {
   const { addToCart } = useCart();
