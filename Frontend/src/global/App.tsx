@@ -11,6 +11,8 @@ import AdminLoginPage from '../pages/admin/login';
 import Dashboard from '../components/layout/admin/dashboard';
 import CheckoutPage from '../pages/checkout/checkout';
 import OrderConfirmationPage from '../pages/checkout/ordenconfirmation';
+import ScrollToTop from '../lib/ScrollToTop';
+
 
 // Importa el componente ProtectedRoute
 import ProtectedRoute from '../components/layout/admin/protectedroute';
@@ -73,6 +75,7 @@ function App() {
     <div className="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header />
       <main style={{ flexGrow: 1 }}>
+      <ScrollToTop /> {/* <-- COLOCA EL COMPONENTE AQUÍ */}
         <Routes>
           {/* Rutas Públicas */}
           <Route path="/" element={<HomePage />} />
