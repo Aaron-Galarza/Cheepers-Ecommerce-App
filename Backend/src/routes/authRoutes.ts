@@ -2,10 +2,11 @@
 
 import { Router } from 'express';
 import { registerUser, loginUser } from '../controllers/authController';
+import {loginLimiter} from '../index'
 
 const router = Router();
 
 router.post('/register', registerUser); // Para crear un nuevo usuario/negocio
-router.post('/login', loginUser);     // Para el login
+router.post('/login', loginUser, loginLimiter);     // Para el login
 
 export default router;

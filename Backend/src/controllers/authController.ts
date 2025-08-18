@@ -6,6 +6,14 @@ import User from '../models/User'; // Aseg\u00FArate que la ruta a tu modelo Use
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+declare module 'express-serve-static-core' {
+    interface Request {
+        rateLimit?: {
+            reset: () => void;
+        };
+    }
+}
+
 // Helper para generar el token JWT (si no lo tienes, a\u00F1adelo)
 const generateToken = (id: string, email: string, isAdmin: boolean, isOwner: boolean) => {
     return jwt.sign(
@@ -72,6 +80,12 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
     // 3. Verificar si el usuario existe y si la contrase\u00F1a es correcta
     if (user && (await user.comparePassword(password))) {
+
+ // --- AQUÍ ES DONDE AGREGAS LA LÍNEA PARA REINICIAR EL CONTADOR ---
+        if (req.rateLimit) {
+            req.rateLimit.reset();
+        }
+
         // 4. Si las credenciales son v\u00E1lidas, generar JWT (incluyendo isAdmin)
         const token = generateToken(user._id, user.email, user.isAdmin, user.isOwner);
 

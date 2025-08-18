@@ -52,7 +52,7 @@ app.use(cors({
 }));
 
 // --- LIMITADOR DE VELOCIDAD PARA RUTAS ESPECÍFICAS (LOGIN) ---
-const loginLimiter = rateLimit({
+export const loginLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
     max: 5,
     message: 'Demasiados intentos de login fallidos desde esta IP, por favor, intenta de nuevo en 15 minutos.'
@@ -63,7 +63,6 @@ import connectDB from './config/db';
 connectDB();
 
 // Usar las rutas con sus prefijos específicos
-app.use('/api/negocio/login', loginLimiter);
 app.use('/api/negocio', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
