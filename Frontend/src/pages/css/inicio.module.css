@@ -494,3 +494,12 @@ body {
     padding: 10px 20px;
   }
 }
+@media (max-width: 395px)
+{
+  .heroImageContainer {
+  width: 95%;
+    height: 290px; /* Altura fija para la imagen en móvil */
+   
+  }
+
+}

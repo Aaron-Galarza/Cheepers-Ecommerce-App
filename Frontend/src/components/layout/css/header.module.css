@@ -101,7 +101,7 @@
 .action-button {
   position: relative;
   background-color: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-white); /* Color del texto/icono por defecto del botón */
   font-size: 1.1rem;
   width: 40px;
   height: 40px;
@@ -110,21 +110,42 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s; /* Añadido box-shadow a la transición */
   box-shadow: var(--shadow-sm);
 }
 
-.action-button:hover {
-  background-color: rgb(228, 18, 18);
-  transform: translateY(-2px);
+/* Estilo para los iconos dentro de .action-button cuando NO están en hover */
+.action-button svg {
+  color: var(--color-white); /* Asegura que el icono sea blanco por defecto cuando el botón es rojo */
+  transition: color 0.3s ease; /* Transición suave para el color del icono */
 }
+
+.action-button:hover {
+  background-color: rgb(228, 18, 18); /* Un rojo ligeramente más oscuro al pasar el ratón */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* CAMBIO CLAVE: Estilos para el botón cuando está activo/seleccionado */
+.action-button.active {
+  background-color: var(--color-primary); /* O un rojo más fuerte/oscuro si prefieres */
+  /* Si quieres un rojo más fuerte en vez de naranja, usa un color hexadecimal más oscuro: */
+  /* background-color: #a02020; */ 
+  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.4); /* Un halo que indica selección */
+  transform: translateY(0); /* Evita el translate para que quede "asentado" */
+}
+
+.action-button.active svg {
+    color: var(--color-white); /* Mantiene el icono blanco en el estado activo */
+}
+
 
 .badge {
   position: absolute;
   top: -6px;
   right: -6px;
   background-color: var(--color-white);
-  color: var(--color-primary);
+  color: var(--color-primary); /* Color de texto del badge, que es rojo */
   font-size: 0.7rem;
   border-radius: var(--border-radius-full);
   padding: 2px 6px;
