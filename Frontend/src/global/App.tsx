@@ -73,9 +73,9 @@ const Footer: FC = () => {
 function App() {
   return (
     <div className="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <ScrollToTop /> {/* <-- COLOCA EL COMPONENTE AQUÍ */}
       <Header />
       <main style={{ flexGrow: 1 }}>
-      <ScrollToTop /> {/* <-- COLOCA EL COMPONENTE AQUÍ */}
         <Routes>
           {/* Rutas Públicas */}
           <Route path="/" element={<HomePage />} />

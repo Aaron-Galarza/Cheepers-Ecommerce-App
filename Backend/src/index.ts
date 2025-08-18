@@ -53,7 +53,7 @@ app.use(cors({
 
 // --- LIMITADOR DE VELOCIDAD PARA RUTAS ESPECÍFICAS (LOGIN) ---
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
     max: 5,
     message: 'Demasiados intentos de login fallidos desde esta IP, por favor, intenta de nuevo en 15 minutos.'
 });
