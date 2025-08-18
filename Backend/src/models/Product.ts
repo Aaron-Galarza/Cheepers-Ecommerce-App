@@ -8,6 +8,7 @@ export interface IProduct extends Document {
   price: number;
   imageUrl?: string; // URL de la imagen, opcional
   category: string; // Categoría del producto
+  tags?: string[]; // <-- NUEVO CAMPO: Array de strings opcional
   isActive: boolean;
   // Aquí podríamos añadir un campo 'businessId' en el futuro para multi-tenancy
   // businessId: mongoose.Types.ObjectId;
@@ -20,6 +21,7 @@ const ProductSchema: Schema = new Schema({
   price: { type: Number, required: true }, // Precio del producto, obligatorio
   imageUrl: { type: String }, // URL de la imagen del producto
   category: { type: String }, // Categoría del producto
+  tags: { type: [String] },
   isActive: { type: Boolean, required: true, default: true },
   // Si implementamos multi-tenancy, añadiríamos:
   // businessId: { type: mongoose.Types.ObjectId, required: true, ref: 'Negocio' },
