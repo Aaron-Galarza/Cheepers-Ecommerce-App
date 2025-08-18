@@ -1,7 +1,10 @@
+// Backend/src/middlewares/authMiddleware.ts
+
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User, { IUser } from '../models/User';
+import rateLimit from 'express-rate-limit';
 
 // Extiende la interfaz Request de Express para añadir el usuario autenticado
 declare global {
@@ -78,3 +81,9 @@ export const owner = (req: Request, res: Response, next: NextFunction) => {
         throw new Error('No autorizado como dueño');
     }
 };
+
+export const loginLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 5,
+    message: 'Demasiados intentos de login fallidos desde esta IP, por favor, intenta de nuevo en 15 minutos.'
+});

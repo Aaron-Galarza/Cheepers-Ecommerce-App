@@ -4,7 +4,6 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet'; // Importamos helmet
-import rateLimit from 'express-rate-limit'; // Importamos rateLimit
 import mongoSanitize from 'express-mongo-sanitize'; // Importamos express-mongo-sanitize
 import { setupSchedule } from './utils/schedule'; // <-- IMPORTA LA FUNCIÓN
 
@@ -50,13 +49,6 @@ app.use(cors({
     credentials: true,
     optionsSuccessStatus: 204
 }));
-
-// --- LIMITADOR DE VELOCIDAD PARA RUTAS ESPECÍFICAS (LOGIN) ---
-export const loginLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 5,
-    message: 'Demasiados intentos de login fallidos desde esta IP, por favor, intenta de nuevo en 15 minutos.'
-});
 
 // Importar la conexión a la base de datos
 import connectDB from './config/db';
