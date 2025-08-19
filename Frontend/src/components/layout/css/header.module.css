@@ -1,4 +1,3 @@
-/* Variables de color */
 :root {
   --color-primary: #e53e3e; /* Rojo Cheepers */
   --color-secondary: #f12424; /* Naranja */
@@ -27,7 +26,7 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 }
 
-/* Estructura principal del header (Ahora fijo en todas las resoluciones) */
+/* Estructura principal del header */
 .header {
   background-color: white;
   padding: 15px 5%; /* Padding para desktop */
@@ -35,13 +34,13 @@
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-  position: fixed; /* Header fijo en todas las resoluciones */
-  width: 100%; /* Ocupa todo el ancho */
-  top: 0; /* Se pega a la parte superior */
-  left: 0; /* Se pega a la izquierda */
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
   z-index: 1000;
   flex-wrap: wrap;
-  box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
+  box-sizing: border-box;
 }
 
 /* Logo + texto "CHEEPERS" */
@@ -57,13 +56,13 @@
 }
 
 .logo-image {
-  height: 70px; /* Tamaño del logo en desktop */
+  height: 70px;
   width: auto;
   margin-right: 12px;
 }
 
 .logo-text {
-  font-size: 2.2rem; /* Tamaño del texto "CHEEPERS" en desktop */
+  font-size: 2.2rem;
   font-weight: 700;
   font-family: 'Montserrat', sans-serif;
   color: var(--color-dark-text);
@@ -76,6 +75,8 @@
   gap: 25px;
   font-size: 1.2rem;
   align-items: center;
+  /* CAMBIO CLAVE: Agregamos margin-right para alinear en PC */
+  margin-right:60px;
 }
 
 .navLink {
@@ -101,7 +102,7 @@
 .action-button {
   position: relative;
   background-color: var(--color-primary);
-  color: var(--color-white); /* Color del texto/icono por defecto del botón */
+  color: var(--color-white);
   font-size: 1.1rem;
   width: 40px;
   height: 40px;
@@ -110,42 +111,37 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s; /* Añadido box-shadow a la transición */
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
   box-shadow: var(--shadow-sm);
 }
 
-/* Estilo para los iconos dentro de .action-button cuando NO están en hover */
 .action-button svg {
-  color: var(--color-white); /* Asegura que el icono sea blanco por defecto cuando el botón es rojo */
-  transition: color 0.3s ease; /* Transición suave para el color del icono */
+  color: var(--color-white);
+  transition: color 0.3s ease;
 }
 
 .action-button:hover {
-  background-color: rgb(228, 18, 18); /* Un rojo ligeramente más oscuro al pasar el ratón */
+  background-color: rgb(228, 18, 18);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-/* CAMBIO CLAVE: Estilos para el botón cuando está activo/seleccionado */
 .action-button.active {
-  background-color: var(--color-primary); /* O un rojo más fuerte/oscuro si prefieres */
-  /* Si quieres un rojo más fuerte en vez de naranja, usa un color hexadecimal más oscuro: */
-  /* background-color: #a02020; */ 
-  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.4); /* Un halo que indica selección */
-  transform: translateY(0); /* Evita el translate para que quede "asentado" */
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.4);
+  transform: translateY(0);
 }
 
 .action-button.active svg {
-    color: var(--color-white); /* Mantiene el icono blanco en el estado activo */
+  color: var(--color-white);
 }
-
 
 .badge {
   position: absolute;
   top: -6px;
   right: -6px;
   background-color: var(--color-white);
-  color: var(--color-primary); /* Color de texto del badge, que es rojo */
+  color: var(--color-primary);
   font-size: 0.7rem;
   border-radius: var(--border-radius-full);
   padding: 2px 6px;
@@ -153,12 +149,10 @@
   border: 2px solid var(--color-primary);
 }
 
-/* Botón de usuario (solo visible en desktop por defecto) */
 .user-button-desktop {
   display: flex;
 }
 
-/* Menú hamburguesa (oculto en desktop por defecto) */
 .menu-toggle {
   display: none;
   background: none;
@@ -172,10 +166,9 @@
 /* --- ESTILOS RESPONSIVOS (Mobile) --- */
 @media (max-width: 768px) {
   .header {
-    padding: var(--space-sm) 3%; /* Ajusta el padding para móvil, el position: fixed ya está arriba */
+    padding: var(--space-sm) 3%;
   }
 
-  /* Ocultar la navegación principal en móvil */
   .nav-links {
     display: none;
     width: 100%;
@@ -183,7 +176,7 @@
     align-items: center;
     gap: 15px;
     position: absolute;
-    top: 70px; /* Ajusta según la altura de tu header en móvil */
+    top: 70px;
     left: 0;
     background-color: var(--color-white);
     box-shadow: var(--shadow-md);
@@ -191,6 +184,9 @@
     z-index: 999;
     border-bottom-left-radius: var(--border-radius-md);
     border-bottom-right-radius: var(--border-radius-md);
+    /* Desactivamos los márgenes de alineación en móvil */
+    margin-right: 0;
+    padding-left: 0;
   }
 
   .nav-links.open {
@@ -208,12 +204,10 @@
     border-bottom: none;
   }
 
-  /* Mostrar el menú hamburguesa en móvil */
   .menu-toggle {
     display: block;
   }
 
-  /* Ajustes para el logo y texto "CHEEPERS" en móvil */
   .logo-image {
     height: 40px;
     width: auto;
@@ -224,7 +218,6 @@
     font-size: 1.8rem;
   }
 
-  /* Ajustes para los botones de acción en móvil */
   .header-actions {
     margin-left: auto;
     gap: var(--space-sm);
@@ -232,5 +225,20 @@
 
   .user-button-desktop {
     display: none;
+  }
+}
+
+/* Ajustes adicionales para monitores más pequeños que un desktop normal */
+@media (max-width: 1200px) {
+  .nav-links {
+   margin-right: 45px; /* Reduce el margen en monitores más pequeños */
+    gap: 20px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .nav-links {
+    margin-right: 35px; /* Reduce aún más el margen */
+    gap: 15px;
   }
 }

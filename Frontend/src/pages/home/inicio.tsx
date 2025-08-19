@@ -1,5 +1,4 @@
-// src/components/layout/Inicio.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './../css/inicio.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,54 +20,97 @@ const bannerItems = [
 const Inicio: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
-  // Funcionalidad de auto-slide para el banner
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
+  // Usamos useRef para mantener una referencia al intervalo que no cambia en cada render
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Función para reiniciar el temporizador
+  const startAutoSlide = () => {
+    // Limpia cualquier temporizador existente
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    // Crea un nuevo temporizador
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
         prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
       );
-    }, 6000); // Velocidad de auto-slide: 6 segundos
-
-    // Limpiar el intervalo al desmontar el componente para evitar fugas de memoria
-    return () => clearInterval(interval);
-  }, []);
-
-  // Función para cambiar el slide manualmente al hacer clic en los puntos
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
+    }, 6000);
   };
 
-  // Números de WhatsApp (¡RECUERDA CAMBIAR ESTOS VALORES!)
-  // const whatsappPedidosNumber = 'NUMERO_PEDIDOS'; // Ya está en el href
-  // const whatsappConsultasNumber = 'NUMERO_CONSULTAS'; // Ya está en el href
+  // El useEffect ahora solo llama a startAutoSlide una vez y lo limpia al desmontar
+  useEffect(() => {
+    startAutoSlide();
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  // Función para cambiar el slide manualmente
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+    startAutoSlide(); // Reinicia el temporizador al hacer clic en los puntos
+  };
+
+  // ----- Nuevas funciones de manejo de eventos táctiles para deslizar -----
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current); // Detiene el auto-slide mientras se desliza
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart - touchEnd > 75) {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
+      );
+    }
+
+    if (touchStart - touchEnd < -75) {
+      setCurrentIndex((prevIndex) =>
+        prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
+      );
+    }
+    setTouchStart(0);
+    setTouchEnd(0);
+    startAutoSlide(); // Reinicia el temporizador después de soltar el dedo
+  };
+
   const whatsappPedidoMessage = 'Hola! Quisiera hacer un pedido.';
   const whatsappConsultaMessage = 'Hola! Tengo una consulta.';
 
   return (
     <div className={styles.inicioContainer}>
-      {/* Sección del Banner Principal */}
-      <section className={styles.heroSection}>
-        {/* Mapea y renderiza cada slide del banner */}
+      <section 
+        className={styles.heroSection}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {bannerItems.map((item, index) => (
           <div
             key={index}
             className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''}`}
-            // Controla el z-index para la superposición de slides
             style={{ zIndex: index === currentIndex ? 1 : 0 }}
           >
-            {/* Contenedor de imagen para cada slide */}
             <div className={styles.heroImageContainer}>
               <img src={item.image} alt={item.altText} className={styles.heroImage}/>
             </div>
-            {/* Contenido de texto para cada slide */}
             <div className={styles.heroContent}>
               <h1 className={styles.heroTitle}>{item.title}</h1>
               <p className={styles.heroText}>
                 {item.descriptionLine1}<br />
                 {item.descriptionLine2}
               </p>
-              {/* BOTÓN CON NAVEGACIÓN A /menu */}
               <button
                 className={styles.heroCallToAction}
                 onClick={() => navigate('/menu')}
@@ -79,7 +121,6 @@ const Inicio: React.FC = () => {
           </div>
         ))}
 
-        {/* Puntos para navegación del banner */}
         <div className={styles.bannerDots}>
           {bannerItems.map((_, index) => (
             <span
@@ -94,7 +135,6 @@ const Inicio: React.FC = () => {
       {/* SECCIÓN: SOBRE NOSOTROS / CONTACTO CON MAPA Y WHATSAPP */}
       <section className={styles.aboutContactSection}>
 
-        {/* Contenido Principal de Texto (IZQUIERDA en Desktop) */}
         <div className={styles.aboutContent}>
 
           <h2 className={styles.aboutMainTitle}>
@@ -133,14 +173,11 @@ const Inicio: React.FC = () => {
 
         </div>
 
-        {/* Columna del Mapa Embebido (DERECHA en Desktop) */}
         <div className={styles.mapEmbedContainer}>
 
-            {/* Bloque de Información de Contacto / Ubicación */}
             <div className={styles.contactInfoBlock}>
               <h3 className={styles.contactTitle}>Contáctanos</h3>
 
-              {/* Contacto Item: Teléfono/WhatsApp */}
               <div className={styles.contactItem}>
                   <span className={styles.contactIconWrapper}>
                     <FaPhone/>
@@ -154,7 +191,6 @@ const Inicio: React.FC = () => {
                   </p>
               </div>
 
-              {/* Contacto Item: Horario de Atención */}
               <div className={styles.contactItem}>
                   <span className={styles.contactIconWrapper}>
                     <FaClock/>
@@ -166,7 +202,6 @@ const Inicio: React.FC = () => {
                   </div>
               </div>
 
-              {/* Contacto Item: Ubicación */}
               <div className={styles.contactItem}>
                   <span className={styles.contactIconWrapper}>
                     <FaMapMarkerAlt/>
@@ -176,9 +211,8 @@ const Inicio: React.FC = () => {
                     {' '} (<a href="https://maps.app.goo.gl/QppqFpF3aGCp6tnq9" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
                   </p>
               </div>
-            </div> {/* Fin contactInfoBlock */}
+            </div>
 
-            {/* IFRAME REAL DEL MAPA */}
             <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar"
             width="100%"
@@ -190,7 +224,6 @@ const Inicio: React.FC = () => {
             title="Ubicación de Cheepers en Google Maps"
             ></iframe>
 
-            {/* Botón "Abrir en Maps" */}
             <a
               href="https://maps.app.goo.gl/QppqFpF3aGCp6tnq9"
               target="_blank"
@@ -199,7 +232,7 @@ const Inicio: React.FC = () => {
             >
               Abrir en Maps <FaArrowRight />
             </a>
-        </div> {/* Fin mapEmbedContainer */}
+        </div>
 
       </section>
 

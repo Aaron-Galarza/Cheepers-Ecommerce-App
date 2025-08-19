@@ -1,4 +1,30 @@
-/* menu.module.css */
+:root {
+  --color-primary: #e53e3e;
+  --color-secondary: #f6ad55;
+  --color-dark-text: #2d3748;
+  --color-medium-text: #4a5568;
+  --color-light-text: #718096;
+  --color-white: #ffffff;
+  --color-off-white: #FDFDF5;
+  --color-grey-background: #edf2f7;
+  --color-hero-background: #FFF8E1;
+
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 48px;
+  --space-xl: 80px;
+
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+  --border-radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+}
 
 body {
   background-image: url(./assets/images/fondo.jpg);
@@ -11,6 +37,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: rgba(243, 243, 243, 0.6);
   color: #333;
+  padding-top: 40px;
 }
 
 .sectionTitle {
@@ -18,20 +45,19 @@ body {
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
---color-dark-text: #2d3748; /* Asumiendo que --color-tertiary está definido en algún lugar o es un color válido */
-  /* --- AÑADIDO: Margen inferior extra para separación entre secciones --- */
-  margin-bottom: 2rem; /* Aumenta el espacio debajo de cada título de sección */
-  margin-top: 3.5rem; /* Añade un poco más de espacio arriba también, para el primer título */
+  color: var(--color-dark-text);
+  margin-bottom: 2rem;
+  margin-top: 3.5rem;
 }
 
-/* Ajuste para el primer sectionTitle si es el primero en la página */
 .menuContainer .sectionTitle:first-of-type {
-    margin-top: 0; /* Elimina el margen superior si es el primer título */
+  margin-top: 0;
 }
+
 .promoSectionTitle {
-    text-align: center;
+  text-align: center;
   margin-bottom: 35px;
-  margin-top: 29px;
+  margin-top: 39px;
 }
 
 .grid {
@@ -59,7 +85,6 @@ body {
   border-bottom: 1px solid #eee;
 }
 
-/* Aquí el padding extra para desplazar contenido hacia la derecha */
 .info {
   padding: 1rem 1rem 1rem 1.5rem;
   display: flex;
@@ -102,22 +127,111 @@ body {
   background-color: #ee7f18;
 }
 
-/* Media Queries para responsividad */
+/* ** Mini-header fijo y responsive ** */
+.stickyNav {
+  position: fixed;
+  top: 100px;
+  z-index: 100;
+  background-color: white;
+  padding: 1rem 0;
+  border-bottom: 2px solid var(--color-grey-background);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stickyNav + .menuContainer .sectionTitle:first-of-type {
+  margin-top: 5rem;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  margin: 0 auto;
+  padding: 0 10px;
+  max-width: 1100px;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.navList a {
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-dark-text);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.navList a:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.navIcon {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  transition: all 0.3s ease;
+}
+
+.navList a:hover .navIcon {
+  color: var(--color-white);
+}
+
+/* ** Media Queries para mejorar la alineación en móvil y reducir la altura del header ** */
 @media (max-width: 768px) {
   .menuContainer {
     padding: 1rem;
-    margin-top: 79px;
-  
+    padding-top: 150px;
   }
 
+  .stickyNav {
+    top: 70px;
+    padding: 0.5rem 0; /* ** CAMBIO CLAVE: Padding más bajo para reducir la altura ** */
+  }
+  
+  .stickyNav + .menuContainer .sectionTitle:first-of-type {
+    margin-top: 3rem;
+  }
+
+  .navList {
+    justify-content: space-around;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .navList a {
+    font-size: 0.8rem; /* ** CAMBIO CLAVE: Fuente más pequeña ** */
+    padding: 0.3rem 0.5rem; /* ** CAMBIO CLAVE: Padding más bajo para reducir la altura del elemento ** */
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .navIcon {
+    font-size: 1rem; /* ** CAMBIO CLAVE: Icono más pequeño ** */
+    margin-bottom: 0.2rem;
+  }
+  
   .sectionTitle {
     font-size: 1.8rem;
-    margin-bottom: 3rem; /* Ajuste para móvil */
-    margin-top: 3rem; /* Ajuste para móvil */
+    margin-bottom: 3rem; 
+    margin-top: 3rem; 
   }
 
   .grid {
-    grid-template-columns: 1fr; /* Una columna en móviles */
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
 
@@ -127,7 +241,7 @@ body {
 
   .image {
     height: 270px;
-  border-radius: 8px;
+    border-radius: 8px;
   }
 
   .info {
@@ -150,5 +264,12 @@ body {
   .button {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 395px) {
+  .heroImageContainer {
+    width: 95%;
+    height: 290px;
   }
 }

@@ -369,6 +369,8 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+
+
 /* Media Queries para Responsividad */
 @media (max-width: 1024px) {
   .heroTitle {
@@ -388,7 +390,7 @@ body {
     min-height: 605px; /* Ajustado para dar más espacio en móvil */
     flex-direction: column;
     padding: var(--space-md);
-    margin-top: 55px;
+    margin-top: 65px;
   }
 
   .heroSlide {
