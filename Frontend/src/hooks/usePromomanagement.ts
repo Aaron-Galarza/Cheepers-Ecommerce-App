@@ -4,13 +4,9 @@ import authService from '../services/authservice';
 
 // AÑADIDO: Tags para las promociones
 export const PROMO_TAGS = [
-    '2x1',
     'lunes-a-jueves',
     'pizza-promo',
-    'empanada',
-    'combo',
-    'efectivo',
-    'tarjeta'
+    'promo-normal',
 ];
 
 export interface Promotion {

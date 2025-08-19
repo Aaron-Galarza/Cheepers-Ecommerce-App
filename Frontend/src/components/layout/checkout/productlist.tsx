@@ -1,4 +1,4 @@
-// C:\Users\Usuario\Desktop\Aaron\front-facu\Cheepers-Ecommerce-App\Frontend\src\components\layout\productlist.tsx
+// C:\Users\Usuario\Desktop\Aaron\front-facu\Cheepers-Ecommerce-App\Frontend\src\components\layout\checkout\productlist.tsx
 
 export interface Product {
     _id: string;
@@ -8,6 +8,7 @@ export interface Product {
     imageUrl?: string;
     category: string; // Ej. "Hamburguesas", "Pizzas", "Papas Fritas"
     isActive: boolean; // Para saber si está disponible
+    tags?: string[]; // <-- ¡VERIFICA QUE ESTA LÍNEA ESTÉ TAL CUAL, CON EL '?'!
 }
 
 // Interfaz para un Adicional (AddOn) tal como viene del backend
