@@ -255,3 +255,41 @@
         font-size: 1.8rem;
     }
 }
+
+.addOnsSection {
+    margin-top: 15px; /* Ajusta el espacio superior */
+}
+
+/* Estilos para el contenedor de los botones de adicionales */
+.addOnsButtonsContainer {
+    display: flex; /* Mantenemos flex para que los botones se organicen */
+    flex-wrap: wrap; /* Permite que los botones pasen a la siguiente línea */
+    gap: 8px; /* Espacio entre los botones */
+    margin-top: 10px; /* Separación del título */
+    flex-direction: row; /* Apila los botones uno debajo del otro */
+    align-items: flex-start; /* Alinea los botones a la izquierda */
+}
+
+/* Estilos para cada botón individual */
+.addOnButton {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 10px; /* CAMBIO: Reduce el padding para hacerlo más pequeño */
+    font-size: 0.9rem; /* CAMBIO: Reduce el tamaño de la fuente */
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    width: fit-content; /* CAMBIO: Ajusta el ancho al contenido */
+}
+
+.addOnButton:hover {
+    background-color: #e0e0e0;
+}
+
+.addOnButtonActive {
+    background-color: #e53e3e; /* Rojo Cheepers */
+    color: white;
+    border-color: #e53e3e;
+}

@@ -324,7 +324,7 @@ const CheckoutPage: React.FC = () => {
                     <ul className={styles.addOnsSummaryList}>
                       {item.addOns.map(addOn => (
                         <li key={addOn._id} className={styles.addOnsSummaryItem}>
-                          + {addOn.name} (x{addOn.quantity}) - ${addOn.price.toFixed(2)} c/u
+                          {addOn.name} - ${addOn.price.toFixed(2)}
                         </li>
                       ))}
                     </ul>

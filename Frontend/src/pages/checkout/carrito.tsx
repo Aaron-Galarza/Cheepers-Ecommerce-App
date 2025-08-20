@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'; // Agregamos useEffect
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import styles from './../css/carrito.module.css';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/layout/design/button';
-import axios from 'axios'; // Para obtener los adicionales disponibles
-import { CartItem, IAddOn, SelectedAddOn } from '../../components/layout/checkout/productlist'; // Importa las interfaces
+import axios from 'axios';
+import { CartItem, IAddOn, SelectedAddOn } from '../../components/layout/checkout/productlist';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -13,18 +13,15 @@ const CarritoPage: React.FC = () => {
     const total = calculateCartTotal();
     const navigate = useNavigate();
 
-    // ADICIÓN: Estado para almacenar todos los adicionales disponibles del backend
     const [allAvailableAddOns, setAllAvailableAddOns] = useState<IAddOn[]>([]);
     const [loadingAddOns, setLoadingAddOns] = useState<boolean>(true);
     const [errorAddOns, setErrorAddOns] = useState<string | null>(null);
 
-    // ADICIÓN: Cargar los adicionales disponibles al montar el componente
     useEffect(() => {
         const fetchAddOns = async () => {
             try {
                 setLoadingAddOns(true);
                 const response = await axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons`);
-                // Filtramos solo los adicionales activos para mostrar en el carrito
                 setAllAvailableAddOns(response.data.filter(ao => ao.isActive));
             } catch (err) {
                 console.error('Error al cargar los adicionales disponibles:', err);
@@ -33,11 +30,9 @@ const CarritoPage: React.FC = () => {
                 setLoadingAddOns(false);
             }
         };
-
         fetchAddOns();
-    }, []); // Se ejecuta solo una vez al montar
+    }, []);
 
-    // Función para calcular el subtotal de un item individual, incluyendo sus adicionales
     const calculateItemSubtotal = (item: CartItem) => {
         let subtotal = item.price * item.quantity;
         if (item.addOns && item.addOns.length > 0) {
@@ -48,37 +43,31 @@ const CarritoPage: React.FC = () => {
         return subtotal;
     };
 
-    // ADICIÓN: Manejar el cambio del checkbox para un adicional
-    const handleAddOnToggle = (cartItemId: string, addOn: IAddOn, isChecked: boolean) => {
+    const handleAddOnToggle = (cartItemId: string, addOn: IAddOn) => {
         const currentItem = cart.find(item => item.cartItemId === cartItemId);
         if (!currentItem) return;
 
-        const newAddOns: SelectedAddOn[] = [];
-
-        // Primero, copia los adicionales existentes, excluyendo el que se va a modificar/eliminar
-        currentItem.addOns?.forEach(existingAddOn => {
-            if (existingAddOn._id !== addOn._id) {
-                newAddOns.push(existingAddOn);
-            }
-        });
-
-        // Si el checkbox está marcado, añade el adicional con cantidad 1
-        if (isChecked) {
-            newAddOns.push({
-                _id: addOn._id,
-                name: addOn.name,
-                price: addOn.price,
-                quantity: 1, // Cantidad fija de 1 para checkbox
-            });
-        }
+        const isAddOnSelected = currentItem.addOns?.some(a => a._id === addOn._id);
+        let newAddOns: SelectedAddOn[] = [];
         
-        // Llama a la función del contexto para actualizar el carrito con los nuevos adicionales
+        if (isAddOnSelected) {
+            newAddOns = currentItem.addOns?.filter(existingAddOn => existingAddOn._id !== addOn._id) || [];
+        } else {
+            newAddOns = [
+                ...(currentItem.addOns || []),
+                {
+                    _id: addOn._id,
+                    name: addOn.name,
+                    price: addOn.price,
+                    quantity: 1,
+                },
+            ];
+        }
         updateCartItemAddOns(cartItemId, newAddOns);
     };
 
     if (loadingAddOns) return <div className={styles.container}>Cargando adicionales...</div>;
     if (errorAddOns) return <div className={styles.container} style={{ color: 'red' }}>{errorAddOns}</div>;
-
 
     return (
         <div className={styles.container}>
@@ -89,7 +78,6 @@ const CarritoPage: React.FC = () => {
                 <>
                     <ul className={styles.list}>
                         {cart.map(item => {
-                            // Filtra los adicionales disponibles que son relevantes para la categoría de este producto
                             const relevantAddOns = allAvailableAddOns.filter(ao =>
                                 ao.associatedProductCategories.includes(item.category)
                             );
@@ -101,32 +89,33 @@ const CarritoPage: React.FC = () => {
                                         <h2 className={styles.itemName}>{item.name}</h2>
                                         <p className={styles.itemQuantity}>Cantidad: {item.quantity}</p>
 
-                                        {/* ADICIÓN: Sección para Checkboxes de Adicionales */}
                                         {relevantAddOns.length > 0 && (
-                                            <div className={styles.addOnsCheckboxes}>
+                                            <div className={styles.addOnsSection}>
                                                 <p className={styles.addOnsTitle}>Adicionales disponibles:</p>
-                                                {relevantAddOns.map(addOn => (
-                                                    <label key={addOn._id} className={styles.addOnCheckboxLabel}>
-                                                        <input
-                                                            type="checkbox"
-                                                            className={styles.addOnCheckboxInput}
-                                                            checked={item.addOns?.some(a => a._id === addOn._id) || false}
-                                                            onChange={(e) => handleAddOnToggle(item.cartItemId, addOn, e.target.checked)}
-                                                        />
-                                                        {addOn.name} (+${addOn.price.toFixed(2)})
-                                                    </label>
-                                                ))}
+                                                <div className={styles.addOnsButtonsContainer}>
+                                                {relevantAddOns.map(addOn => {
+                                                    const isSelected = item.addOns?.some(a => a._id === addOn._id);
+                                                    return (
+                                                        <button
+                                                            key={addOn._id}
+                                                            className={`${styles.addOnButton} ${isSelected ? styles.addOnButtonActive : ''}`}
+                                                            onClick={() => handleAddOnToggle(item.cartItemId, addOn)}
+                                                        >
+                                                            {addOn.name}
+                                                        </button>
+                                                    );
+                                                })}
+                                                </div>
                                             </div>
                                         )}
 
-                                        {/* ADICIÓN: Mostrar adicionales ya seleccionados (la lista de arriba es para seleccionar, esta para ver lo que ya está) */}
                                         {item.addOns && item.addOns.length > 0 && (
                                             <div className={styles.itemAddOnsSummary}>
                                                 <p className={styles.addOnsTitle}>Adicionales agregados:</p>
                                                 <ul className={styles.addOnsList}>
                                                     {item.addOns.map(addOn => (
                                                         <li key={addOn._id} className={styles.addOnItem}>
-                                                            {addOn.name} (x{addOn.quantity}) - ${addOn.price.toFixed(2)} c/u
+                                                            {addOn.name} - ${addOn.price.toFixed(2)}
                                                         </li>
                                                     ))}
                                                 </ul>
