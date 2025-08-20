@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import styles from './../css/carrito.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -34,20 +34,22 @@ const CarritoPage: React.FC = () => {
     }, []);
 
     const calculateItemSubtotal = (item: CartItem) => {
-        let subtotal = item.price * item.quantity;
+        let subtotal = item.price;
         if (item.addOns && item.addOns.length > 0) {
             subtotal += item.addOns.reduce((addOnsSum, addOn) => {
                 return addOnsSum + (addOn.price * addOn.quantity);
-            }, 0) * item.quantity;
+            }, 0);
         }
-        return subtotal;
+        return subtotal * item.quantity;
     };
-
-    const handleAddOnToggle = (cartItemId: string, addOn: IAddOn) => {
+    
+    // Función para manejar el "toggle" de adicionales
+    const handleAddOnToggle = useCallback((cartItemId: string, addOn: IAddOn) => {
         const currentItem = cart.find(item => item.cartItemId === cartItemId);
         if (!currentItem) return;
-
+    
         const isAddOnSelected = currentItem.addOns?.some(a => a._id === addOn._id);
+        
         let newAddOns: SelectedAddOn[] = [];
         
         if (isAddOnSelected) {
@@ -59,12 +61,13 @@ const CarritoPage: React.FC = () => {
                     _id: addOn._id,
                     name: addOn.name,
                     price: addOn.price,
-                    quantity: 1,
+                    quantity: 1, 
                 },
             ];
         }
+
         updateCartItemAddOns(cartItemId, newAddOns);
-    };
+    }, [cart, updateCartItemAddOns]);
 
     if (loadingAddOns) return <div className={styles.container}>Cargando adicionales...</div>;
     if (errorAddOns) return <div className={styles.container} style={{ color: 'red' }}>{errorAddOns}</div>;
@@ -88,27 +91,27 @@ const CarritoPage: React.FC = () => {
                                     <div className={styles.info}>
                                         <h2 className={styles.itemName}>{item.name}</h2>
                                         <p className={styles.itemQuantity}>Cantidad: {item.quantity}</p>
-
+                                        
                                         {relevantAddOns.length > 0 && (
                                             <div className={styles.addOnsSection}>
                                                 <p className={styles.addOnsTitle}>Adicionales disponibles:</p>
                                                 <div className={styles.addOnsButtonsContainer}>
-                                                {relevantAddOns.map(addOn => {
-                                                    const isSelected = item.addOns?.some(a => a._id === addOn._id);
-                                                    return (
-                                                        <button
-                                                            key={addOn._id}
-                                                            className={`${styles.addOnButton} ${isSelected ? styles.addOnButtonActive : ''}`}
-                                                            onClick={() => handleAddOnToggle(item.cartItemId, addOn)}
-                                                        >
-                                                            {addOn.name}
-                                                        </button>
-                                                    );
-                                                })}
+                                                    {relevantAddOns.map(addOn => {
+                                                        const isSelected = item.addOns?.some(a => a._id === addOn._id);
+                                                        return (
+                                                            <button
+                                                                key={addOn._id}
+                                                                className={`${styles.addOnButton} ${isSelected ? styles.addOnButtonActive : ''}`}
+                                                                onClick={() => handleAddOnToggle(item.cartItemId, addOn)}
+                                                            >
+                                                                {addOn.name}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
-
+                                        
                                         {item.addOns && item.addOns.length > 0 && (
                                             <div className={styles.itemAddOnsSummary}>
                                                 <p className={styles.addOnsTitle}>Adicionales agregados:</p>
@@ -121,7 +124,7 @@ const CarritoPage: React.FC = () => {
                                                 </ul>
                                             </div>
                                         )}
-
+                                        
                                         <p className={styles.itemSubtotal}>Subtotal: ${calculateItemSubtotal(item).toFixed(2)}</p>
                                         
                                         <div className={styles.itemActions}>

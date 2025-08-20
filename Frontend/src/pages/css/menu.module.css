@@ -194,7 +194,7 @@ body {
 @media (max-width: 768px) {
   .menuContainer {
     padding: 1rem;
-    padding-top: 150px;
+    padding-top: 140px;
   }
 
   .stickyNav {
@@ -203,12 +203,12 @@ body {
   }
   
   .stickyNav + .menuContainer .sectionTitle:first-of-type {
-    margin-top: 3rem;
+    margin-top: 2rem;
   }
 
   .navList {
-    justify-content: space-around;
-    gap: 0.5rem;
+    justify-content: center;
+    gap:2rem;
     padding: 0 0.5rem;
   }
 
@@ -217,6 +217,8 @@ body {
     padding: 0.3rem 0.5rem; /* ** CAMBIO CLAVE: Padding más bajo para reducir la altura del elemento ** */
     text-align: center;
     flex-direction: column;
+    align-items: center;
+    margin-right: 22px;
   }
 
   .navIcon {
