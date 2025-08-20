@@ -22,86 +22,150 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [cart, setCart] = useState<CartItem[]>([]);
 
     const generateCartItemId = useCallback((productId: string, addOns: SelectedAddOn[] = []): string => {
-        if (addOns.length === 0) {
+        if (!addOns || addOns.length === 0) {
             return productId;
         }
-        const addOnParts = addOns
-            .map(ao => `${ao._id}_${ao.quantity}`)
-            .sort()
-            .join('-');
+        
+        const sortedAddOns = [...addOns].sort((a, b) => a._id.localeCompare(b._id));
+        const addOnParts = sortedAddOns.map(ao => `${ao._id}:${ao.quantity}`).join(',');
+
         return `${productId}__${addOns.length > 0 ? addOnParts : ''}`;
     }, []);
 
     const addToCart = useCallback((product: Product, addOns: SelectedAddOn[] = []) => {
-        setCart((prev: CartItem[]) => {
+        setCart((prevCart) => {
             const newCartItemId = generateCartItemId(product._id, addOns);
-            const existingCartItem = prev.find((item: CartItem) => item.cartItemId === newCartItemId);
+            const existingItem = prevCart.find(item => item.cartItemId === newCartItemId);
             
-            if (existingCartItem) {
-                return prev.map((item: CartItem) =>
+            if (existingItem) {
+                return prevCart.map(item =>
                     item.cartItemId === newCartItemId
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             } else {
-                return [...prev, { ...product, quantity: 1, addOns: addOns || [], cartItemId: newCartItemId }];
+                return [...prevCart, { ...product, quantity: 1, addOns: addOns || [], cartItemId: newCartItemId }];
             }
         });
     }, [generateCartItemId]);
 
-    const updateCartItemAddOns = useCallback((oldCartItemId: string, newAddOns: SelectedAddOn[]) => {
-        setCart((prev: CartItem[]) => {
-            const itemToUpdate = prev.find(item => item.cartItemId === oldCartItemId);
+const updateCartItemAddOns = useCallback((oldCartItemId: string, newAddOns: SelectedAddOn[]) => {
+    setCart((prevCart) => {
+        const itemToUpdate = prevCart.find(item => item.cartItemId === oldCartItemId);
+        if (!itemToUpdate) {
+            console.warn(`No se encontró el ítem del carrito con ID: ${oldCartItemId}`);
+            return prevCart;
+        }
 
-            if (!itemToUpdate) {
-                console.warn(`No se encontró el ítem del carrito con ID: ${oldCartItemId}`);
-                return prev;
-            }
+        const newCartItemId = generateCartItemId(itemToUpdate._id, newAddOns);
+        const itemIndex = prevCart.findIndex(item => item.cartItemId === oldCartItemId);
 
-            // Si el ítem ya está personalizado (tiene adicionales), simplemente actualiza
-            if (itemToUpdate.addOns && itemToUpdate.addOns.length > 0) {
-                const updatedItem = {
-                    ...itemToUpdate,
-                    addOns: newAddOns,
-                    cartItemId: generateCartItemId(itemToUpdate._id, newAddOns) // Actualiza el ID si cambian los adicionales
+        // 1. Lógica de FUSIÓN (cuando se eliminan todos los adicionales)
+        if (newAddOns.length === 0) {
+            const consolidatedItemIndex = prevCart.findIndex(item => 
+                item.cartItemId === itemToUpdate._id && 
+                (!item.addOns || item.addOns.length === 0) &&
+                item.cartItemId !== oldCartItemId
+            );
+            
+            if (consolidatedItemIndex !== -1) {
+                const newCart = [...prevCart];
+                const consolidatedItem = newCart[consolidatedItemIndex];
+                const updatedConsolidatedItem = { 
+                    ...consolidatedItem, 
+                    quantity: consolidatedItem.quantity + itemToUpdate.quantity 
                 };
-                return prev.map(item => item.cartItemId === oldCartItemId ? updatedItem : item);
+                
+                newCart[consolidatedItemIndex] = updatedConsolidatedItem;
+                newCart.splice(itemIndex, 1);
+                return newCart;
+            } else {
+                // Si no hay un ítem consolidado, actualizamos este para que no tenga adicionales
+                const newCart = [...prevCart];
+                newCart[itemIndex] = { 
+                    ...itemToUpdate, 
+                    addOns: [], 
+                    cartItemId: newCartItemId 
+                };
+                return newCart;
+            }
+        }
+
+        // 2. Lógica de DIVISIÓN (cuando se añade a un ítem con cantidad > 1)
+        if (itemToUpdate.quantity > 1) {
+            const newCart = [...prevCart];
+            const updatedOriginalItem = { 
+                ...itemToUpdate, 
+                quantity: itemToUpdate.quantity - 1, 
+                addOns: [], 
+                cartItemId: generateCartItemId(itemToUpdate._id) 
+            };
+            
+            const newPersonalizedItem = { 
+                ...itemToUpdate, 
+                quantity: 1, 
+                addOns: newAddOns, 
+                cartItemId: newCartItemId 
+            };
+            
+            // Buscar si ya existe un ítem con la misma combinación
+            const existingPersonalizedItemIndex = newCart.findIndex(item => 
+                item.cartItemId === newCartItemId && 
+                item.cartItemId !== oldCartItemId
+            );
+            
+            if (existingPersonalizedItemIndex !== -1) {
+                const existingItem = newCart[existingPersonalizedItemIndex];
+                newCart[existingPersonalizedItemIndex] = { 
+                    ...existingItem, 
+                    quantity: existingItem.quantity + 1 
+                };
+                newCart[itemIndex] = updatedOriginalItem;
+            } else {
+                newCart[itemIndex] = updatedOriginalItem;
+                newCart.splice(itemIndex + 1, 0, newPersonalizedItem);
             }
             
-            // Si el ítem es el genérico y se le está agregando un adicional,
-            // necesitamos dividirlo si la cantidad es mayor a 1
-            if (itemToUpdate.quantity > 1) {
-                // 1. Decrementar la cantidad del ítem original
-                const updatedOriginalItem = { ...itemToUpdate, quantity: itemToUpdate.quantity - 1 };
-                
-                // 2. Crear un nuevo ítem para la unidad personalizada
-                const newPersonalizedItem = {
-                    ...itemToUpdate,
-                    quantity: 1,
-                    addOns: newAddOns,
-                    cartItemId: generateCartItemId(itemToUpdate._id, newAddOns)
-                };
-                
-                // 3. Reemplazar y añadir en el carrito
-                const otherItems = prev.filter(item => item.cartItemId !== oldCartItemId);
-                return [...otherItems, updatedOriginalItem, newPersonalizedItem];
-            } else {
-                // Si la cantidad es 1, simplemente actualiza el ítem
-                const updatedItem = { ...itemToUpdate, addOns: newAddOns, cartItemId: generateCartItemId(itemToUpdate._id, newAddOns) };
-                return prev.map(item => item.cartItemId === oldCartItemId ? updatedItem : item);
-            }
-        });
-    }, [generateCartItemId]);
+            return newCart;
+        }
+
+        // 3. Lógica de ACTUALIZACIÓN (para cualquier otro caso)
+        const existingItemIndex = prevCart.findIndex(item => 
+            item.cartItemId === newCartItemId && 
+            item.cartItemId !== oldCartItemId
+        );
+        
+        if (existingItemIndex !== -1) {
+            const newCart = [...prevCart];
+            const existingItem = newCart[existingItemIndex];
+            newCart[existingItemIndex] = { 
+                ...existingItem, 
+                quantity: existingItem.quantity + 1 
+            };
+            newCart.splice(itemIndex, 1);
+            return newCart;
+        } else {
+            // Si no existe, simplemente actualizar el ítem actual en su posición
+            const newCart = [...prevCart];
+            newCart[itemIndex] = { 
+                ...itemToUpdate, 
+                addOns: newAddOns, 
+                cartItemId: newCartItemId 
+            };
+            return newCart;
+        }
+    });
+}, [generateCartItemId]);
 
     const removeFromCart = useCallback((cartItemId: string) => {
-        setCart((prev: CartItem[]) => {
-            const itemToRemove = prev.find((item: CartItem) => item.cartItemId === cartItemId);
+        setCart((prevCart) => {
+            const itemToRemove = prevCart.find(item => item.cartItemId === cartItemId);
             if (itemToRemove && itemToRemove.quantity > 1) {
-                return prev.map((item: CartItem) =>
+                return prevCart.map(item =>
                     item.cartItemId === cartItemId ? { ...item, quantity: item.quantity - 1 } : item
                 );
             } else {
-                return prev.filter((item: CartItem) => item.cartItemId !== cartItemId);
+                return prevCart.filter(item => item.cartItemId !== cartItemId);
             }
         });
     }, []);

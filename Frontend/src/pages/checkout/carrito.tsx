@@ -43,7 +43,6 @@ const CarritoPage: React.FC = () => {
         return subtotal * item.quantity;
     };
     
-    // Función para manejar el "toggle" de adicionales
     const handleAddOnToggle = useCallback((cartItemId: string, addOn: IAddOn) => {
         const currentItem = cart.find(item => item.cartItemId === cartItemId);
         if (!currentItem) return;
