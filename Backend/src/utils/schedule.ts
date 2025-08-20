@@ -13,7 +13,7 @@ const horarios = {
     DO: { open: '20:00', close: '23:00' },
     LU: { open: '20:00', close: '23:00' },
     MA: { open: '20:00', close: '23:00' },
-    MI: { open: '20:00', close: '23:00' },
+    MI: { open: '00:00', close: '23:00' },
     JU: { open: '20:00', close: '23:00' },
     VI: { open: '20:00', close: '23:30' },
     SA: { open: '20:00', close: '23:59' }
