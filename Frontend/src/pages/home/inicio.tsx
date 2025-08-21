@@ -69,16 +69,19 @@ const Inicio: React.FC = () => {
   };
 
   const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 75) {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
-      );
-    }
-
-    if (touchStart - touchEnd < -75) {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
-      );
+    // Verifica que haya un deslizamiento significativo para evitar conflictos con clics
+    if (Math.abs(touchStart - touchEnd) > 75) {
+      if (touchStart - touchEnd > 0) {
+        // Deslizamiento a la izquierda
+        setCurrentIndex((prevIndex) => 
+          prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
+        );
+      } else {
+        // Deslizamiento a la derecha
+        setCurrentIndex((prevIndex) =>
+          prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
+        );
+      }
     }
     setTouchStart(0);
     setTouchEnd(0);
@@ -113,7 +116,12 @@ const Inicio: React.FC = () => {
               </p>
               <button
                 className={styles.heroCallToAction}
+                // SOLUCIÓN: Agregamos onTouchEnd para asegurar que la navegación tenga prioridad en móviles
                 onClick={() => navigate('/menu')}
+                onTouchEnd={(e) => {
+                    e.stopPropagation(); // Detiene la propagación para evitar conflictos con el deslizamiento
+                    navigate('/menu');
+                }}
               >
                 {item.callToAction}
               </button>
