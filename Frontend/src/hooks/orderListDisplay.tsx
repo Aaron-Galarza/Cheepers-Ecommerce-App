@@ -47,7 +47,7 @@ const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
 
   // Construye el mensaje automático (sin el ID del pedido completo)
   let message = `¡Hola ${order.guestName}!`;
-  message += `\nTu pedido Cheepers ha sido CONFIRMADO y está siendo preparado.`; // Mensaje simplificado
+  message += `\nTu pedido Cheepers ha sido ACEPTADO y está siendo preparado.`; // Mensaje simplificado
   message += `\n\nDetalles de tu pedido:`;
   message += `\nProductos:`;
   order.products.forEach(p => {
@@ -65,7 +65,7 @@ const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
   if (order.deliveryType === 'delivery' && order.shippingAddress) {
     message += `\nDirección: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
   }
-  message += `\n\n¡Gracias por tu compra!`;
+  message += `\n\n¿Quieres agregar algo más?`;
 
   // Codifica el mensaje para que pueda ir en la URL
   const encodedMessage = encodeURIComponent(message);
