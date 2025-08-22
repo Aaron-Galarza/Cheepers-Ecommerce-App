@@ -195,7 +195,7 @@ body {
 @media (max-width: 768px) {
   .menuContainer {
     padding: 1rem;
-    padding-top: 130px;
+    padding-top:80px;
   }
 
   .stickyNav {
@@ -204,7 +204,7 @@ body {
   }
   
   .stickyNav + .menuContainer .sectionTitle:first-of-type {
-    margin-top: 2rem;
+    margin-top: 5rem;
   }
 
   .navList {
@@ -231,13 +231,13 @@ body {
   .sectionTitle {
     font-size: 1.8rem;
     margin-bottom: 2rem; 
-    margin-top: 3rem; 
+    margin-top: 2.5rem; 
     text-align: center;
   }
 
   .promoSectionTitle {
     margin-bottom: 1.5rem;
-    margin-top: 1.5rem;
+    margin-top: 2.5rem;
     text-align: center;
   }
 

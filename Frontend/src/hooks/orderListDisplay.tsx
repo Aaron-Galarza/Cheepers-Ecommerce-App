@@ -41,27 +41,27 @@ const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
 
   // Determinar el nombre legible del método de pago
   const paymentMethodDisplay = order.paymentMethod === 'cash' ? 'Efectivo' :
-                                order.paymentMethod === 'card' ? 'Mercado Pago' :
-                                'Transferencia';
+    order.paymentMethod === 'card' ? 'Mercado Pago' :
+    'Transferencia';
 
 
   // Construye el mensaje automático (sin el ID del pedido completo)
-  let message = `¡Hola ${order.guestName}!`;
-  message += `\nTu pedido Cheepers ha sido ACEPTADO y está siendo preparado.`; // Mensaje simplificado
-  message += `\n\nDetalles de tu pedido:`;
-  message += `\nProductos:`;
+  let message = `¡Hola ${order.guestName}!\n`;
+  message += `Tu pedido Cheepers ha sido ACEPTADO y está siendo preparado.\n\n`; // Mensaje simplificado
+  message += `Detalles de tu pedido:\n`;
+  message += `Productos:\n`;
   order.products.forEach(p => {
-    message += `\n- ${p.name} (x${p.quantity})`;
+    message += `- ${p.name} (x${p.quantity})\n`;
     if (Array.isArray(p.addOns) && p.addOns.length > 0) {
       p.addOns.forEach(ao => {
-        message += `\n  + ${ao.name} (x${ao.quantity})`;
+        message += `  + ${ao.name} (x${ao.quantity})\n`;
       });
     }
   });
 
-  message += `\nTotal: $${order.totalAmount.toFixed(2)}`;
-  message += `\nMétodo de pago: ${paymentMethodDisplay}`; // AÑADIDO: Método de pago
-  message += `\nTipo de entrega: ${order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}`;
+  message += `\nTotal: $${order.totalAmount.toFixed(2)}\n`;
+  message += `Método de pago: ${paymentMethodDisplay}\n`; // AÑADIDO: Método de pago
+  message += `Tipo de entrega: ${order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}`;
   if (order.deliveryType === 'delivery' && order.shippingAddress) {
     message += `\nDirección: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
   }
@@ -139,7 +139,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                           <ul className={styles.addOnsSublist}>
                             {item.addOns.map((addOn, i) => (
                               <li key={i} className={styles.addOnItem}>
-                                └ {addOn.name} (x{addOn.quantity}) - ${addOn.price.toFixed(2)}
+                                └ {addOn.name} - ${addOn.price.toFixed(2)}
                               </li>
                             ))}
                           </ul>
@@ -186,14 +186,14 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                   </>
                 )}
                 {order.status === 'processing' && (
-                   <>
+                  <>
                     <button onClick={() => handleOrderDelivered(order._id)} className={styles.deliveredButton}>
                       <FaCheckCircle /> Marcar Entregado
                     </button>
                     <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
                       <FaTimesCircle /> Cancelar
                     </button>
-                   </>
+                  </>
                 )}
                 {(order.status === 'delivered' || order.status === 'cancelled') && (
                   <button onClick={() => handleOrderRestore(order._id)} className={styles.restoreButton}>
