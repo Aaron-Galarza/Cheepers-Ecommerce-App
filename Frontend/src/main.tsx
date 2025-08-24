@@ -48,18 +48,7 @@ const RootApp: React.FC = () => {
         window.outerWidth - window.innerWidth > threshold ||
         window.outerHeight - window.innerHeight > threshold
       ) {
-        if (!hasWarned) {
-          toast.warn('¡Detectamos que las herramientas de desarrollo están abiertas! no hagas un mal uso 🧐', {
-            position: "bottom-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-          hasWarned = true;
-        }
+      
       } else {
         // Reiniciar la advertencia si las DevTools se cierran
         if (hasWarned) {
