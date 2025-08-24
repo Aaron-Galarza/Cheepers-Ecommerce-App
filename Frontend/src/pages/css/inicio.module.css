@@ -1,4 +1,3 @@
-
 :root {
   --color-primary: #e53e3e; /* Rojo Cheepers */
   --color-secondary: #f6ad55; /* Naranja */
@@ -81,7 +80,7 @@ body {
   z-index: 1;
   pointer-events: auto;
   /* Animación de entrada para el slide activo */
-  animation: slideInFade 1s forwards;
+  animation: slideInFade 1.5s forwards;
 }
 
 /* Keyframes para la animación de entrada del slide */
@@ -469,6 +468,10 @@ body {
     text-align: justify;
     /* Añade espacio entre párrafos para evitar que se vean como un solo bloque */
     margin-bottom: 1.2em;
+    /* --- INICIO DEL CAMBIO --- */
+    word-spacing: -2px;
+    letter-spacing: 0.2px;
+    /* --- FIN DEL CAMBIO --- */
   }
 
   .aboutSubTitle {

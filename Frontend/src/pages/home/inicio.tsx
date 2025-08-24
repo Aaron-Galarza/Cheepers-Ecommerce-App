@@ -22,6 +22,7 @@ const Inicio: React.FC = () => {
     const navigate = useNavigate();
     const [touchStart, setTouchStart] = useState(0);
     const [touchEnd, setTouchEnd] = useState(0);
+    const [isSwiping, setIsSwiping] = useState(false); // Nuevo estado para rastrear el deslizamiento
 
     // Usamos useRef para mantener una referencia al intervalo que no cambia en cada render
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -51,42 +52,67 @@ const Inicio: React.FC = () => {
     }, []);
 
     // Función para cambiar el slide manualmente
-    const goToSlide = (index: number) => {
+    const goToSlide = (index: number, e: React.MouseEvent) => {
+        // Previene la acción si se detectó un deslizamiento
+        if (isSwiping) {
+            e.preventDefault();
+            return;
+        }
         setCurrentIndex(index);
         startAutoSlide(); // Reinicia el temporizador al hacer clic en los puntos
     };
 
     // ----- Nuevas funciones de manejo de eventos táctiles para deslizar -----
     const handleTouchStart = (e: React.TouchEvent) => {
-        setTouchStart(e.targetTouches[0].clientX);
+        // Detiene el auto-slide
         if (intervalRef.current) {
-            clearInterval(intervalRef.current); // Detiene el auto-slide mientras se desliza
+            clearInterval(intervalRef.current);
         }
+        setTouchStart(e.targetTouches[0].clientX);
+        setIsSwiping(false); // Reinicia el estado de deslizamiento
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
+        const touchDistance = Math.abs(e.targetTouches[0].clientX - touchStart);
+        // Si la distancia es mayor a 10px, asume que es un deslizamiento
+        if (touchDistance > 10) {
+            setIsSwiping(true);
+        }
         setTouchEnd(e.targetTouches[0].clientX);
     };
 
     const handleTouchEnd = () => {
-        // Verifica que haya un deslizamiento significativo para evitar conflictos con clics
-        if (Math.abs(touchStart - touchEnd) > 75) {
-            if (touchStart - touchEnd > 0) {
-                // Deslizamiento a la izquierda
-                setCurrentIndex((prevIndex) => 
-                    prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
-                );
-            } else {
-                // Deslizamiento a la derecha
-                setCurrentIndex((prevIndex) =>
-                    prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
-                );
+        // No hace nada si fue un deslizamiento y el onClick debería ser ignorado
+        if (isSwiping) {
+            const minSwipeDistance = 75;
+            if (Math.abs(touchStart - touchEnd) > minSwipeDistance) {
+                if (touchStart - touchEnd > 0) {
+                    // Deslizamiento a la izquierda
+                    setCurrentIndex((prevIndex) => 
+                        prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
+                    );
+                } else {
+                    // Deslizamiento a la derecha
+                    setCurrentIndex((prevIndex) =>
+                        prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
+                    );
+                }
             }
         }
         setTouchStart(0);
         setTouchEnd(0);
-        startAutoSlide(); // Reinicia el temporizador después de soltar el dedo
+        setIsSwiping(false); // Resetea el estado
+        startAutoSlide(); // Reinicia el temporizador
     };
+    
+    // Función del botón para manejar la navegación
+    const handleButtonClick = (e: React.MouseEvent) => {
+        if (isSwiping) {
+            e.preventDefault();
+            return;
+        }
+        navigate('/menu');
+    }
 
     const whatsappPedidoMessage = 'Hola! Quisiera hacer un pedido.';
     const whatsappConsultaMessage = 'Hola! Tengo una consulta.';
@@ -115,11 +141,7 @@ const Inicio: React.FC = () => {
                             </p>
                             <button
                                 className={styles.heroCallToAction}
-                                onClick={() => navigate('/menu')}
-                                onTouchEnd={(e) => {
-                                    e.stopPropagation();
-                                    navigate('/menu');
-                                }}
+                                onClick={handleButtonClick}
                             >
                                 {item.callToAction}
                             </button>
@@ -132,7 +154,7 @@ const Inicio: React.FC = () => {
                         <span
                             key={index}
                             className={`${styles.dot} ${index === currentIndex ? styles.active : ''}`}
-                            onClick={() => goToSlide(index)}
+                            onClick={(e) => goToSlide(index, e as unknown as React.MouseEvent)}
                         ></span>
                     ))}
                 </div>
@@ -204,6 +226,7 @@ const Inicio: React.FC = () => {
                             <div className={styles.contactText}>
                                 <p><strong>Horario de Atención:</strong></p>
                                 <p>Lunes a Domingo: 20:00 - 23:00 hs</p>
+                                <p>Viernes: hasta las 23:30</p>
                                 <p>Sabados: hasta las 00:00</p>
                             </div>
                         </div>
@@ -214,13 +237,13 @@ const Inicio: React.FC = () => {
                             </span>
                             <p className={styles.contactText}>
                                 Ubicados en Corrientes 1200, Resistencia - Chaco
-                                {' '} (<a href="https://maps.app.goo.gl/QppqFpF3aGCp6tnq9" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
+                                {' '} (<a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar0" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
                             </p>
                         </div>
                     </div>
 
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar1"
                         width="100%"
                         height="100%"
                         style={{ border: 0 }}
@@ -231,7 +254,7 @@ const Inicio: React.FC = () => {
                     ></iframe>
 
                     <a
-                        href="https://maps.app.goo.gl/QppqFpF3aGCp6tnq9"
+                        href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar0"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.openInMapsButton}
