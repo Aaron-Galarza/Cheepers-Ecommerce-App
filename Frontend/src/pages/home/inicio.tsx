@@ -21,7 +21,6 @@ const Inicio: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const navigate = useNavigate();
     const [touchStart, setTouchStart] = useState(0);
-    const [touchEnd, setTouchEnd] = useState(0);
 
     // Usamos useRef para mantener una referencia al intervalo que no cambia en cada render
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,7 +55,7 @@ const Inicio: React.FC = () => {
         startAutoSlide(); // Reinicia el temporizador al hacer clic en los puntos
     };
 
-    // ----- Funciones de manejo de eventos táctiles para deslizar -----
+    // ----- Nuevas funciones de manejo de eventos táctiles para deslizar -----
     const handleTouchStart = (e: React.TouchEvent) => {
         // Detiene el auto-slide
         if (intervalRef.current) {
@@ -65,12 +64,8 @@ const Inicio: React.FC = () => {
         setTouchStart(e.targetTouches[0].clientX);
     };
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-        setTouchEnd(e.targetTouches[0].clientX);
-    };
-
-    const handleTouchEnd = () => {
-        // Establece una distancia mínima para considerar un deslizamiento
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        const touchEnd = e.changedTouches[0].clientX;
         const minSwipeDistance = 75;
         
         // Compara la distancia total del deslizamiento
@@ -90,7 +85,6 @@ const Inicio: React.FC = () => {
         
         // Resetea los valores táctiles y reinicia el auto-slide
         setTouchStart(0);
-        setTouchEnd(0);
         startAutoSlide();
     };
     
@@ -107,7 +101,7 @@ const Inicio: React.FC = () => {
             <section 
                 className={styles.heroSection}
                 onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
+                onTouchMove={(e) => { e.preventDefault() }}
                 onTouchEnd={handleTouchEnd}
             >
                 {bannerItems.map((item, index) => (
