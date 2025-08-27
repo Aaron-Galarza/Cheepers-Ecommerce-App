@@ -7,7 +7,6 @@ import Sound from '../../assets/sounds/sonido.mp3';
 import authService from '../../services/authservice';
 import ShippingCostModal from '../../components/layout/common/ShippingCostModal';
 
-
 // Importar los componentes
 import OrderCreationForm from '../../components/layout/admin/ordercreationform';
 import OrderListDisplay from '../../hooks/orderListDisplay';
@@ -561,26 +560,13 @@ const handleOrderAccept = (orderId: string) => {
       }
     );
   };
-
-  const handleOrderRestore = (orderId: string) => {
-    toast.info(
-      <div className={styles.toastConfirmContent}>
-        <p>¿RESTAURAR este pedido a PENDIENTE?</p>
-        <div className={styles.toastButtons}>
-          <button onClick={() => { updateOrderStatus(orderId, 'pending'); toast.dismiss(); }} className={styles.toastConfirmButton}>Sí</button>
-          <button onClick={() => toast.dismiss()} className={styles.toastCancelButton}>No</button>
-        </div>
-      </div>,
-      {
-        position: "top-center",
-        autoClose: false,
-        closeButton: false,
-        draggable: false,
-        className: styles.customConfirmationToast,
-      }
-    );
-  };
   
+  // [MODIFICACIÓN CLAVE]
+  // Esta función ahora solo maneja la lógica de restauración y no muestra la confirmación.
+  const handleOrderRestore = (orderId: string) => {
+    updateOrderStatus(orderId, 'pending');
+  };
+ 
   // [REFACTORIZADO] Usar el nuevo hook para la funcionalidad de exportar y limpiar
   const { handleExport, handleClean } = useOrderExport({ API_BASE_URL, productMapRef, fetchOrders });
 
@@ -637,6 +623,9 @@ const handleOrderAccept = (orderId: string) => {
         handleOrderCancelled={handleOrderCancelled}
         handleOrderRestore={handleOrderRestore}
         handleOrderAccept={handleOrderAccept}
+        // [MODIFICACIÓN CLAVE] Pasar el array completo de pedidos para que
+        // OrderListDisplay pueda acceder a todos los datos.
+        orders={orders}
       />
 
         {showShippingModal && (

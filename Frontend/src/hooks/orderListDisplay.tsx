@@ -14,6 +14,7 @@ interface OrderListDisplayProps {
   handleOrderCancelled: (orderId: string) => void;
   handleOrderRestore: (orderId: string) => void;
   handleOrderAccept: (orderId: string) => void;
+  orders: OrderDisplay[]; // Se añadió la propiedad 'orders' para resolver el error de TypeScript
 }
 
 // Función para formatear el número de teléfono para WhatsApp y generar el enlace
@@ -49,12 +50,11 @@ const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
   let message = `¡Hola ${order.guestName}!\n`;
   message += `Tu pedido Cheepers ha sido ACEPTADO y está siendo preparado.\n\n`; // Mensaje simplificado
   message += `Detalles de tu pedido:\n`;
-  message += `Productos:\n`;
   order.products.forEach(p => {
     message += `- ${p.name} (x${p.quantity})\n`;
     if (Array.isArray(p.addOns) && p.addOns.length > 0) {
       p.addOns.forEach(ao => {
-        message += `  + ${ao.name} (x${ao.quantity})\n`;
+        message += `  + ${ao.name} (x${ao.quantity})\n`;
       });
     }
   });
@@ -83,6 +83,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   handleOrderCancelled,
   handleOrderRestore,
   handleOrderAccept,
+  orders, // Se recibe la nueva propiedad 'orders'
 }) => {
   return (
     <>
@@ -194,11 +195,6 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                       <FaTimesCircle /> Cancelar
                     </button>
                   </>
-                )}
-                {(order.status === 'delivered' || order.status === 'cancelled') && (
-                  <button onClick={() => handleOrderRestore(order._id)} className={styles.restoreButton}>
-                    <FaRedo /> Restaurar a Pendiente
-                  </button>
                 )}
               </div>
             </div>
