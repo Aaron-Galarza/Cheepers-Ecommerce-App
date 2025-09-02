@@ -34,23 +34,22 @@ body {
 
 .inicioContainer {
   padding: var(--space-md);
-  background-color: var(--color-off-white); /* Usa el nuevo color crema sutil */
+  background-color: var(--color-off-white);
 }
 
 /* SECCIÓN DEL BANNER PRINCIPAL */
 .heroSection {
   position: relative;
   width: 100%;
-  min-height: 600px; /* Asegura espacio para el contenido */
+  min-height: 600px;
   overflow: hidden;
-  border-radius: 70px; /* Mantiene el radio original */
-  background-color: var(--color-hero-background); /* Usa el nuevo color crema cálido */
-  /* Patrón de hamburguesas sutil en SVG */
+  border-radius: 70px;
+  background-color: var(--color-hero-background);
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><path d="M75 15c-20.7 0-37.5 16.8-37.5 37.5s16.8 37.5 37.5 37.5 37.5-16.8 37.5-37.5-16.8-37.5-37.5-37.5zM75 97.5c-20.7 0-37.5-16.8-37.5-37.5s16.8-37.5 37.5-37.5 37.5 16.8 37.5 37.5-16.8 37.5-37.5 37.5z" fill="%23f0e68c" opacity="0.08" /></svg>');
-  background-size: 150px 150px; /* Ajusta el tamaño del patrón */
+  background-size: 150px 150px;
   background-repeat: repeat;
   margin-bottom: var(--space-xl);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); /* Sombra sutil */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -63,64 +62,33 @@ body {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transform: translateX(10%); /* Inicia ligeramente a la derecha */
-  transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out; /* Transición más rápida para Safari */
+  transition: opacity 0.8s ease-in-out;
   display: flex;
   align-items: center;
-  justify-content: space-around; /* Distribuye espacio entre imagen y texto */
+  justify-content: space-around;
   flex-wrap: wrap;
-  padding: 43px; /* Padding interno del slide */
+  padding: 43px;
   pointer-events: none;
-  -webkit-backface-visibility: hidden; /* Soluciona parpadeo en Safari */
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  will-change: opacity, transform; /* Mejora rendimiento en Safari */
 }
 
 .heroSlide.active {
   opacity: 1;
-  transform: translateX(0); /* Se desliza a su posición */
   z-index: 1;
   pointer-events: auto;
-  /* Animación de entrada para el slide activo */
-  animation: slideInFade 1.5s forwards;
-}
-
-/* Keyframes para la animación de entrada del slide */
-@keyframes slideInFade {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Safari-specific fixes para animaciones */
-@-webkit-keyframes slideInFade {
-  from {
-    opacity: 0;
-    -webkit-transform: translateX(100%);
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    -webkit-transform: translateX(0);
-    transform: translateX(0);
-  }
 }
 
 .heroImageContainer {
   position: relative;
-  width: 550px; /* Ancho fijo para la imagen */
-  height: 400px; /* Altura fija para la imagen */
-  max-width: 45%; /* Adaptabilidad en desktop */
+  width: 550px;
+  height: 400px;
+  max-width: 45%;
   overflow: hidden;
-  border-radius: var(--border-radius-md); /* Bordes redondeados para la imagen */
-  box-shadow: var(--shadow-lg); /* Sombra para la imagen */
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
   z-index: 1;
-  -webkit-transform: translateZ(0); /* Mejora rendimiento en Safari */
+  -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
 
@@ -130,88 +98,61 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius-md);
-  -webkit-backface-visibility: hidden; /* Soluciona parpadeo en Safari */
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transform: translateZ(0); /* Mejora rendimiento en Safari */
+  -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
 
 .heroContent {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Alinea el texto a la izquierda */
+  align-items: flex-start;
   justify-content: center;
-  max-width: 500px; /* Ancho máximo para el texto */
-  padding-left: var(--space-md); /* Espacio entre imagen y texto */
+  max-width: 500px;
+  padding-left: var(--space-md);
   text-align: left;
   z-index: 2;
   color: var(--color-dark-text);
 }
 
-/* Animaciones de entrada para los elementos de texto dentro del slide activo */
-.heroSlide.active .heroTitle,
-.heroSlide.active .heroText,
-.heroSlide.active .heroCallToAction {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.heroSlide.active .heroTitle {
-  transition: opacity 0.7s ease-out 0.2s, transform 0.7s ease-out 0.2s; /* Retraso para el título */
-}
-
-.heroSlide.active .heroText {
-  transition: opacity 0.7s ease-out 0.4s, transform 0.7s ease-out 0.4s; /* Retraso para la descripción */
-}
-
-.heroSlide.active .heroCallToAction {
-  transition: opacity 0.7s ease-out 0.6s, transform 0.7s ease-out 0.6s; /* Retraso para el CTA */
-}
-
-
 .heroTitle {
   font-family: 'Montserrat', sans-serif;
-  font-size: 4.5em; /* Tamaño grande y audaz */
+  font-size: 4.5em;
   color: var(--color-primary);
   margin: 0 0 var(--space-sm) 0;
   line-height: 1.1;
   letter-spacing: -1px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-  opacity: 0; /* Inicialmente oculto para la animación */
-  transform: translateY(20px); /* Inicialmente desplazado para la animación */
 }
 
 .heroText {
   font-family: 'Open Sans', sans-serif;
-  font-size: 2em; /* Tamaño grande para la descripción */
+  font-size: 2em;
   color: var(--color-medium-text);
   margin-bottom: var(--space-md);
   line-height: 1.3;
-  opacity: 0; /* Inicialmente oculto para la animación */
-  transform: translateY(20px); /* Inicialmente desplazado para la animación */
 }
 
 .heroCallToAction {
   font-family: 'Montserrat', sans-serif;
   font-size: 1.5em;
   font-weight: 700;
-  color: var(--color-primary); /* Color del texto por defecto */
-  background-color: transparent; /* Fondo transparente por defecto */
+  color: var(--color-primary);
+  background-color: transparent;
   padding: var(--space-sm) var(--space-md);
-  border: 2px solid var(--color-primary); /* Borde con color primario */
+  border: 2px solid var(--color-primary);
   border-radius: var(--border-radius-full);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   box-shadow: var(--shadow-sm);
   text-transform: uppercase;
   letter-spacing: 1px;
-  opacity: 0; /* Inicialmente oculto para la animación */
-  transform: translateY(20px); /* Inicialmente desplazado para la animación */
 }
 
 .heroCallToAction:hover {
-  background-color: var(--color-primary); /* Relleno con color primario al hover */
-  color: var(--color-white); /* Texto blanco al hover */
+  background-color: var(--color-primary);
+  color: var(--color-white);
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
@@ -410,7 +351,7 @@ body {
     flex-direction: column;
     padding: var(--space-md);
     margin-top: 65px;
-    border-radius: 40px; /* Reducir el radio en móviles */
+    border-radius: 40px;
   }
 
   .heroSlide {
@@ -430,7 +371,6 @@ body {
 
   .heroContent {
     width: 100%;
-    /* Añade padding horizontal para que el texto no toque los bordes */
     padding: 0 var(--space-md);
     align-items: center;
     text-align: center;
@@ -472,7 +412,6 @@ body {
   .aboutContent {
     max-width: 100%;
     text-align: center;
-    /* Añade padding horizontal para evitar que el texto toque los bordes */
     padding: 0 15px;
     box-sizing: border-box;
   }
@@ -482,30 +421,20 @@ body {
     text-align: center;
   }
   
-  /* ******************************************************************* */
-  /* CAMBIOS PARA MEJORAR LA JUSTIFICACIÓN DEL TEXTO EN MÓVILES */
-  /* ******************************************************************* */
+
   .aboutParagraph {
     font-size: 1.05em;
     line-height: 1.7;
     margin-bottom: 1.2em;
-    /* word-spacing: normal;
-    letter-spacing: normal; */ /* Estos ya estaban en 'normal', los quitamos para evitar redundancia o conflictos */
-    hyphens: auto; /* Permite la división de palabras con guiones en puntos de silabación */
+    hyphens: auto;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    text-align: justify; /* Propiedad para justificar el texto */
-    text-justify: inter-word; /* Mejora la justificación entre palabras */
-    
-    /* Nuevas propiedades para mejorar la apariencia en justificación: */
-    word-break: break-word; /* Rompe palabras largas si es necesario para evitar desbordamientos */
-    overflow-wrap: break-word; /* Similar a word-break, asegura que las palabras se rompan en cualquier punto si no caben */
+    text-align: justify;
+    text-justify: inter-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
-  /* ******************************************************************* */
-  /* FIN DE CAMBIOS PARA JUSTIFICACIÓN */
-  /* ******************************************************************* */
-
-
+  
   .aboutSubTitle {
     font-size: 1.4em;
     text-align: center;
@@ -551,28 +480,34 @@ body {
     line-height: 1.6;
     word-spacing: normal;
     letter-spacing: normal;
-    text-align: justify; /* Asegura la justificación en pantallas aún más pequeñas */
-    hyphens: auto; /* Mantener la silabación */
+    text-align: justify;
+    hyphens: auto;
     word-break: break-word;
     overflow-wrap: break-word;
   }
 }
 
 /* Safari-specific fixes */
-@supports (-webkit-appearance:none) {
-  .heroSlide {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-  }
-  
-  .heroImage {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-  }
-  
-  .heroSection {
-    -webkit-perspective: 1000;
-    perspective: 1000;
+@media not all and (min-resolution:.001dpcm) { 
+  @supports (-webkit-appearance:none) {
+    .heroSlide {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    
+    .heroImage {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    
+    .heroSection {
+      -webkit-perspective: 1000;
+      perspective: 1000;
+    }
+    
+    .heroSlide {
+      transition: opacity 0.6s ease-in-out !important;
+    }
   }
 }
 

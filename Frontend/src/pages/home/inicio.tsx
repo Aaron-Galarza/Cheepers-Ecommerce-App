@@ -19,13 +19,13 @@ const bannerItems = [
 
 const Inicio: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(false);
     const navigate = useNavigate();
     const [touchStart, setTouchStart] = useState(0);
+    const [touchPosition, setTouchPosition] = useState<number | null>(null);
 
     // Usamos useRef para mantener una referencia al intervalo que no cambia en cada render
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const transitionRef = useRef<NodeJS.Timeout | null>(null);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     // Función para reiniciar el temporizador
     const startAutoSlide = () => {
@@ -35,18 +35,9 @@ const Inicio: React.FC = () => {
         }
         // Crea un nuevo temporizador
         intervalRef.current = setInterval(() => {
-            setIsTransitioning(true);
             setCurrentIndex((prevIndex) => 
                 prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
             );
-            
-            // Limpiar transición después de que se complete
-            if (transitionRef.current) {
-                clearTimeout(transitionRef.current);
-            }
-            transitionRef.current = setTimeout(() => {
-                setIsTransitioning(false);
-            }, 600); // Tiempo que debe coincidir con la duración de la transición CSS
         }, 6000);
     };
 
@@ -57,28 +48,12 @@ const Inicio: React.FC = () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
-            if (transitionRef.current) {
-                clearTimeout(transitionRef.current);
-            }
         };
     }, []);
 
     // Función para cambiar el slide manualmente
     const goToSlide = (index: number) => {
-        if (isTransitioning) return;
-        
-        setIsTransitioning(true);
         setCurrentIndex(index);
-        
-        // Limpiar timeout existente
-        if (transitionRef.current) {
-            clearTimeout(transitionRef.current);
-        }
-        
-        transitionRef.current = setTimeout(() => {
-            setIsTransitioning(false);
-        }, 600);
-        
         startAutoSlide(); // Reinicia el temporizador al hacer clic en los puntos
     };
 
@@ -89,18 +64,28 @@ const Inicio: React.FC = () => {
             clearInterval(intervalRef.current);
         }
         setTouchStart(e.targetTouches[0].clientX);
+        setTouchPosition(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (touchPosition === null) return;
+        const currentTouch = e.targetTouches[0].clientX;
+        const diff = touchPosition - currentTouch;
+        
+        // Para Safari, limitamos el movimiento para evitar comportamientos extraños
+        if (isSafari && Math.abs(diff) > 50) {
+            e.preventDefault();
+        }
+        
+        setTouchPosition(currentTouch);
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
         const touchEnd = e.changedTouches[0].clientX;
-        const minSwipeDistance = 75;
-        
-        if (isTransitioning) return;
+        const minSwipeDistance = 50; // Reducido para mejor respuesta en Safari
         
         // Compara la distancia total del deslizamiento
         if (Math.abs(touchStart - touchEnd) > minSwipeDistance) {
-            setIsTransitioning(true);
-            
             if (touchStart - touchEnd > 0) {
                 // Deslizamiento a la izquierda
                 setCurrentIndex((prevIndex) => 
@@ -112,19 +97,11 @@ const Inicio: React.FC = () => {
                     prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
                 );
             }
-            
-            // Limpiar timeout existente
-            if (transitionRef.current) {
-                clearTimeout(transitionRef.current);
-            }
-            
-            transitionRef.current = setTimeout(() => {
-                setIsTransitioning(false);
-            }, 600);
         }
         
         // Resetea los valores táctiles y reinicia el auto-slide
         setTouchStart(0);
+        setTouchPosition(null);
         startAutoSlide();
     };
     
@@ -136,18 +113,26 @@ const Inicio: React.FC = () => {
     const whatsappPedidoMessage = 'Hola! Quisiera hacer un pedido.';
     const whatsappConsultaMessage = 'Hola! Tengo una consulta.';
 
+    // URL corregida para abrir la ubicación específica de Cheepers en Google Maps
+    // Usando las coordenadas exactas: -27.439180676238557, -58.99709008998274
+    const mapsUrl = "https://www.google.com/maps?q=Cheepers,Corrientes+1200,Resistencia,Chaco&ll=-27.439181,-58.997090&z=17";
+
     return (
         <div className={styles.inicioContainer}>
             <section 
                 className={styles.heroSection}
                 onTouchStart={handleTouchStart}
-                onTouchMove={(e) => { e.preventDefault() }}
+                onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
             >
                 {bannerItems.map((item, index) => (
                     <div
                         key={index}
-                        className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''} ${isTransitioning ? styles.transitioning : ''}`}
+                        className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''}`}
+                        style={{ 
+                            // Para Safari, usamos una aproximación diferente
+                            transform: isSafari ? (index === currentIndex ? 'translateX(0)' : 'translateX(100%)') : undefined
+                        }}
                     >
                         <div className={styles.heroImageContainer}>
                             <img src={item.image} alt={item.altText} className={styles.heroImage}/>
@@ -256,7 +241,7 @@ const Inicio: React.FC = () => {
                             </span>
                             <p className={styles.contactText}>
                                 Ubicados en Corrientes 1200, Resistencia - Chaco
-                                {' '} (<a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar0" target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
+                                {' '} (<a href={mapsUrl} target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
                             </p>
                         </div>
                     </div>
@@ -273,7 +258,7 @@ const Inicio: React.FC = () => {
                     ></iframe>
 
                     <a
-                        href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.965667751859!2d-58.99709008998274!3d-27.439180676238557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450d001ef242d1%3A0x52378bc04033ee5a!2sCheepers!5e0!3m2!1ses!2sar!4v1747468372361!5m2!1ses!2sar0"
+                        href={mapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.openInMapsButton}
