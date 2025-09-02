@@ -19,11 +19,13 @@ const bannerItems = [
 
 const Inicio: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const navigate = useNavigate();
     const [touchStart, setTouchStart] = useState(0);
 
     // Usamos useRef para mantener una referencia al intervalo que no cambia en cada render
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const transitionRef = useRef<NodeJS.Timeout | null>(null);
 
     // Función para reiniciar el temporizador
     const startAutoSlide = () => {
@@ -33,9 +35,18 @@ const Inicio: React.FC = () => {
         }
         // Crea un nuevo temporizador
         intervalRef.current = setInterval(() => {
+            setIsTransitioning(true);
             setCurrentIndex((prevIndex) => 
                 prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
             );
+            
+            // Limpiar transición después de que se complete
+            if (transitionRef.current) {
+                clearTimeout(transitionRef.current);
+            }
+            transitionRef.current = setTimeout(() => {
+                setIsTransitioning(false);
+            }, 600); // Tiempo que debe coincidir con la duración de la transición CSS
         }, 6000);
     };
 
@@ -46,12 +57,28 @@ const Inicio: React.FC = () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
+            if (transitionRef.current) {
+                clearTimeout(transitionRef.current);
+            }
         };
     }, []);
 
     // Función para cambiar el slide manualmente
     const goToSlide = (index: number) => {
+        if (isTransitioning) return;
+        
+        setIsTransitioning(true);
         setCurrentIndex(index);
+        
+        // Limpiar timeout existente
+        if (transitionRef.current) {
+            clearTimeout(transitionRef.current);
+        }
+        
+        transitionRef.current = setTimeout(() => {
+            setIsTransitioning(false);
+        }, 600);
+        
         startAutoSlide(); // Reinicia el temporizador al hacer clic en los puntos
     };
 
@@ -68,8 +95,12 @@ const Inicio: React.FC = () => {
         const touchEnd = e.changedTouches[0].clientX;
         const minSwipeDistance = 75;
         
+        if (isTransitioning) return;
+        
         // Compara la distancia total del deslizamiento
         if (Math.abs(touchStart - touchEnd) > minSwipeDistance) {
+            setIsTransitioning(true);
+            
             if (touchStart - touchEnd > 0) {
                 // Deslizamiento a la izquierda
                 setCurrentIndex((prevIndex) => 
@@ -81,6 +112,15 @@ const Inicio: React.FC = () => {
                     prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
                 );
             }
+            
+            // Limpiar timeout existente
+            if (transitionRef.current) {
+                clearTimeout(transitionRef.current);
+            }
+            
+            transitionRef.current = setTimeout(() => {
+                setIsTransitioning(false);
+            }, 600);
         }
         
         // Resetea los valores táctiles y reinicia el auto-slide
@@ -107,7 +147,7 @@ const Inicio: React.FC = () => {
                 {bannerItems.map((item, index) => (
                     <div
                         key={index}
-                        className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''}`}
+                        className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''} ${isTransitioning ? styles.transitioning : ''}`}
                     >
                         <div className={styles.heroImageContainer}>
                             <img src={item.image} alt={item.altText} className={styles.heroImage}/>

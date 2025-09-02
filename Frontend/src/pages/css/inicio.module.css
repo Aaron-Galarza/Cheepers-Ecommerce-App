@@ -26,7 +26,6 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 }
 
-
 body {
   font-family: 'Open Sans', sans-serif;
   color: var(--color-dark-text);
@@ -65,13 +64,16 @@ body {
   height: 100%;
   opacity: 0;
   transform: translateX(10%); /* Inicia ligeramente a la derecha */
-  transition: opacity 2s ease-in-out, transform 2s ease-in-out; /* Transición suave */
+  transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out; /* Transición más rápida para Safari */
   display: flex;
   align-items: center;
   justify-content: space-around; /* Distribuye espacio entre imagen y texto */
   flex-wrap: wrap;
   padding: 43px; /* Padding interno del slide */
   pointer-events: none;
+  -webkit-backface-visibility: hidden; /* Soluciona parpadeo en Safari */
+  backface-visibility: hidden;
+  will-change: opacity, transform; /* Mejora rendimiento en Safari */
 }
 
 .heroSlide.active {
@@ -95,6 +97,20 @@ body {
   }
 }
 
+/* Safari-specific fixes para animaciones */
+@-webkit-keyframes slideInFade {
+  from {
+    opacity: 0;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+}
+
 .heroImageContainer {
   position: relative;
   width: 550px; /* Ancho fijo para la imagen */
@@ -104,6 +120,8 @@ body {
   border-radius: var(--border-radius-md); /* Bordes redondeados para la imagen */
   box-shadow: var(--shadow-lg); /* Sombra para la imagen */
   z-index: 1;
+  -webkit-transform: translateZ(0); /* Mejora rendimiento en Safari */
+  transform: translateZ(0);
 }
 
 .heroImage {
@@ -112,6 +130,10 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius-md);
+  -webkit-backface-visibility: hidden; /* Soluciona parpadeo en Safari */
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0); /* Mejora rendimiento en Safari */
+  transform: translateZ(0);
 }
 
 .heroContent {
@@ -368,8 +390,6 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-
-
 /* Media Queries para Responsividad */
 @media (max-width: 1024px) {
   .heroTitle {
@@ -390,6 +410,7 @@ body {
     flex-direction: column;
     padding: var(--space-md);
     margin-top: 65px;
+    border-radius: 40px; /* Reducir el radio en móviles */
   }
 
   .heroSlide {
@@ -460,19 +481,30 @@ body {
     font-size: 1.8em;
     text-align: center;
   }
-
+  
+  /* ******************************************************************* */
+  /* CAMBIOS PARA MEJORAR LA JUSTIFICACIÓN DEL TEXTO EN MÓVILES */
+  /* ******************************************************************* */
   .aboutParagraph {
-    /* Ajusta el tamaño de fuente para mejorar la legibilidad */
     font-size: 1.05em;
-    /* Usa la justificación para un texto más ordenado */
-    text-align: justify;
-    /* Añade espacio entre párrafos para evitar que se vean como un solo bloque */
+    line-height: 1.7;
     margin-bottom: 1.2em;
-    /* --- INICIO DEL CAMBIO --- */
-    word-spacing: -2px;
-    letter-spacing: 0.2px;
-    /* --- FIN DEL CAMBIO --- */
+    /* word-spacing: normal;
+    letter-spacing: normal; */ /* Estos ya estaban en 'normal', los quitamos para evitar redundancia o conflictos */
+    hyphens: auto; /* Permite la división de palabras con guiones en puntos de silabación */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    text-align: justify; /* Propiedad para justificar el texto */
+    text-justify: inter-word; /* Mejora la justificación entre palabras */
+    
+    /* Nuevas propiedades para mejorar la apariencia en justificación: */
+    word-break: break-word; /* Rompe palabras largas si es necesario para evitar desbordamientos */
+    overflow-wrap: break-word; /* Similar a word-break, asegura que las palabras se rompan en cualquier punto si no caben */
   }
+  /* ******************************************************************* */
+  /* FIN DE CAMBIOS PARA JUSTIFICACIÓN */
+  /* ******************************************************************* */
+
 
   .aboutSubTitle {
     font-size: 1.4em;
@@ -507,9 +539,54 @@ body {
     padding: 10px 20px;
   }
 }
+
 @media (max-width: 395px) {
   .heroImageContainer {
     width: 95%;
     height: 290px;
   }
+  
+  .aboutParagraph {
+    font-size: 1em;
+    line-height: 1.6;
+    word-spacing: normal;
+    letter-spacing: normal;
+    text-align: justify; /* Asegura la justificación en pantallas aún más pequeñas */
+    hyphens: auto; /* Mantener la silabación */
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Safari-specific fixes */
+@supports (-webkit-appearance:none) {
+  .heroSlide {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .heroImage {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .heroSection {
+    -webkit-perspective: 1000;
+    perspective: 1000;
+  }
+}
+
+/* Prevenir el efecto de parpadeo en Safari */
+.heroSlide {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+/* Mejoras de rendimiento para animaciones en Safari */
+.heroSlide,
+.heroImageContainer,
+.heroImage {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
