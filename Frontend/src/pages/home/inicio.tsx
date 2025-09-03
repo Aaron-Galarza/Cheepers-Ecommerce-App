@@ -3,18 +3,19 @@ import styles from './../css/inicio.module.css';
 import { useNavigate } from 'react-router-dom';
 
 // Asegúrate de que las rutas de las imágenes sean correctas
-import baconcheep from '../../assets/images/baconcheep.jpg';
-import barbacue from '../../assets/images/cheddar.jpg';
-import cheddar from '../../assets/images/barbacue.jpg';
-
+import baconcheep from '../../assets/images/hamburguesa big tasty.jpeg';
+import barbacue from '../../assets/images/con queso con sesamo.jpeg';
+import cheddar from '../../assets/images/papas fritas bacon.jpeg';
+import conqueso from '../../assets/images/con queso.jpeg'
 // Importar FaClock además de los otros iconos
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // Definición de los elementos del banner
 const bannerItems = [
-    { image: baconcheep, title: 'BACON CHEEP', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Pruébala ahora!', altText: 'Hamburguesa Bacon Cheep' },
-    { image: barbacue, title: 'BARBACUE', descriptionLine1: 'Con nuestra salsa', descriptionLine2: 'barbacoa casera.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Barbacue Deluxe' },
-    { image: cheddar, title: 'CHEDDAR', descriptionLine1: 'Ketchup carne y', descriptionLine2: 'queso cheddar.', callToAction: '¡Con Mucho queso!', altText: 'Hamburguesa Cheddar Explosion' },
+    { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty' },
+    { image: barbacue, title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso' },
+    { image: cheddar, title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon' },
+    { image: conqueso, title: 'CALIDAD ÚNICA', descriptionLine1: 'Mira nuestro menú completo', callToAction: '¡Menú completo!', altText: 'Mira nuestro menú completo' },
 ];
 
 const Inicio: React.FC = () => {
