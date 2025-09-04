@@ -55,6 +55,7 @@ body {
   align-items: center;
 }
 
+/* Solución específica para Safari - Animación simplificada */
 .heroSlide {
   position: absolute;
   top: 0;
@@ -71,6 +72,7 @@ body {
   pointer-events: none;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  will-change: opacity; /* Mejora rendimiento en Safari */
 }
 
 .heroSlide.active {
@@ -88,7 +90,7 @@ body {
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-lg);
   z-index: 1;
-  -webkit-transform: translateZ(0);
+  -webkit-transform: translateZ(0); /* Aceleración por hardware para Safari */
   transform: translateZ(0);
 }
 
@@ -98,10 +100,8 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius-md);
-  -webkit-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; /* Previene parpadeo en Safari */
   backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 .heroContent {
@@ -215,6 +215,7 @@ body {
   line-height: 1.2;
 }
 
+/* RESPETANDO TUS REGLAS DE TEXTO - SIN MODIFICACIONES */
 .aboutParagraph {
   font-family: 'Open Sans', sans-serif;
   font-size: 1.1em;
@@ -421,7 +422,7 @@ body {
     text-align: center;
   }
   
-
+  /* RESPETANDO TUS REGLAS DE TEXTO PARA MÓVILES - SIN MODIFICACIONES */
   .aboutParagraph {
     font-size: 1.05em;
     line-height: 1.7;
@@ -475,6 +476,7 @@ body {
     height: 290px;
   }
   
+  /* RESPETANDO TUS REGLAS DE TEXTO PARA MÓVILES PEQUEÑOS - SIN MODIFICACIONES */
   .aboutParagraph {
     font-size: 1em;
     line-height: 1.6;
@@ -487,37 +489,38 @@ body {
   }
 }
 
-/* Safari-specific fixes */
-@media not all and (min-resolution:.001dpcm) { 
-  @supports (-webkit-appearance:none) {
+/* SOLUCIONES ESPECÍFICAS PARA SAFARI */
+/* Detección de Safari usando @supports */
+@supports (-webkit-touch-callout: none) {
+  .heroSection {
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+  }
+  
+  .heroSlide {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    transition: opacity 0.6s ease-in-out !important;
+  }
+  
+  .heroImageContainer, .heroImage {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* Fallback para versiones antiguas de Safari */
+@media not all and (min-resolution: 0.001dpcm) {
+  @supports (-webkit-appearance: none) {
     .heroSlide {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-    
-    .heroImage {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-    
-    .heroSection {
-      -webkit-perspective: 1000;
-      perspective: 1000;
-    }
-    
-    .heroSlide {
-      transition: opacity 0.6s ease-in-out !important;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      will-change: opacity;
     }
   }
 }
 
 /* Prevenir el efecto de parpadeo en Safari */
-.heroSlide {
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-}
-
-/* Mejoras de rendimiento para animaciones en Safari */
 .heroSlide,
 .heroImageContainer,
 .heroImage {
