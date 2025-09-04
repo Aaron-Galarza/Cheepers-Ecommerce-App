@@ -19,7 +19,7 @@ const generateToken = (id: string, email: string, isAdmin: boolean, isOwner: boo
     return jwt.sign(
         { id, email, isAdmin, isOwner }, // Incluimos isAdmin en el payload del token
         process.env.JWT_SECRET as string,
-        { expiresIn: '1h' } // El token expirar\u00E1 en 1 hora
+        { expiresIn: '3h' } // El token expirar\u00E1 en 1 hora
     );
 };
 
