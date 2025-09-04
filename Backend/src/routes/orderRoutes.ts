@@ -7,6 +7,7 @@ import {
   getOrderById,
   updateOrderStatus,
   deleteAllOrders,
+  updateOrderPaymentMethod,
 } from '../controllers/orderController';
 import { protect, admin, owner } from '../middleware/authMiddleware'; // Aseg\u00FArate que estas rutas est\u00E1n correctas
 
@@ -25,6 +26,9 @@ router.get('/:id', protect, admin, getOrderById);
 
 // Actualizar el estado de un pedido (solo para administradores)
 router.put('/:id/status', protect, admin, updateOrderStatus);
+
+// Actualizar el paymentMethod de un pedido (solo para administradores)
+router.put('/:id/paymentMethod', protect, admin, updateOrderPaymentMethod);
 
 router.route('/all').delete(protect, owner, deleteAllOrders); 
 

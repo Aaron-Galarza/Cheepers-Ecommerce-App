@@ -223,6 +223,57 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     }
 });
 
+// @desc      Actualizar el paymentMethod de un pedido
+// @route     PUT /api/orders/:id/paymentMethod
+// @access    Private/Admin
+export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: Response) => {
+    const { paymentMethod } = req.body; // Esperamos un campo 'paymentMethod' en el body
+
+    const validpaymentMethod = ['cash', 'card', 'transfer'];
+    if (!paymentMethod || !validpaymentMethod.includes(paymentMethod)) {
+        res.status(400);
+        throw new Error(`El Metodo de Pago del pedido es inválido: "${paymentMethod}". Los estados permitidos son: ${validpaymentMethod.join(', ')}.`);
+    }
+
+    const order = await Pedido.findById(req.params.id);
+
+    // --- CORRECCIÓN CLAVE ---
+    // Primero, verifica si el pedido existe. Si no, lanza el error y termina la ejecución.
+    if (!order) {
+        res.status(404);
+        throw new Error('Pedido no encontrado');
+    }
+
+    // Si llegamos a este punto, 'order' no es null.
+    // Ahora puedes acceder a sus propiedades de forma segura.
+
+    // Recalcular el precio total del pedido sin el descuento
+    let newTotalAmount = 0;
+    
+    // Iterar sobre los productos del pedido para recalcular el total
+    for (const item of order.products) {
+        let itemPrice = item.priceAtOrder;
+
+        if (item.addOns && item.addOns.length > 0) {
+            for (const addOn of item.addOns) {
+                itemPrice += addOn.priceAtOrder * addOn.quantity;
+            }
+        }
+        newTotalAmount += itemPrice * item.quantity;
+    }
+
+    // Actualizar el pedido
+    order.totalAmount = newTotalAmount; // Asignar el nuevo total sin descuento
+    order.paymentMethod = paymentMethod;
+
+    const updatedOrder = await order.save();
+    
+    res.status(200).json({ 
+        message: 'El Metodo de Pago del pedido actualizado exitosamente', 
+        order: updatedOrder 
+    });
+});
+
 // @desc      Eliminar todos los pedidos
 // @route     DELETE /api/orders/all
 // @access    Private/Admin
