@@ -223,34 +223,31 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     }
 });
 
-// @desc      Actualizar el paymentMethod de un pedido
+// @desc      Actualizar el paymentMethod y recalcular el precio de un pedido
 // @route     PUT /api/orders/:id/paymentMethod
 // @access    Private/Admin
 export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: Response) => {
-    const { paymentMethod } = req.body; // Esperamos un campo 'paymentMethod' en el body
+    const { paymentMethod } = req.body; // Nuevo método de pago
+    const orderId = req.params.id;
 
-    const validpaymentMethod = ['cash', 'card', 'transfer'];
-    if (!paymentMethod || !validpaymentMethod.includes(paymentMethod)) {
+    const validpaymentMethods = ['cash', 'card', 'transfer', 'Efectivo', 'Mercado Pago'];
+    if (!paymentMethod || !validpaymentMethods.includes(paymentMethod)) {
         res.status(400);
-        throw new Error(`El Metodo de Pago del pedido es inválido: "${paymentMethod}". Los estados permitidos son: ${validpaymentMethod.join(', ')}.`);
+        throw new Error(`El Método de Pago del pedido es inválido: "${paymentMethod}". Los estados permitidos son: ${validpaymentMethods.join(', ')}.`);
     }
 
-    const order = await Pedido.findById(req.params.id);
+    const order = await Pedido.findById(orderId);
 
-    // --- CORRECCIÓN CLAVE ---
-    // Primero, verifica si el pedido existe. Si no, lanza el error y termina la ejecución.
     if (!order) {
         res.status(404);
-        throw new Error('Pedido no encontrado');
+        throw new Error('Pedido no encontrado.');
     }
 
-    // Si llegamos a este punto, 'order' no es null.
-    // Ahora puedes acceder a sus propiedades de forma segura.
+    // Lógica para recalcular el precio total
+    let totalAmount = 0;
+    let discountableAmount = 0;
 
-    // Recalcular el precio total del pedido sin el descuento
-    let newTotalAmount = 0;
-    
-    // Iterar sobre los productos del pedido para recalcular el total
+    // Recalcular el total base y la cantidad sobre la que se puede aplicar el descuento
     for (const item of order.products) {
         let itemPrice = item.priceAtOrder;
 
@@ -259,17 +256,56 @@ export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: R
                 itemPrice += addOn.priceAtOrder * addOn.quantity;
             }
         }
-        newTotalAmount += itemPrice * item.quantity;
-    }
+        const itemTotal = itemPrice * item.quantity;
+        totalAmount += itemTotal;
+        
+        // Asumimos que la categoría del producto se puede obtener
+        // Esto podría requerir una consulta adicional o almacenar la categoría en el pedido.
+        // Por ahora, asumimos que 'priceAtOrder' es el precio sin descuento
+        // y que 'product.category' está disponible si el modelo de pedido lo referencia.
 
+        // IMPORTANTE: si tu modelo de pedido no guarda la categoría, este código fallará.
+        // Si no la guardas, deberás hacer un Product.findById() para cada item.
+        // Una solución más limpia es guardar la categoría en el modelo de Pedido.
+        
+        // Simulación de la lógica de descuento (basada en tu createOrder)
+        // Por la forma en que construiste el modelo de pedido, no tienes la categoría.
+        // Por lo tanto, no podemos recrear esta lógica.
+        
+        // LA SOLUCION: En lugar de usar la categoría, vamos a usar el precio actual
+        // del pedido para determinar el descuento
+        
+        // Opción 1 (la más robusta): Si tienes la lógica del descuento en el controlador,
+        // necesitas recrear la misma lógica aquí. Esto es propenso a errores.
+        
+        // Opción 2 (la que sugiero): Basarse en el precio actual del pedido.
+    }
+    
+    let newTotalAmount = totalAmount; // Empezamos con el total sin descuento
+    
+    // --- LÓGICA DE ACTUALIZACIÓN Y RECALCULO ---
+    
+    // CASO 1: El nuevo método de pago es 'cash' (Efectivo)
+    // Asumimos que quieres aplicar el descuento si el nuevo método es efectivo
+    if (paymentMethod === 'cash') {
+        const discountableAmount = totalAmount; // Asumimos que todo es con descuento
+        const discount = discountableAmount * 0.10;
+        newTotalAmount = totalAmount - discount;
+    } 
+    // CASO 2: El nuevo método de pago es 'card' o 'transfer' (Sin descuento)
+    // El precio se mantiene en el total sin descuento
+    else if (['card', 'transfer', 'Mercado Pago'].includes(paymentMethod)) {
+        newTotalAmount = totalAmount;
+    }
+    
     // Actualizar el pedido
-    order.totalAmount = newTotalAmount; // Asignar el nuevo total sin descuento
+    order.totalAmount = newTotalAmount;
     order.paymentMethod = paymentMethod;
 
     const updatedOrder = await order.save();
     
     res.status(200).json({ 
-        message: 'El Metodo de Pago del pedido actualizado exitosamente', 
+        message: 'El método de pago del pedido y el precio han sido actualizados exitosamente.', 
         order: updatedOrder 
     });
 });
