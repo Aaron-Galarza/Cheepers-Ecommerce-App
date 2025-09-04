@@ -50,7 +50,7 @@ const ShippingAddressSchema: Schema = new Schema({
 
 // Interface para el pedido
 export interface IOrder extends Document {
-    guestEmail: string;
+    guestEmail?: string;
     guestPhone: string;
     guestName: string;
     products: IProductItem[];
@@ -68,7 +68,7 @@ export interface IOrder extends Document {
 const orderSchema: Schema = new Schema({
     guestEmail: {
         type: String,
-        required: true,
+        required: false,
         match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Por favor, introduce un email valido'],
     },
     guestPhone: {

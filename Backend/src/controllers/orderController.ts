@@ -26,7 +26,7 @@ interface CreateOrderRequestBody {
         quantity: number;
         addOns?: { addOnId: string; quantity: number }[];
     }[];
-    guestEmail: string;
+    guestEmail?: string;
     guestPhone: string;
     guestName: string;
     paymentMethod: 'cash' | 'card' | 'transfer';
@@ -48,7 +48,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
     const { products, shippingAddress, paymentMethod, notes, guestEmail, guestName, guestPhone, deliveryType } = req.body;
 
     // 1. Validaciones básicas iniciales
-    if (!products || products.length === 0 || !paymentMethod || !guestEmail || !guestPhone || !guestName || !deliveryType) {
+    if (!products || products.length === 0 || !paymentMethod || !guestPhone || !guestName || !deliveryType) {
         res.status(400);
         throw new Error('Faltan campos obligatorios para crear el pedido: productos, método de pago, email, teléfono, y tipo de entrega.');
     }
