@@ -903,3 +903,35 @@ a:hover{
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(107, 114, 128, 0.3);
 }
+
+.changePaymentButton {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 5px 7px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.changePaymentButton:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+}
+
+.changePaymentButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.paymentMethodValue {
+  color: #2e3133; /* Gris neutral */
+  font-weight: normal;
+  margin-left: 1px;
+}

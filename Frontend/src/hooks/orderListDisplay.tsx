@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave,
-  FaCheckCircle, FaTimesCircle, FaPhone, FaRedo, FaPlayCircle
+  FaCheckCircle, FaTimesCircle, FaPhone, FaPlayCircle
 } from 'react-icons/fa';
 import styles from './../pages/management.styles/ordersmanagement.module.css';
-import { OrderDisplay } from '../pages/management/ordersmanagement'; // Re-importar OrderDisplay
+import { OrderDisplay } from '../pages/management/ordersmanagement';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 interface OrderListDisplayProps {
   filteredOrders: OrderDisplay[];
@@ -14,66 +17,8 @@ interface OrderListDisplayProps {
   handleOrderCancelled: (orderId: string) => void;
   handleOrderRestore: (orderId: string) => void;
   handleOrderAccept: (orderId: string) => void;
-  orders: OrderDisplay[]; // Se añadió la propiedad 'orders' para resolver el error de TypeScript
+  updateOrderInState: (orderId: string, updates: Partial<OrderDisplay>) => void;
 }
-
-// Función para formatear el número de teléfono para WhatsApp y generar el enlace
-const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
-  // Limpia el número de cualquier caracter que no sea dígito
-  let cleanedPhoneNumber = order.guestPhone.replace(/\D/g, '');
-
-  // Elimina un posible cero inicial para números locales (ej. 011 -> 11),
-  // pero solo si no es parte de un prefijo de país ya incluido (como '540...')
-  // y si el número tiene más de un dígito para no eliminar un '0' único.
-  if (cleanedPhoneNumber.length > 1 && cleanedPhoneNumber.startsWith('0') && !cleanedPhoneNumber.startsWith('540')) {
-    cleanedPhoneNumber = cleanedPhoneNumber.substring(1);
-  }
-
-  // Ajuste para números de Argentina (código de país 54, prefijo 9 para móvil)
-  let formattedNumber = cleanedPhoneNumber;
-  if (!cleanedPhoneNumber.startsWith('54')) {
-    formattedNumber = `549${cleanedPhoneNumber}`;
-  } else if (cleanedPhoneNumber.startsWith('54') && !cleanedPhoneNumber.startsWith('549')) {
-    // Si ya empieza con 54 pero no con 549 (ej. es un fijo o le falta el 9 para móvil)
-    // Asumimos que para WhatsApp móvil en Argentina necesita el 9.
-    formattedNumber = `549${cleanedPhoneNumber.substring(2)}`;
-  }
-  // Si ya tiene 549, o si después de la limpieza y ajuste ya es un número válido.
-
-  // Determinar el nombre legible del método de pago
-  const paymentMethodDisplay = order.paymentMethod === 'cash' ? 'Efectivo' :
-    order.paymentMethod === 'card' ? 'Mercado Pago' :
-    'Transferencia';
-
-
-  // Construye el mensaje automático (sin el ID del pedido completo)
-  let message = `¡Hola ${order.guestName}!\n`;
-  message += `Tu pedido Cheepers ha sido ACEPTADO y está siendo preparado.\n\n`; // Mensaje simplificado
-  message += `Detalles de tu pedido:\n`;
-  order.products.forEach(p => {
-    message += `- ${p.name} (x${p.quantity})\n`;
-    if (Array.isArray(p.addOns) && p.addOns.length > 0) {
-      p.addOns.forEach(ao => {
-        message += `  + ${ao.name} (x${ao.quantity})\n`;
-      });
-    }
-  });
-
-  message += `\nTotal: $${order.totalAmount.toFixed(2)}\n`;
-  message += `Método de pago: ${paymentMethodDisplay}\n`; // AÑADIDO: Método de pago
-  message += `Tipo de entrega: ${order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}`;
-  if (order.deliveryType === 'delivery' && order.shippingAddress) {
-    message += `\nDirección: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
-  }
-  message += `\n\n¿Quieres agregar algo más?`;
-
-  // Codifica el mensaje para que pueda ir en la URL
-  const encodedMessage = encodeURIComponent(message);
-
-  // Construye el enlace de WhatsApp
-  return `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
-};
-
 
 const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   filteredOrders,
@@ -83,11 +28,86 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   handleOrderCancelled,
   handleOrderRestore,
   handleOrderAccept,
-  orders, // Se recibe la nueva propiedad 'orders'
+  updateOrderInState,
 }) => {
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState<Record<string, boolean>>({});
+
+  // Función para generar el enlace de WhatsApp
+  const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
+    let cleanedPhoneNumber = order.guestPhone.replace(/\D/g, '');
+
+    if (cleanedPhoneNumber.length > 1 && cleanedPhoneNumber.startsWith('0') && !cleanedPhoneNumber.startsWith('540')) {
+      cleanedPhoneNumber = cleanedPhoneNumber.substring(1);
+    }
+
+    let formattedNumber = cleanedPhoneNumber;
+    if (!cleanedPhoneNumber.startsWith('54')) {
+      formattedNumber = `549${cleanedPhoneNumber}`;
+    } else if (cleanedPhoneNumber.startsWith('54') && !cleanedPhoneNumber.startsWith('549')) {
+      formattedNumber = `549${cleanedPhoneNumber.substring(2)}`;
+    }
+
+    const paymentMethodDisplay = order.paymentMethod === 'cash' ? 'Efectivo' :
+      order.paymentMethod === 'card' ? 'Mercado Pago' :
+      'Transferencia';
+
+    let message = `¡Hola ${order.guestName}!\n`;
+    message += `Tu pedido Cheepers ha sido ACEPTADO y está siendo preparado.\n\n`;
+    message += `Detalles de tu pedido:\n`;
+    order.products.forEach(p => {
+      message += `- ${p.name} (x${p.quantity})\n`;
+      if (Array.isArray(p.addOns) && p.addOns.length > 0) {
+        p.addOns.forEach(ao => {
+          message += `  + ${ao.name} (x${ao.quantity})\n`;
+        });
+      }
+    });
+
+    message += `\nTotal: $${order.totalAmount.toFixed(2)}\n`;
+    message += `Método de pago: ${paymentMethodDisplay}\n`;
+    message += `Tipo de entrega: ${order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}`;
+    if (order.deliveryType === 'delivery' && order.shippingAddress) {
+      message += `\nDirección: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
+    }
+    message += `\n\n¿Quieres agregar algo más?`;
+
+    const encodedMessage = encodeURIComponent(message);
+    return `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+  };
+
+  const handleUpdatePaymentMethod = async (orderId: string, currentMethod: 'cash' | 'card') => {
+    const newMethod = currentMethod === 'cash' ? 'card' : 'cash';
+    
+    setIsUpdatingPayment(prevState => ({ ...prevState, [orderId]: true }));
+
+    try {
+      const response = await axios.put(`${API_BASE_URL}/api/orders/${orderId}/paymentMethod`, {
+        paymentMethod: newMethod,
+      });
+
+      console.log('Método de pago actualizado:', response.data);
+      
+      // Actualizar el estado local con los datos que devuelve el backend
+      // El backend recalcula el totalAmount y devuelve el pedido actualizado
+      const updatedOrder = response.data.order;
+      
+      updateOrderInState(orderId, { 
+        paymentMethod: updatedOrder.paymentMethod,
+        totalAmount: updatedOrder.totalAmount
+      });
+      
+      alert(`Método de pago del pedido #${orderId.slice(-8)} actualizado a ${newMethod === 'cash' ? 'Efectivo' : 'Mercado Pago'}.`);
+      
+    } catch (error: any) {
+      console.error('Error al actualizar el método de pago:', error);
+      alert(`Error al actualizar el método de pago: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsUpdatingPayment(prevState => ({ ...prevState, [orderId]: false }));
+    }
+  };
+
   return (
     <>
-      {/* Sección de Filtros */}
       <div className={styles.filterContainer}>
         <label htmlFor="statusFilter">Filtrar por estado: </label>
         <select
@@ -104,7 +124,6 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
         </select>
       </div>
 
-      {/* Lista de Pedidos */}
       <div className={styles.ordersList}>
         {filteredOrders.length === 0 ? (
           <p className={styles.noOrdersMessage}>No hay pedidos para mostrar.</p>
@@ -116,14 +135,13 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                   <FaCalendarAlt /> {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 </p>
                 <p className={styles.customerName}><FaUser /> {order.guestName}</p>
-                {/* CAMBIO CLAVE AQUÍ: Usar la nueva función para el enlace de WhatsApp con mensaje */}
                 <p className={styles.customerPhone}>
                   <FaPhone />{' '}
                   <a
                     href={generateWhatsAppMessageLink(order)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={styles.whatsappLink} // Puedes definir esta clase en ordersmanagement.module.css para estilo
+                    className={styles.whatsappLink}
                   >
                     {order.guestPhone}
                   </a>
@@ -155,7 +173,13 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                   {order.deliveryType === 'delivery' && order.shippingAddress && (
                     <p className={styles.shippingAddress}>Dirección: {order.shippingAddress.street}, {order.shippingAddress.city}</p>
                   )}
-                  <p className={styles.paymentMethod}>Método de pago: {order.paymentMethod === 'cash' ? 'Efectivo' : order.paymentMethod === 'card' ? 'Mercado Pago' : 'Transferencia'}</p>
+                <p className={styles.paymentMethod}>Método de pago:
+    <span className={styles.paymentMethodValue}>
+    {order.paymentMethod === 'cash' ? ' Efectivo' : 
+     order.paymentMethod === 'card' ? ' Mercado Pago' : 
+     ' Transferencia'}
+  </span>
+</p>
                   <p className={styles.orderStatus}>Estado:
                     <span className={
                       order.status === 'pending' ? styles.statusPending :
@@ -171,6 +195,16 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                       }
                     </span>
                   </p>
+                  {/* Botón para cambiar el método de pago */}
+                  {(order.status === 'pending' || order.status === 'processing') && (order.paymentMethod === 'cash' || order.paymentMethod === 'card') && (
+                    <button
+                      onClick={() => handleUpdatePaymentMethod(order._id, order.paymentMethod as 'cash' | 'card')}
+                      disabled={isUpdatingPayment[order._id]}
+                      className={styles.changePaymentButton}
+                    >
+                      {isUpdatingPayment[order._id] ? 'Cambiando...' : `Cambiar a ${order.paymentMethod === 'cash' ? 'Mercado Pago' : 'Efectivo'}`}
+                    </button>
+                  )}
                 </div>
               </div>
               <div className={styles.orderActions}>
@@ -180,11 +214,9 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                   </button>
                 )}
                 {order.status === 'pending' && (
-                  <>
-                    <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
-                      <FaTimesCircle /> Cancelar
-                    </button>
-                  </>
+                  <button onClick={() => handleOrderCancelled(order._id)} className={styles.cancelButton}>
+                    <FaTimesCircle /> Cancelar
+                  </button>
                 )}
                 {order.status === 'processing' && (
                   <>
@@ -195,6 +227,11 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                       <FaTimesCircle /> Cancelar
                     </button>
                   </>
+                )}
+                {order.status === 'cancelled' && (
+                  <button onClick={() => handleOrderRestore(order._id)} className={styles.restoreButton}>
+                    <FaPlayCircle /> Restaurar Pedido
+                  </button>
                 )}
               </div>
             </div>

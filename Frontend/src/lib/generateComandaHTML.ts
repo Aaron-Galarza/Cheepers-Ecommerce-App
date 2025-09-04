@@ -73,7 +73,7 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
         <body>
             <div class="comanda-container">
                 <div style="text-align: center;">
-                    <h3>COMANDA</h3>
+                    <h3>CHEEPERS</h3>
                 </div>
                 <div class="separator"></div>
                 <div class="details">

@@ -143,6 +143,15 @@ const OrdersManagement: React.FC = () => {
   const previousOrderIds = useRef<Set<string>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Añadir esta función para actualizar pedidos en el estado local
+  const updateOrderInState = useCallback((orderId: string, updates: Partial<OrderDisplay>) => {
+    setOrders(prevOrders => 
+      prevOrders.map(order => 
+        order._id === orderId ? { ...order, ...updates } : order
+      )
+    );
+  }, []);
+
   // Esta función ahora solo abre la ventana de impresión. La lógica para pasar el
   // costo de envío ahora es más directa.
   const handlePrintComanda = (order: OrderDisplay, shippingCost?: number) => {
@@ -361,7 +370,7 @@ const OrdersManagement: React.FC = () => {
     for (const fp of newOrderForm.formProducts) {
       if (!fp.productId) {
         toast.error('Por favor, selecciona un producto para cada artículo.', { position: "bottom-center", autoClose: 3000 });
-        return;
+      return;
       }
       if (fp.quantity <= 0) {
         toast.error('La cantidad de cada producto debe ser mayor a 0.', { position: "bottom-center", autoClose: 3000 });
@@ -615,18 +624,16 @@ const handleOrderAccept = (orderId: string) => {
       />
 
       {/* Renderizar la lista de pedidos */}
-      <OrderListDisplay
-        filteredOrders={filteredOrders}
-        filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
-        handleOrderDelivered={handleOrderDelivered}
-        handleOrderCancelled={handleOrderCancelled}
-        handleOrderRestore={handleOrderRestore}
-        handleOrderAccept={handleOrderAccept}
-        // [MODIFICACIÓN CLAVE] Pasar el array completo de pedidos para que
-        // OrderListDisplay pueda acceder a todos los datos.
-        orders={orders}
-      />
+  <OrderListDisplay
+  filteredOrders={filteredOrders}
+  filterStatus={filterStatus}
+  setFilterStatus={setFilterStatus}
+  handleOrderDelivered={handleOrderDelivered}
+  handleOrderCancelled={handleOrderCancelled}
+  handleOrderRestore={handleOrderRestore}
+  handleOrderAccept={handleOrderAccept}
+  updateOrderInState={updateOrderInState}
+/>
 
         {showShippingModal && (
         <ShippingCostModal
