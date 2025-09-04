@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import styles from './../css/checkout.module.css';
 import Button from '../../components/layout/design/button';
-import { FaUser, FaPhone, FaEnvelope, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
+import { FaUser, FaPhone, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 // Función para normalizar y limpiar el nombre de la ciudad
 const normalizeCityName = (cityName: string) => {
   const accentsMap: Record<string, string> = {
@@ -30,7 +31,7 @@ const normalizeCityName = (cityName: string) => {
 };
 
 const CheckoutPage: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(''); // Se mantiene el estado aunque no se use en el input
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
@@ -78,7 +79,8 @@ const CheckoutPage: React.FC = () => {
     setErrorMessage('');
     setIsLoading(true);
 
-    if (!email || !name || !phone || !metodo || !deliveryType) {
+    // Se eliminó la validación de 'email'
+    if (!name || !phone || !metodo || !deliveryType) {
       setErrorMessage('Por favor, completá todos los campos generales y de pago.');
       setIsLoading(false);
       return;
@@ -91,9 +93,7 @@ const CheckoutPage: React.FC = () => {
         return;
       }
 
-      // Validar que la ciudad sea Resistencia (considerando variantes)
       const normalizedCity = normalizeCityName(city);
-
       const validCities = ['resistencia', 'resistensia', 'resistensía', 'resisténcia'];
 
       if (!validCities.includes(normalizedCity)) {
@@ -123,7 +123,7 @@ const CheckoutPage: React.FC = () => {
     const orderData: any = {
       products: productsForOrder,
       guestName: name,
-      guestEmail: email,
+      guestEmail: email, // Se envía el email con un valor vacío o un valor por defecto si es necesario
       guestPhone: phone,
       totalAmount: finalTotal,
       paymentMethod: backendPaymentMethod,
@@ -162,20 +162,8 @@ const CheckoutPage: React.FC = () => {
               <span className={styles.errorMessageSpan}> {errorMessage}</span>
             </div>
           )}
+          {/* Ajuste del inputGroup para eliminar el campo de correo y mantener la alineación */}
           <div className={styles.inputGroup}>
-            <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}><FaEnvelope /></span>
-              <input
-                type="email"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className={styles.inputField}
-                required
-                maxLength={100}
-                title="Ingresá un correo electrónico válido."
-              />
-            </div>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><FaUser /></span>
               <input
@@ -185,7 +173,6 @@ const CheckoutPage: React.FC = () => {
                 onChange={e => setName(e.target.value)}
                 className={styles.inputField}
                 required
-                // CAMBIO AQUÍ: \\s a \s para permitir espacios correctamente
                 pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
                 maxLength={40}
                 title="El nombre no puede contener números ni símbolos."
@@ -262,11 +249,9 @@ const CheckoutPage: React.FC = () => {
                     title="La ciudad es obligatoria."
                   />
                 </div>
-                {/* INICIO DEL CAMBIO: Mini advertencia */}
                 <p className={styles.infoTextSimple}>
                   Actualmente solo hacemos envíos en Resistencia.
                 </p>
-                {/* FIN DEL CAMBIO */}
               </div>
             </>
           )}
