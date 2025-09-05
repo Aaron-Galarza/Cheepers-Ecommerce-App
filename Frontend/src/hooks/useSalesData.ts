@@ -63,7 +63,8 @@ export const useSalesData = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [timeRangeFilter, setTimeRangeFilter] = useState<'today' | 'week' | 'month' | 'year' | 'custom'>('month');
+  // ACTUALIZADO: Agregar 'yesterday' al tipo
+  const [timeRangeFilter, setTimeRangeFilter] = useState<'today' | 'yesterday' | 'week' | 'month' | 'year' | 'custom'>('month');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [triggerSearch, setTriggerSearch] = useState<number>(0);
@@ -138,9 +139,15 @@ export const useSalesData = () => {
     let filterStartDate: Date | null = null;
     let filterEndDate: Date | null = null;
 
+    // ACTUALIZADO: Agregar lógica para 'yesterday'
     if (timeRangeFilter === 'today') {
       filterStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
       filterEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (timeRangeFilter === 'yesterday') {
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      filterStartDate = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0, 0);
+      filterEndDate = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59, 999);
     } else if (timeRangeFilter === 'week') {
       filterStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6, 0, 0, 0, 0);
       filterEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
@@ -388,6 +395,10 @@ export const useSalesData = () => {
       filename += `personalizado_${startDate}_a_${endDate}`;
     } else if (timeRangeFilter === 'today') {
       filename += `hoy_${new Date().toISOString().split('T')[0]}`;
+    } else if (timeRangeFilter === 'yesterday') {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      filename += `ayer_${yesterday.toISOString().split('T')[0]}`;
     } else {
       filename += `${timeRangeFilter}`;
     }

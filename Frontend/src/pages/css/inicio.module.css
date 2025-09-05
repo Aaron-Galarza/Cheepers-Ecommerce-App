@@ -363,7 +363,7 @@ body {
   }
 
   .heroImageContainer {
-    width: 90%;
+    width: 95%;
     height: 290px;
     margin-bottom: var(--space-md);
     max-width: none;

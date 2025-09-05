@@ -41,8 +41,11 @@ const VentasManagement: React.FC = () => {
   const [rowsToShow, setRowsToShow] = useState(INITIAL_ROWS_LIMIT);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTimeRange = e.target.value as 'today' | 'week' | 'month' | 'year' | 'custom';
-    setTimeRangeFilter(newTimeRange);
+    const newTimeRange = e.target.value;
+    
+    // Type assertion para el setter
+    (setTimeRangeFilter as React.Dispatch<React.SetStateAction<string>>)(newTimeRange);
+    
     setStartDate('');
     setEndDate('');
     setRowsToShow(INITIAL_ROWS_LIMIT);
@@ -57,12 +60,6 @@ const VentasManagement: React.FC = () => {
     
     // Limpiar el filtro de método de pago al hacer una búsqueda personalizada
     setPaymentMethodFilter('all');
-  };
-
-  // Función wrapper para setPaymentMethodFilter que también reinicia rowsToShow
-  const handlePaymentMethodFilterChange = (newFilter: 'all' | 'mercadopago' | 'efectivo') => {
-    setPaymentMethodFilter(newFilter);
-    setRowsToShow(INITIAL_ROWS_LIMIT);
   };
 
   if (loading) return <div className={styles.loading}>Cargando estadísticas...</div>;
@@ -86,6 +83,7 @@ const VentasManagement: React.FC = () => {
               className={styles.selectField}
             >
               <option value="today">Hoy</option>
+              <option value="yesterday">Ayer</option>
               <option value="week">Última Semana</option>
               <option value="month">Este Mes</option>
               <option value="year">Este Año</option>
@@ -202,6 +200,7 @@ const VentasManagement: React.FC = () => {
               {timeRangeFilter === 'year' ? 'Top 5 Meses de Ventas:' :
                 timeRangeFilter === 'month' ? 'Top 10 Días de Ventas:' :
                 timeRangeFilter === 'week' ? 'Top 3 Días de Ventas:' :
+                timeRangeFilter === 'yesterday' ? 'Ventas de Ayer:' :
                 'Mejores Días de Ventas:'}
             </h3>
             {topSellingPeriods.length > 0 ? (
@@ -260,7 +259,7 @@ const VentasManagement: React.FC = () => {
         INITIAL_ROWS_LIMIT={INITIAL_ROWS_LIMIT}
         exportDailySalesToCsv={exportDailySalesToCsv}
         paymentMethodFilter={paymentMethodFilter}
-        setPaymentMethodFilter={setPaymentMethodFilter} // PASA EL SETTER DIRECTAMENTE
+        setPaymentMethodFilter={setPaymentMethodFilter}
       />
     </div>
   );
