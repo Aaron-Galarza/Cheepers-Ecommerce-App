@@ -1,16 +1,20 @@
+// Frontend/src/hooks/useSalesData.ts
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import authService from '../services/authservice';
-import { SelectedAddOn, IAddOn } from '../components/layout/checkout/productlist'; // Ajusta esta ruta si es necesario en tu proyecto
+import { SelectedAddOn, IAddOn } from '../components/layout/checkout/productlist';
+import { getPaymentMethodDisplayName } from '../lib/paymentMethods'; // Importación añadida
 
-// Interfaces re-exportadas para que sean accesibles desde donde se use el hook
+// Interfaces
 export interface Order {
   _id: string;
   guestEmail: string;
   guestName: string;
   guestPhone: string;
   totalAmount: number;
-  paymentMethod: 'cash' | 'card' | 'transfer';
+  // Asegúrate de que este tipo en el backend coincida con lo que se envía
+  paymentMethod: 'cash' | 'card' | 'transfer'; 
   deliveryType: 'delivery' | 'pickup';
   shippingAddress?: {
     street: string;
@@ -40,13 +44,14 @@ interface SalesData {
   sales: number;
 }
 
-export interface DailySaleTableItem { // Exportada para el componente de tabla
+export interface DailySaleTableItem {
   orderId: string;
   orderSummary: string;
   subtotal: number;
   orderDate: string;
   orderTime: string;
   fullOrderTime: Date;
+  paymentMethod: string;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -62,6 +67,9 @@ export const useSalesData = () => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [triggerSearch, setTriggerSearch] = useState<number>(0);
+  
+  // Los valores 'mercadopago' y 'efectivo' son para el frontend
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState<'all' | 'mercadopago' | 'efectivo'>('all');
 
   const fetchData = useCallback(async () => {
     try {
@@ -115,7 +123,7 @@ export const useSalesData = () => {
     totalSales,
     totalOrdersCount,
     completedOrdersCount,
-    soldProductsCount, // NUEVO: productos vendidos (sin promos)
+    soldProductsCount,
     promosSoldCount,
     bestSellingProducts,
     salesDataForChart,
@@ -154,6 +162,33 @@ export const useSalesData = () => {
       });
     }
 
+    // LÓGICA DE FILTRADO CORRECTAMENTE MAPEADA - CON DEBUG
+    if (paymentMethodFilter !== 'all') {
+      console.log('=== FILTRADO EN HOOK useSalesData ===');
+      console.log('Filtrando por método de pago:', paymentMethodFilter);
+      console.log('Órdenes antes de filtrar:', currentOrders.length);
+      
+      currentOrders = currentOrders.filter(order => {
+        const backendPaymentMethod = order.paymentMethod;
+        console.log('Método de pago del backend:', backendPaymentMethod);
+        
+        if (paymentMethodFilter === 'mercadopago') {
+          const result = backendPaymentMethod === 'card' || backendPaymentMethod === 'transfer';
+          console.log('¿Es Mercado Pago?', result);
+          return result;
+        }
+        if (paymentMethodFilter === 'efectivo') {
+          const result = backendPaymentMethod === 'cash';
+          console.log('¿Es Efectivo?', result);
+          return result;
+        }
+        return false;
+      });
+      
+      console.log('Órdenes después de filtrar:', currentOrders.length);
+      console.log('=====================================');
+    }
+
     const deliveredOrders = currentOrders.filter(order => order.status === 'delivered');
 
     const calculatedTotalSales = deliveredOrders.reduce((sum, order) => sum + order.totalAmount, 0);
@@ -165,7 +200,6 @@ export const useSalesData = () => {
       ? (deliveredOrdersForDeliveryPercentage.length / calculatedCompletedOrdersCount) * 100
       : 0;
 
-    // --- NUEVA LÓGICA: Calcular productos vendidos (excluyendo promos) ---
     let calculatedSoldProductsCount = 0;
     let calculatedPromosSoldCount = 0;
 
@@ -176,13 +210,11 @@ export const useSalesData = () => {
           if (product.category === 'Promos Solo en Efectivo') {
             calculatedPromosSoldCount += item.quantity;
           } else {
-            // Este es el nuevo contador para productos NO promo
             calculatedSoldProductsCount += item.quantity;
           }
         }
       });
     });
-    // --- FIN NUEVA LÓGICA ---
 
     const productSalesMap = new Map<string, { quantity: number; totalAmount: number }>();
     deliveredOrders.forEach(order => {
@@ -252,10 +284,13 @@ export const useSalesData = () => {
       calculatedTopSellingPeriods = calculatedTopSellingPeriods.slice(0, 5);
     }
 
-    // --- CÁLCULO DE DATOS PARA LA TABLA DE VENTAS POR RANGO (CON FECHA Y HORA) ---
+    // Datos para la tabla
     const tableData: DailySaleTableItem[] = [];
     let tableTotalSales = 0;
     const productMapForTable = new Map(allProducts.map(p => [p._id, p]));
+
+    // REEMPLAZA la función formatPaymentMethodForTable con esta:
+    const formatPaymentMethodForTable = getPaymentMethodDisplayName;
 
     deliveredOrders.forEach(order => {
       const orderCreatedAt = new Date(order.createdAt);
@@ -280,20 +315,27 @@ export const useSalesData = () => {
         orderSummary: orderSummary,
         subtotal: order.totalAmount,
         orderDate: orderCreatedAt.toLocaleDateString('es-AR'),
-        orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }), // CAMBIO AQUÍ: hour12: false
-        fullOrderTime: orderCreatedAt
+        orderTime: orderCreatedAt.toLocaleTimeString('es-AR', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          hour12: false 
+        }),
+        fullOrderTime: orderCreatedAt,
+        paymentMethod: formatPaymentMethodForTable(order.paymentMethod)
       });
       tableTotalSales += order.totalAmount;
     });
-
     tableData.sort((a, b) => a.fullOrderTime.getTime() - b.fullOrderTime.getTime());
-    // --- FIN CÁLCULO DE DATOS PARA LA TABLA ---
+
+    console.log('=== DATOS DE TABLA GENERADOS ===');
+    console.log('Total de items en tabla:', tableData.length);
+    console.log('Métodos de pago en tabla:', tableData.map(item => item.paymentMethod));
+    console.log('================================');
 
     return {
       totalSales: calculatedTotalSales,
       totalOrdersCount: calculatedTotalOrdersCount,
       completedOrdersCount: calculatedCompletedOrdersCount,
-      // Se ha reemplazado 'activeProductsCount' por 'soldProductsCount'
       soldProductsCount: calculatedSoldProductsCount, 
       promosSoldCount: calculatedPromosSoldCount,
       bestSellingProducts: bestSellingWithPercentage,
@@ -303,7 +345,7 @@ export const useSalesData = () => {
       dailyTotalSales: tableTotalSales,
       deliveryPercentage: calculatedDeliveryPercentage
     };
-  }, [allOrders, allProducts, allAddOns, timeRangeFilter, startDate, endDate]);
+  }, [allOrders, allProducts, allAddOns, timeRangeFilter, startDate, endDate, paymentMethodFilter]);
 
   const exportDailySalesToCsv = useCallback(() => {
     if (dailySalesTableData.length === 0) {
@@ -315,6 +357,7 @@ export const useSalesData = () => {
       'Fecha',
       'Hora',
       'Resumen del Pedido',
+      'Metodo de Pago',
       'Subtotal'
     ];
 
@@ -322,10 +365,11 @@ export const useSalesData = () => {
       `"${item.orderDate}"`,
       `"${item.orderTime}"`,
       `"${item.orderSummary.replace(/"/g, '""')}"`,
+      `"${item.paymentMethod}"`,
       `"${item.subtotal.toFixed(2)}"`
     ]);
 
-    rows.push(['', '', 'Total del Período:', `"${dailyTotalSales.toFixed(2)}"`]);
+    rows.push(['', '', '', 'Total del Periodo:', `"${dailyTotalSales.toFixed(2)}"`]);
 
     const csvContent = [
       headers.join(','),
@@ -341,12 +385,19 @@ export const useSalesData = () => {
 
     let filename = 'ventas_';
     if (timeRangeFilter === 'custom') {
-      filename += `personalizado_${startDate}_a_${endDate}.csv`;
+      filename += `personalizado_${startDate}_a_${endDate}`;
     } else if (timeRangeFilter === 'today') {
-      filename += `hoy_${new Date().toISOString().split('T')[0]}.csv`;
+      filename += `hoy_${new Date().toISOString().split('T')[0]}`;
     } else {
-      filename += `${timeRangeFilter}.csv`;
+      filename += `${timeRangeFilter}`;
     }
+    
+    if (paymentMethodFilter !== 'all') {
+      filename += `_${paymentMethodFilter}`;
+    }
+    
+    filename += '.csv';
+    
     link.setAttribute('download', filename);
 
     link.style.visibility = 'hidden';
@@ -354,9 +405,8 @@ export const useSalesData = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }, [dailySalesTableData, dailyTotalSales, timeRangeFilter, startDate, endDate]);
+  }, [dailySalesTableData, dailyTotalSales, timeRangeFilter, startDate, endDate, paymentMethodFilter]);
 
-  // Se ha actualizado el objeto de retorno para incluir 'soldProductsCount'
   return {
     loading,
     error,
@@ -378,6 +428,8 @@ export const useSalesData = () => {
     dailySalesTableData,
     dailyTotalSales,
     exportDailySalesToCsv,
-    deliveryPercentage
+    deliveryPercentage,
+    paymentMethodFilter,
+    setPaymentMethodFilter
   };
 };

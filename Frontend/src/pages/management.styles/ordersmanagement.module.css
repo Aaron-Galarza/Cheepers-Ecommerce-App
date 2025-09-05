@@ -935,3 +935,36 @@ a:hover{
   font-weight: normal;
   margin-left: 1px;
 }
+/* Dentro de Frontend/src/pages/management.styles/ordersmanagement.module.css */
+
+/* ... tus clases existentes ... */
+
+.productsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* Ajusta según sea necesario para el espaciado */
+}
+
+.productsTitle {
+  /* Mantén los estilos existentes o ajusta si es necesario */
+}
+
+.printButtonSmall {
+  background-color: #6c757d; /* Un gris neutro */
+  color: white;
+  border: none;
+  padding: 8px; /* Haz el botón más pequeño */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px; /* Tamaño de fuente más pequeño */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.printButtonSmall:hover {
+  background-color: #5a6268;
+}
+
