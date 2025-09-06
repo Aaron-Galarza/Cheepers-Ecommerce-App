@@ -33,7 +33,7 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
 
     // Construir la lista de productos y adicionales
     const productsHtml = order.products.map(item => `
-        <p style="margin: 0; font-weight: bold; font-size: 1.1em;">- ${item.name} x${item.quantity}</p>
+        <p style="margin: 0; font-weight: bold; font-size: 1.1em;"><strong>- ${item.name} x${item.quantity}</strong></p>
         ${item.addOns && item.addOns.length > 0 ? `
             <ul style="list-style: none; padding-left: 15px; margin: 5px 0;">
                 ${item.addOns.map(addOn => `
@@ -53,7 +53,7 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
     
     // Crear el bloque HTML para el costo de envío si existe
     const shippingCostHtml = shippingCost !== undefined ? `
-        <p>Costo de Envío: $${shippingCost.toFixed(2)}</p>
+        <p style="font-size: 1.1em; font-weight: bold;"> Envío: <strong>$${shippingCost.toFixed(2)}</strong></p>
     ` : '';
 
     return `
@@ -62,11 +62,23 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
         <head>
             <title>Comanda</title>
             <style>
-                body { font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.2; margin: 0; padding: 10px; }
-                .comanda-container { width: 300px; margin: 0 auto; padding: 10px; box-sizing: border-box; border: 1px solid #000; }
-                h3 { text-align: center; margin: 5px 0; }
-                .separator { border-top: 1px dashed #000; margin: 8px 0; }
-                .details p { margin: 2px 0; }
+                body { 
+                    font-family: 'Courier New', Courier, monospace; 
+                    font-size: 14px;
+                    line-height: 1.2; 
+                    margin: 0; 
+                    padding: 10px; 
+                }
+                .comanda-container { 
+                    width: 300px; 
+                    margin: 0 auto; 
+                    padding: 10px; 
+                    box-sizing: border-box; 
+                    border: 1px solid #000; 
+                }
+                h3 { text-align: center; margin: 5px 0; font-size: 1.5em; }
+                .separator { border-top: 1px dashed #000; margin: 10px 0; } /* Líneas más finas */
+                .details p { margin: 5px 0; font-size: 1.1em; font-weight: bold; }
                 .products-section { margin: 10px 0; }
             </style>
         </head>
@@ -89,10 +101,10 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
                 </div>
                 <div class="separator"></div>
                 <div style="text-align: right;">
-                    <p><strong>Pago:</strong> ${paymentMethodText}</p>
-                    <p>Subtotal: $${order.totalAmount.toFixed(2)}</p>
+                    <p style="font-size: 1.1em; font-weight: bold;"><strong>Pago:</strong> <strong>${paymentMethodText}</strong></p>
+                    <p style="font-size: 1.1em; font-weight: bold;">Subtotal: <strong>$${order.totalAmount.toFixed(2)}</strong></p>
                     ${shippingCostHtml}
-                    <p><strong>TOTAL: $${totalFinal.toFixed(2)}</strong></p>
+                    <p style="font-size: 1.2em;"><strong>TOTAL: $${totalFinal.toFixed(2)}</strong></p>
                 </div>
             </div>
         </body>
