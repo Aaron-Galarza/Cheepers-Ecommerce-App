@@ -609,3 +609,126 @@
     margin-right: 0;
   }
 }
+
+/* En tu ventasmanagement.module.css */
+.dailyDateFilter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Estilos específicos para el grupo de filtro de pago */
+.paymentFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paymentFilterGroup .filterLabel {
+  font-weight: 600;
+  color: var(--color-dark-text);
+  white-space: nowrap;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.paymentFilterGroup .selectField {
+  min-width: 180px;
+  width: auto;
+  flex-shrink: 0;
+  padding: 10px 15px; /* Padding más compacto */
+  font-size: 0.95rem; /* Texto ligeramente más pequeño */
+}
+
+/* Ajustes para tablets */
+@media (max-width: 992px) {
+  .paymentFilterGroup {
+    justify-content: flex-start;
+    width: 100%;
+  }
+  
+  .paymentFilterGroup .selectField {
+    min-width: 150px; /* Más pequeño en tablets */
+    padding: 9px 12px;
+  }
+}
+
+/* Ajustes para móviles - ¡ESTOS SON LOS CAMBIOS PRINCIPALES! */
+@media (max-width: 768px) {
+  .filterSection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px; /* Menor espacio entre elementos */
+  }
+  
+  .paymentFilterGroup {
+    flex-direction: row; /* Mantenemos en fila pero con ajustes */
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .paymentFilterGroup .filterLabel {
+    width: auto; /* No ocupa todo el ancho */
+    flex-shrink: 0;
+    font-size: 0.95rem; /* Texto más pequeño */
+    justify-content: flex-start;
+  }
+  
+  .paymentFilterGroup .selectField {
+    width: 60%; /* Ocupa el 60% del ancho */
+    min-width: unset;
+    padding: 8px 10px; /* Más compacto */
+    font-size: 0.9rem; /* Texto más pequeño */
+  }
+  
+  .customDateFilter {
+    flex-direction: column;
+    gap: 10px; /* Menor espacio entre inputs */
+  }
+  
+  /* Hacer todos los inputs más pequeños en móvil */
+  .selectField, .inputField {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas (menos de 480px) */
+@media (max-width: 480px) {
+  .paymentFilterGroup {
+    flex-direction: column; /* En móviles muy pequeños va a columna */
+    align-items: stretch;
+    gap: 5px;
+  }
+  
+  .paymentFilterGroup .filterLabel {
+    width: 100%;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  
+  .paymentFilterGroup .selectField {
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 0.85rem;
+  }
+  
+  /* Botones también más compactos */
+  .searchButton, .exportButton {
+    padding: 10px 15px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Estilo para cuando el select está enfocado (mejora visual) */
+.paymentFilterGroup .selectField:focus {
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 0 0 2px rgba(44, 134, 236, 0.2);
+}

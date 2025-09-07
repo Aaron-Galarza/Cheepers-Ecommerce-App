@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import {
   FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave,
-  FaCheckCircle, FaTimesCircle, FaPhone, FaPlayCircle
+  FaCheckCircle, FaTimesCircle, FaPhone, FaPlayCircle, FaPrint
 } from 'react-icons/fa';
 import styles from './../pages/management.styles/ordersmanagement.module.css';
 import { OrderDisplay } from '../pages/management/ordersmanagement';
 import axios from 'axios';
+import { generateComandaHTML } from '../lib/generateComandaHTML'; // Importar la función
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -58,7 +59,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
       message += `- ${p.name} (x${p.quantity})\n`;
       if (Array.isArray(p.addOns) && p.addOns.length > 0) {
         p.addOns.forEach(ao => {
-          message += `  + ${ao.name} (x${ao.quantity})\n`;
+          message += `   + ${ao.name} (x${ao.quantity})\n`;
         });
       }
     });
@@ -75,6 +76,25 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
     return `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
   };
 
+  // Función para imprimir comanda
+  const handlePrintComanda = (order: OrderDisplay) => {
+    const comandaHtml = generateComandaHTML(order);
+    const printWindow = window.open('', '_blank');
+    
+    if (printWindow) {
+      printWindow.document.write(comandaHtml);
+      printWindow.document.close();
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+        // Cerrar la ventana después de imprimir (opcional)
+        // setTimeout(() => printWindow.close(), 500);
+      };
+    } else {
+      alert('No se pudo abrir la ventana de impresión. Por favor, permite ventanas emergentes.');
+    }
+  };
+
   const handleUpdatePaymentMethod = async (orderId: string, currentMethod: 'cash' | 'card') => {
     const newMethod = currentMethod === 'cash' ? 'card' : 'cash';
     
@@ -87,8 +107,6 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
 
       console.log('Método de pago actualizado:', response.data);
       
-      // Actualizar el estado local con los datos que devuelve el backend
-      // El backend recalcula el totalAmount y devuelve el pedido actualizado
       const updatedOrder = response.data.order;
       
       updateOrderInState(orderId, { 
@@ -148,8 +166,18 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                 </p>
               </div>
               <div className={styles.orderBody}>
-                <div className={styles.productsList}>
+                {/* Contenedor para el título y el botón de impresión */}
+                <div className={styles.productsHeader}>
                   <p className={styles.productsTitle}><FaBox /> Productos:</p>
+                  <button 
+                    onClick={() => handlePrintComanda(order)} 
+                    className={styles.printButtonSmall}
+                    title="Imprimir comanda"
+                  >
+                    <FaPrint />
+                  </button>
+                </div>
+                <div className={styles.productsList}>
                   <ul>
                     {order.products.map((item, index) => (
                       <li key={index}>
@@ -173,13 +201,13 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                   {order.deliveryType === 'delivery' && order.shippingAddress && (
                     <p className={styles.shippingAddress}>Dirección: {order.shippingAddress.street}, {order.shippingAddress.city}</p>
                   )}
-                <p className={styles.paymentMethod}>Método de pago:
-    <span className={styles.paymentMethodValue}>
-    {order.paymentMethod === 'cash' ? ' Efectivo' : 
-     order.paymentMethod === 'card' ? ' Mercado Pago' : 
-     ' Transferencia'}
-  </span>
-</p>
+                  <p className={styles.paymentMethod}>Método de pago:
+                    <span className={styles.paymentMethodValue}>
+                      {order.paymentMethod === 'cash' ? ' Efectivo' :
+                       order.paymentMethod === 'card' ? ' Mercado Pago' :
+                       ' Transferencia'}
+                    </span>
+                  </p>
                   <p className={styles.orderStatus}>Estado:
                     <span className={
                       order.status === 'pending' ? styles.statusPending :
@@ -195,7 +223,6 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                       }
                     </span>
                   </p>
-                  {/* Botón para cambiar el método de pago */}
                   {(order.status === 'pending' || order.status === 'processing') && (order.paymentMethod === 'cash' || order.paymentMethod === 'card') && (
                     <button
                       onClick={() => handleUpdatePaymentMethod(order._id, order.paymentMethod as 'cash' | 'card')}

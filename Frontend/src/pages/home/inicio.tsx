@@ -6,12 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import baconcheep from '../../assets/images/hamburguesa big tasty.jpeg';
 import barbacue from '../../assets/images/con queso con sesamo.jpeg';
 import cheddar from '../../assets/images/papas fritas bacon.jpeg';
-import conqueso from '../../assets/images/con queso.jpeg'
+import conqueso from '../../assets/images/con queso.jpeg';
+import lomo from '../../assets/images/lomo.jpeg'
 // Importar FaClock además de los otros iconos
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // Definición de los elementos del banner
 const bannerItems = [
+        { image: lomo, title: 'LOMITOS', descriptionLine1: 'Se encontraran disponibles', descriptionLine2: ' desde el lunes 8 de septiembre', callToAction: 'Proximamente', altText: 'Hamburguesa Big Tasty' },
     { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty' },
     { image: barbacue, title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso' },
     { image: cheddar, title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon' },
@@ -20,12 +22,13 @@ const bannerItems = [
 
 const Inicio: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const navigate = useNavigate();
     const [touchStart, setTouchStart] = useState(0);
-    const [touchPosition, setTouchPosition] = useState<number | null>(null);
 
     // Usamos useRef para mantener una referencia al intervalo que no cambia en cada render
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const transitionRef = useRef<NodeJS.Timeout | null>(null);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     // Función para reiniciar el temporizador
@@ -36,9 +39,18 @@ const Inicio: React.FC = () => {
         }
         // Crea un nuevo temporizador
         intervalRef.current = setInterval(() => {
+            setIsTransitioning(true);
             setCurrentIndex((prevIndex) => 
                 prevIndex === bannerItems.length - 1 ? 0 : prevIndex + 1
             );
+            
+            // Limpiar transición después de que se complete
+            if (transitionRef.current) {
+                clearTimeout(transitionRef.current);
+            }
+            transitionRef.current = setTimeout(() => {
+                setIsTransitioning(false);
+            }, 600); // Tiempo que debe coincidir con la duración de la transición CSS
         }, 6000);
     };
 
@@ -49,12 +61,28 @@ const Inicio: React.FC = () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
+            if (transitionRef.current) {
+                clearTimeout(transitionRef.current);
+            }
         };
     }, []);
 
     // Función para cambiar el slide manualmente
     const goToSlide = (index: number) => {
+        if (isTransitioning) return;
+        
+        setIsTransitioning(true);
         setCurrentIndex(index);
+        
+        // Limpiar timeout existente
+        if (transitionRef.current) {
+            clearTimeout(transitionRef.current);
+        }
+        
+        transitionRef.current = setTimeout(() => {
+            setIsTransitioning(false);
+        }, 600);
+        
         startAutoSlide(); // Reinicia el temporizador al hacer clic en los puntos
     };
 
@@ -65,28 +93,18 @@ const Inicio: React.FC = () => {
             clearInterval(intervalRef.current);
         }
         setTouchStart(e.targetTouches[0].clientX);
-        setTouchPosition(e.targetTouches[0].clientX);
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        if (touchPosition === null) return;
-        const currentTouch = e.targetTouches[0].clientX;
-        const diff = touchPosition - currentTouch;
-        
-        // Para Safari, limitamos el movimiento para evitar comportamientos extraños
-        if (isSafari && Math.abs(diff) > 50) {
-            e.preventDefault();
-        }
-        
-        setTouchPosition(currentTouch);
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
         const touchEnd = e.changedTouches[0].clientX;
-        const minSwipeDistance = 50; // Reducido para mejor respuesta en Safari
+        const minSwipeDistance = 75;
+        
+        if (isTransitioning) return;
         
         // Compara la distancia total del deslizamiento
         if (Math.abs(touchStart - touchEnd) > minSwipeDistance) {
+            setIsTransitioning(true);
+            
             if (touchStart - touchEnd > 0) {
                 // Deslizamiento a la izquierda
                 setCurrentIndex((prevIndex) => 
@@ -98,11 +116,19 @@ const Inicio: React.FC = () => {
                     prevIndex === 0 ? bannerItems.length - 1 : prevIndex - 1
                 );
             }
+            
+            // Limpiar timeout existente
+            if (transitionRef.current) {
+                clearTimeout(transitionRef.current);
+            }
+            
+            transitionRef.current = setTimeout(() => {
+                setIsTransitioning(false);
+            }, 600);
         }
         
         // Resetea los valores táctiles y reinicia el auto-slide
         setTouchStart(0);
-        setTouchPosition(null);
         startAutoSlide();
     };
     
@@ -115,7 +141,6 @@ const Inicio: React.FC = () => {
     const whatsappConsultaMessage = 'Hola! Tengo una consulta.';
 
     // URL corregida para abrir la ubicación específica de Cheepers en Google Maps
-    // Usando las coordenadas exactas: -27.439180676238557, -58.99709008998274
     const mapsUrl = "https://www.google.com/maps?q=Cheepers,Corrientes+1200,Resistencia,Chaco&ll=-27.439181,-58.997090&z=17";
 
     return (
@@ -123,17 +148,13 @@ const Inicio: React.FC = () => {
             <section 
                 className={styles.heroSection}
                 onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
+                onTouchMove={(e) => { e.preventDefault() }}
                 onTouchEnd={handleTouchEnd}
             >
                 {bannerItems.map((item, index) => (
                     <div
                         key={index}
-                        className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''}`}
-                        style={{ 
-                            // Para Safari, usamos una aproximación diferente
-                            transform: isSafari ? (index === currentIndex ? 'translateX(0)' : 'translateX(100%)') : undefined
-                        }}
+                        className={`${styles.heroSlide} ${index === currentIndex ? styles.active : ''} ${isTransitioning ? styles.transitioning : ''}`}
                     >
                         <div className={styles.heroImageContainer}>
                             <img src={item.image} alt={item.altText} className={styles.heroImage}/>

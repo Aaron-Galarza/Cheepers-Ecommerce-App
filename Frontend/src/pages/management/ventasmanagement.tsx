@@ -1,25 +1,17 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Se mantiene para axios.isAxiosError si es necesario en el error global
+import axios from 'axios';
 import styles from './../management.styles/ventasmanagement.module.css';
-import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch, FaTruck } from 'react-icons/fa'; // Importar FaTruck
+import { FaDollarSign, FaShoppingCart, FaCheckCircle, FaBox, FaFilter, FaCalendarDay, FaTag, FaTrophy, FaSearch, FaTruck, FaCreditCard, FaMoneyBill } from 'react-icons/fa';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Brush
 } from 'recharts';
 
-// Importa el custom hook
 import { useSalesData } from '../../hooks/useSalesData';
-// Importa el nuevo componente de tabla
 import DailySalesTable from '../../components/layout/admin/dailysalestable';
 
-// Las interfaces Order y Product ya se manejan dentro de useSalesData.ts
-// No necesitamos re-declararlas aquí a menos que sean usadas directamente en el JSX de este componente.
-
-const INITIAL_ROWS_LIMIT = 10; // Límite inicial de filas para "Ver más"
+const INITIAL_ROWS_LIMIT = 10;
 
 const VentasManagement: React.FC = () => {
-  // Usamos el custom hook para obtener todos los datos y funciones
-  // NOTA: Se ha añadido `soldProductsCount` a la desestructuración, asumiendo
-  // que ahora este valor es retornado por el hook `useSalesData`.
   const {
     loading,
     error,
@@ -33,8 +25,7 @@ const VentasManagement: React.FC = () => {
     totalSales,
     totalOrdersCount,
     completedOrdersCount,
-    // Eliminamos `activeProductsCount`
-    soldProductsCount, // NUEVO: Conteo de productos vendidos (sin promos)
+    soldProductsCount,
     promosSoldCount,
     bestSellingProducts,
     salesDataForChart,
@@ -42,25 +33,34 @@ const VentasManagement: React.FC = () => {
     dailySalesTableData,
     dailyTotalSales,
     exportDailySalesToCsv,
-    deliveryPercentage
+    deliveryPercentage,
+    paymentMethodFilter,
+    setPaymentMethodFilter
   } = useSalesData();
 
-  // Estado local para controlar cuántas filas se muestran en la tabla de detalle
   const [rowsToShow, setRowsToShow] = useState(INITIAL_ROWS_LIMIT);
 
-  // Funciones de manejo de filtros que también resetean el estado de la tabla
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTimeRangeFilter(e.target.value as 'today' | 'week' | 'month' | 'year' | 'custom');
+    const newTimeRange = e.target.value;
+    
+    // Type assertion para el setter
+    (setTimeRangeFilter as React.Dispatch<React.SetStateAction<string>>)(newTimeRange);
+    
     setStartDate('');
     setEndDate('');
-    setRowsToShow(INITIAL_ROWS_LIMIT); // Resetear "Ver más" al cambiar filtro
+    setRowsToShow(INITIAL_ROWS_LIMIT);
+    
+    // Limpiar el filtro de método de pago al cambiar el rango de tiempo
+    setPaymentMethodFilter('all');
   };
 
   const handleCustomSearchClick = () => {
     handleCustomSearch();
-    setRowsToShow(INITIAL_ROWS_LIMIT); // Resetear "Ver más" al aplicar búsqueda personalizada
+    setRowsToShow(INITIAL_ROWS_LIMIT);
+    
+    // Limpiar el filtro de método de pago al hacer una búsqueda personalizada
+    setPaymentMethodFilter('all');
   };
-
 
   if (loading) return <div className={styles.loading}>Cargando estadísticas...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
@@ -69,23 +69,28 @@ const VentasManagement: React.FC = () => {
     <div className={styles.ventasManagementContainer}>
       <h1 className={styles.title}>Panel de Estadísticas de Ventas</h1>
 
-      {/* Filter Section */}
+      {/* Filter Section - SOLO filtro de tiempo */}
       <div className={styles.filterSection}>
-        <label htmlFor="timeRangeFilter" className={styles.filterLabel}>
-          <FaFilter /> Rango de Tiempo:
-        </label>
-        <select
-          id="timeRangeFilter"
-          value={timeRangeFilter}
-          onChange={handleFilterChange}
-          className={styles.selectField}
-        >
-          <option value="today">Hoy</option>
-          <option value="week">Última Semana</option>
-          <option value="month">Este Mes</option>
-          <option value="year">Este Año</option>
-          <option value="custom">Personalizado</option>
-        </select>
+        <div className={styles.filterRow}>
+          <div className={styles.filterGroup}>
+            <label htmlFor="timeRangeFilter" className={styles.filterLabel}>
+              <FaFilter /> Rango de Tiempo:
+            </label>
+            <select
+              id="timeRangeFilter"
+              value={timeRangeFilter}
+              onChange={handleFilterChange}
+              className={styles.selectField}
+            >
+              <option value="today">Hoy</option>
+              <option value="yesterday">Ayer</option>
+              <option value="week">Última Semana</option>
+              <option value="month">Este Mes</option>
+              <option value="year">Este Año</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+        </div>
 
         {timeRangeFilter === 'custom' && (
           <div className={styles.customDateFilter}>
@@ -135,10 +140,6 @@ const VentasManagement: React.FC = () => {
           <h3>Pedidos Completados</h3>
           <p>{completedOrdersCount}</p>
         </div>
-        {/*
-          Este es el cuadro de métrica modificado.
-          Ahora muestra el conteo de productos vendidos (excluyendo promos).
-        */}
         <div className={styles.metricCard}>
           <div className={styles.metricIconContainer}>
             <FaBox />
@@ -153,13 +154,12 @@ const VentasManagement: React.FC = () => {
           <h3>Promos Vendidas</h3>
           <p>{promosSoldCount}</p>
         </div>
-        {/* NUEVO CUADRO DE MÉTRICA: Porcentaje de Pedidos a Domicilio */}
         <div className={styles.metricCard}>
           <div className={styles.metricIconContainer}>
-            <FaTruck /> {/* Icono para delivery */}
+            <FaTruck />
           </div>
           <h3>Pedidos a Domicilio</h3>
-          <p>{deliveryPercentage.toFixed(1)}%</p> {/* Mostrar el porcentaje */}
+          <p>{deliveryPercentage.toFixed(1)}%</p>
         </div>
       </div>
 
@@ -194,13 +194,13 @@ const VentasManagement: React.FC = () => {
             </BarChart>
           </ResponsiveContainer>
 
-          {/* Best Selling Days/Months Section */}
           <div className={styles.bestDaysSection}>
             <h3 className={styles.bestDaysTitle}>
               <span className={styles.trophyIcon}><FaTrophy /></span>
               {timeRangeFilter === 'year' ? 'Top 5 Meses de Ventas:' :
                 timeRangeFilter === 'month' ? 'Top 10 Días de Ventas:' :
                 timeRangeFilter === 'week' ? 'Top 3 Días de Ventas:' :
+                timeRangeFilter === 'yesterday' ? 'Ventas de Ayer:' :
                 'Mejores Días de Ventas:'}
             </h3>
             {topSellingPeriods.length > 0 ? (
@@ -230,7 +230,6 @@ const VentasManagement: React.FC = () => {
           </div>
         </div>
 
-        {/* Top 5 Best Selling Products */}
         <div className={styles.chartCard}>
           <h2 className={styles.chartTitle}>Top 5 Productos Más Vendidos</h2>
           <div className={styles.bestSellingList}>
@@ -259,9 +258,10 @@ const VentasManagement: React.FC = () => {
         setRowsToShow={setRowsToShow}
         INITIAL_ROWS_LIMIT={INITIAL_ROWS_LIMIT}
         exportDailySalesToCsv={exportDailySalesToCsv}
+        paymentMethodFilter={paymentMethodFilter}
+        setPaymentMethodFilter={setPaymentMethodFilter}
       />
     </div>
   );
 };
 export default VentasManagement;
-

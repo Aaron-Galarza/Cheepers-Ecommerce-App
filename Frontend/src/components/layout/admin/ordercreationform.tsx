@@ -17,7 +17,7 @@ interface FormProduct {
 
 interface OrderCreationFormProps {
   newOrderForm: {
-    guestEmail: string;
+    guestEmail?: string;
     guestName: string;
     guestPhone: string;
     paymentMethod: 'cash' | 'card' | 'transfer';
@@ -28,7 +28,7 @@ interface OrderCreationFormProps {
   };
   setNewOrderForm: React.Dispatch<React.SetStateAction<OrderCreationFormProps['newOrderForm']>>;
   availableProducts: Product[];
-  availableAddOns: IAddOn[]; // Ahora usa la IAddOn completa
+  availableAddOns: IAddOn[];
   productMapRef: React.MutableRefObject<Map<string, string>>;
   calculateTotalAmount: () => number;
   handleSubmitNewOrder: (e: React.FormEvent) => Promise<void>;
@@ -43,6 +43,13 @@ const OrderCreationForm: React.FC<OrderCreationFormProps> = ({
   calculateTotalAmount,
   handleSubmitNewOrder,
 }) => {
+  // Inicializamos el estado del formulario para que "Resistencia" sea el valor por defecto en la ciudad
+  React.useEffect(() => {
+    setNewOrderForm(prev => ({
+      ...prev,
+      shippingCity: 'Resistencia'
+    }));
+  }, [setNewOrderForm]); // El segundo argumento asegura que esto solo se ejecute una vez al cargar el componente
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -132,18 +139,6 @@ const OrderCreationForm: React.FC<OrderCreationFormProps> = ({
             id="guestName"
             name="guestName"
             value={newOrderForm.guestName}
-            onChange={handleFormChange}
-            className={styles.inputField}
-            required
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="guestEmail">Email del Cliente:</label>
-          <input
-            type="email"
-            id="guestEmail"
-            name="guestEmail"
-            value={newOrderForm.guestEmail}
             onChange={handleFormChange}
             className={styles.inputField}
             required
