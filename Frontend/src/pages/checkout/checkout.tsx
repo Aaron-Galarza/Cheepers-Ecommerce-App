@@ -267,7 +267,7 @@ const CheckoutPage: React.FC = () => {
                 onChange={() => setMetodo('efectivo')}
                 className={styles.radioInput}
               />
-              <span className={styles.radioText}>Efectivo (10% de descuento)</span>
+              <span className={styles.radioText}>Efectivo</span>
             </label>
             <label className={styles.radioLabel}>
               <input
