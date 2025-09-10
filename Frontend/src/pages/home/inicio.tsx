@@ -8,6 +8,7 @@ import barbacue from '../../assets/images/con queso con sesamo.jpeg';
 import cheddar from '../../assets/images/papas fritas bacon.jpeg';
 import conqueso from '../../assets/images/con queso.jpeg';
 import lomo from '../../assets/images/lomo.jpeg'
+import pizzas from '../../assets/images/pizzas.jpeg'
 // Importar FaClock además de los otros iconos
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
@@ -17,6 +18,7 @@ const bannerItems = [
     { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty' },
     { image: barbacue, title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso' },
     { image: cheddar, title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon' },
+    { image: pizzas, title: 'PIZZAS', descriptionLine1: 'Gran variedad de pizzas ', descriptionLine2: 'No te quedes sin probar.', callToAction: '¡Mira nuestro menú!', altText: 'Papas con cheddar y bacon' },
     { image: conqueso, title: 'CALIDAD ÚNICA', descriptionLine1: 'Mira nuestro menú completo', callToAction: '¡Menú completo!', altText: 'Mira nuestro menú completo' },
 ];
 
