@@ -7,14 +7,19 @@ import baconcheep from '../../assets/images/hamburguesa big tasty.jpeg';
 import barbacue from '../../assets/images/con queso con sesamo.jpeg';
 import cheddar from '../../assets/images/papas fritas bacon.jpeg';
 import conqueso from '../../assets/images/con queso.jpeg';
-import lomo from '../../assets/images/lomo.jpeg'
+import lomo from '../../assets/images/lomito.jpeg'
 import pizzas from '../../assets/images/pizzas.jpeg'
+import lomo2 from '../../assets/images/lomito2.jpeg'
+import lomo3 from '../../assets/images/lomito3.jpeg'
+
 // Importar FaClock además de los otros iconos
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // Definición de los elementos del banner
 const bannerItems = [
-        { image: lomo, title: 'LOMITOS', descriptionLine1: 'Ya estarán disponibles', descriptionLine2: 'en esta semana', callToAction: 'Proximamente', altText: 'Hamburguesa Big Tasty' },
+     { image: lomo, title: 'LOMITO', descriptionLine1: 'No te quedes sin', descriptionLine2: 'probar', callToAction: '¡Ya disponible!', altText: 'Hamburguesa Big Tasty' },
+  { image: lomo2, title: 'LOMITO',descriptionLine1: 'Nuevo lomito',  callToAction: '¡Delicioso!'},
+    { image: lomo3, title: 'LOMITO',descriptionLine1: 'Lomito con papas incluidas', callToAction: '¡Miralo en nuestro menú!'},
     { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty' },
     { image: barbacue, title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso' },
     { image: cheddar, title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon' },

@@ -40,7 +40,8 @@ const MenuPage: React.FC = () => {
     }, []);
 
     // ** Función de scroll mejorada para un desplazamiento más preciso **
-    const scrollToSection = (ref: React.RefObject<HTMLHeadingElement>) => {
+    // CORRECCIÓN: Aceptar RefObject<HTMLHeadingElement | null>
+    const scrollToSection = (ref: React.RefObject<HTMLHeadingElement | null>) => {
         if (ref.current) {
             const yOffset = -150;
             const y = ref.current.getBoundingClientRect().top + window.scrollY + yOffset;
