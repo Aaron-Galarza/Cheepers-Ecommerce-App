@@ -333,7 +333,7 @@ const CheckoutPage: React.FC = () => {
 
           {metodo === 'efectivo' && discountAmount > 0 && (
             <div className={styles.summaryDiscountRow}>
-              <p className={styles.summaryDiscountLabel}>Descuento por Efectivo (10%):</p>
+              <p className={styles.summaryDiscountLabel}>Descuento por Efectivo (10%): <br />(No aplica a promos)</p>
               <p className={styles.summaryDiscountValue}>-${discountAmount.toFixed(2)}</p>
             </div>
           )}
