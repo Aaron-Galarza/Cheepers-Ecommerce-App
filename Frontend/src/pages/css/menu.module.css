@@ -60,13 +60,14 @@ body {
   margin-top: 39px;
 }
 
-/* 🔥 MODIFICACIÓN: Grid con auto-fit pero limitando el máximo de columnas */
+/* 🔥 Grid normal para todas las secciones */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, max-content));
-  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
 }
+
+/* 🔥 SOLUCIÓN ESPECÍFICA: Solo para la sección de Lomos */
 
 .card {
   background-color: #fff;
@@ -74,8 +75,6 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.2s;
-  max-width: 320px; /* 🔥 Limitar ancho máximo */
-  margin: 0 auto; /* 🔥 Centrar en caso de pocos productos */
 }
 
 .card:hover {
@@ -245,16 +244,19 @@ body {
     text-align: center;
   }
 
-  /* 🔥 MODIFICACIÓN: En móvil mantenemos el grid de 1 columna */
   .grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-    justify-content: stretch;
+  }
+
+  /* 🔥 En móvil desactivamos la limitación para lomos también */
+  #lomos + .grid {
+    max-width: none;
+    margin: 0;
   }
 
   .card {
     border-radius: 8px;
-    max-width: none; /* 🔥 En móvil ocupa todo el ancho */
   }
 
   .image {
@@ -291,15 +293,15 @@ body {
     height: 290px;
   }
 }
+
 @media (max-width: 382px){
-    .navList {
+  .navList {
     justify-content: center;
     gap: 0.8rem;
-   margin-left: 0.9rem;
-   font-size: 0.2rem;
+    margin-left: 0.9rem;
+    font-size: 0.2rem;
   }
   .navList a{
-       font-size: 0.62rem;
-
+    font-size: 0.62rem;
   }
 }
