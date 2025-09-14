@@ -48,21 +48,23 @@ const CheckoutPage: React.FC = () => {
   const [finalTotal, setFinalTotal] = useState<number>(subtotal);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
 
-  useEffect(() => {
-    const itemsEligibleForDiscount = cart.filter(item =>
-      item.category !== 'Promos' && item.category !== 'Promos Solo en Efectivo'
-    );
+  useEffect(() => {
+    const itemsEligibleForDiscount = cart.filter(item =>
+      item.category !== 'Promos' && item.category !== 'Promos Solo en Efectivo'
+    );
 
-    const totalEligible = itemsEligibleForDiscount.reduce((sum, item) => {
-      let itemSubtotal = item.price * item.quantity;
-      if (item.addOns?.length) {
-        itemSubtotal += item.addOns.reduce(
-          (addOnsSum, addOn) => addOnsSum + addOn.price * addOn.quantity,
-          0
-        );
-      }
-      return sum + itemSubtotal;
-    }, 0);
+    const totalEligible = itemsEligibleForDiscount.reduce((sum, item) => {
+      let itemTotal = item.price; // Costo del producto base
+      if (item.addOns?.length) {
+        itemTotal += item.addOns.reduce(
+          (addOnsSum, addOn) => addOnsSum + addOn.price * addOn.quantity,
+          0
+        );
+      }
+      // La corrección está aquí: multiplicamos el total del ítem (producto + adicionales)
+      // por la cantidad de ese ítem.
+      return sum + (itemTotal * item.quantity);
+    }, 0);
 
     if (metodo === 'efectivo') {
       const discount = totalEligible * 0.1;

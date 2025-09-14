@@ -37,7 +37,7 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
         ${item.addOns && item.addOns.length > 0 ? `
             <ul style="list-style: none; padding-left: 15px; margin: 5px 0;">
                 ${item.addOns.map(addOn => `
-                    <li style="margin: 0; font-size: 0.9em;">&#8627; ${addOn.name} x${addOn.quantity}</li>
+                    <li style="margin: 0; font-size: 0.9em;">&#8627; ${addOn.name}</li>
                 `).join('')}
             </ul>
         ` : ''}
