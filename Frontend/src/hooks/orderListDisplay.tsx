@@ -6,7 +6,7 @@ import {
 import styles from './../pages/management.styles/ordersmanagement.module.css';
 import { OrderDisplay } from '../pages/management/ordersmanagement';
 import axios from 'axios';
-import { generateComandaHTML } from '../lib/generateComandaHTML'; // Importar la función
+import { generateComandaHTML } from '../lib/generateComandaHTML';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -32,6 +32,31 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   updateOrderInState,
 }) => {
   const [isUpdatingPayment, setIsUpdatingPayment] = useState<Record<string, boolean>>({});
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'yesterday'>('all');
+
+  // Función para filtrar órdenes por fecha
+  const getDateFilteredOrders = () => {
+    if (dateFilter === 'all') return filteredOrders;
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    return filteredOrders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      const orderDay = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate());
+      
+      if (dateFilter === 'today') {
+        return orderDay.getTime() === today.getTime();
+      } else if (dateFilter === 'yesterday') {
+        return orderDay.getTime() === yesterday.getTime();
+      }
+      return true;
+    });
+  };
+
+  const dateFilteredOrders = getDateFilteredOrders();
 
   // Función para generar el enlace de WhatsApp
   const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
@@ -87,8 +112,6 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
       printWindow.onload = () => {
         printWindow.focus();
         printWindow.print();
-        // Cerrar la ventana después de imprimir (opcional)
-        // setTimeout(() => printWindow.close(), 500);
       };
     } else {
       alert('No se pudo abrir la ventana de impresión. Por favor, permite ventanas emergentes.');
@@ -126,27 +149,47 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
 
   return (
     <>
-      <div className={styles.filterContainer}>
-        <label htmlFor="statusFilter">Filtrar por estado: </label>
-        <select
-          id="statusFilter"
-          value={filterStatus}
-          onChange={e => setFilterStatus(e.target.value as any)}
-          className={styles.filterSelect}
-        >
-          <option value="all">Todos</option>
-          <option value="pending">Pendientes</option>
-          <option value="processing">En proceso</option>
-          <option value="delivered">Entregados</option>
-          <option value="cancelled">Cancelados</option>
-        </select>
+      <div className={styles.filtersContainer}>
+        <div className={styles.filterGroup}>
+          <label htmlFor="statusFilter">Estado: </label>
+          <select
+            id="statusFilter"
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value as any)}
+            className={styles.filterSelect}
+          >
+            <option value="all">Todos</option>
+            <option value="pending">Pendientes</option>
+            <option value="processing">En proceso</option>
+            <option value="delivered">Entregados</option>
+            <option value="cancelled">Cancelados</option>
+          </select>
+        </div>
+
+        <div className={styles.filterGroup}>
+          <label htmlFor="dateFilter">Fecha: </label>
+          <select
+            id="dateFilter"
+            value={dateFilter}
+            onChange={e => setDateFilter(e.target.value as 'all' | 'today' | 'yesterday')}
+            className={styles.filterSelect}
+          >
+            <option value="all">Todos</option>
+            <option value="today">Hoy</option>
+            <option value="yesterday">Ayer</option>
+          </select>
+        </div>
       </div>
 
       <div className={styles.ordersList}>
-        {filteredOrders.length === 0 ? (
-          <p className={styles.noOrdersMessage}>No hay pedidos para mostrar.</p>
+        {dateFilteredOrders.length === 0 ? (
+          <p className={styles.noOrdersMessage}>
+            {filteredOrders.length === 0 
+              ? 'No hay pedidos para mostrar.' 
+              : `No hay pedidos ${dateFilter === 'today' ? 'de hoy' : dateFilter === 'yesterday' ? 'de ayer' : ''} con el filtro actual.`}
+          </p>
         ) : (
-          filteredOrders.map((order) => (
+          dateFilteredOrders.map((order) => (
             <div key={order._id} className={styles.orderCard}>
               <div className={styles.orderHeader}>
                 <p className={styles.orderDate}>
@@ -166,7 +209,6 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                 </p>
               </div>
               <div className={styles.orderBody}>
-                {/* Contenedor para el título y el botón de impresión */}
                 <div className={styles.productsHeader}>
                   <p className={styles.productsTitle}><FaBox /> Productos:</p>
                   <button 
