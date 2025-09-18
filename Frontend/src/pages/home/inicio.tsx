@@ -11,20 +11,88 @@ import lomo from '../../assets/images/lomito.jpeg'
 import pizzas from '../../assets/images/pizzas.jpeg'
 import lomo2 from '../../assets/images/lomito2.jpeg'
 import lomo3 from '../../assets/images/lomito3.jpeg'
-
+import promodia from '../../assets/images/promocion.jpg'
 // Importar FaClock además de los otros iconos
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // Definición de los elementos del banner
 const bannerItems = [
-     { image: lomo, title: 'LOMITO', descriptionLine1: 'No te quedes sin', descriptionLine2: 'probar', callToAction: '¡Ya disponible!', altText: 'Hamburguesa Big Tasty' },
-  { image: lomo2, title: 'LOMITO',descriptionLine1: 'Nuevo lomito',  callToAction: '¡Delicioso!'},
-    { image: lomo3, title: 'LOMITO',descriptionLine1: 'Lomito con papas incluidas', callToAction: '¡Miralo en nuestro menú!'},
-    { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty' },
-    { image: barbacue, title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso' },
-    { image: cheddar, title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon' },
-    { image: pizzas, title: 'PIZZAS', descriptionLine1: 'Gran variedad de pizzas ', descriptionLine2: 'No te quedes sin probar.', callToAction: '¡Probalas!', altText: 'Papas con cheddar y bacon' },
-    { image: conqueso, title: 'CALIDAD ÚNICA', descriptionLine1: 'Mira nuestro menú completo', callToAction: '¡Menú completo!', altText: 'Mira nuestro menú completo' },
+  { 
+    image: promodia, 
+    title: 'PROMOCIÓN', 
+    descriptionLine1: 'Aprovecha nuestra', 
+    descriptionLine2: 'promo del día', 
+    callToAction: '¡Mira nuestras promos!', 
+    altText: 'Hamburguesa Big Tasty',
+    targetRoute: '/promos' // 🔥 Nueva propiedad para la ruta específica
+  },
+  { 
+    image: lomo, 
+    title: 'LOMITO', 
+    descriptionLine1: 'No te quedes sin', 
+    descriptionLine2: 'probar', 
+    callToAction: '¡Ya disponible!', 
+    altText: 'Hamburguesa Big Tasty',
+    targetRoute: '/menu' // 🔥 Mantener menu para los demás
+  },
+  { 
+    image: lomo2, 
+    title: 'LOMITO',
+    descriptionLine1: 'Nuevo lomito',  
+    callToAction: '¡Delicioso!',
+    targetRoute: '/menu'
+  },
+  { 
+    image: lomo3, 
+    title: 'LOMITO',
+    descriptionLine1: 'Lomito con papas incluidas', 
+    callToAction: '¡Miralo en nuestro menú!',
+    targetRoute: '/menu'
+  },
+  { 
+    image: baconcheep, 
+    title: 'BIG TASTY', 
+    descriptionLine1: 'El sabor ahumado', 
+    descriptionLine2: 'con bacon crujiente.', 
+    callToAction: '¡Probala ahora!', 
+    altText: 'Hamburguesa Big Tasty',
+    targetRoute: '/menu'
+  },
+  { 
+    image: barbacue, 
+    title: 'CON QUESO', 
+    descriptionLine1: 'Ketchup carne cebollita ', 
+    descriptionLine2: 'cheddar y mostaza.', 
+    callToAction: '¡Sabor inigualable!', 
+    altText: 'Hamburguesa Con queso',
+    targetRoute: '/menu'
+  },
+  { 
+    image: cheddar, 
+    title: 'PAPAS BACON', 
+    descriptionLine1: 'Papas con cheddar ', 
+    descriptionLine2: 'y bacon.', 
+    callToAction: '¡Bien crocantes!', 
+    altText: 'Papas con cheddar y bacon',
+    targetRoute: '/menu'
+  },
+  { 
+    image: pizzas, 
+    title: 'PIZZAS', 
+    descriptionLine1: 'Gran variedad de pizzas ', 
+    descriptionLine2: 'No te quedes sin probar.', 
+    callToAction: '¡Probalas!', 
+    altText: 'Papas con cheddar y bacon',
+    targetRoute: '/menu'
+  },
+  { 
+    image: conqueso, 
+    title: 'CALIDAD ÚNICA', 
+    descriptionLine1: 'Mira nuestro menú completo', 
+    callToAction: '¡Menú completo!', 
+    altText: 'Mira nuestro menú completo',
+    targetRoute: '/menu'
+  },
 ];
 
 const Inicio: React.FC = () => {
@@ -139,9 +207,9 @@ const Inicio: React.FC = () => {
         startAutoSlide();
     };
     
-    // Función del botón para manejar la navegación
-    const handleButtonClick = () => {
-        navigate('/menu');
+    // 🔥 Función del botón modificada para manejar rutas específicas
+    const handleButtonClick = (targetRoute: string) => {
+        navigate(targetRoute);
     }
 
     const whatsappPedidoMessage = 'Hola! Quisiera hacer un pedido.';
@@ -172,9 +240,10 @@ const Inicio: React.FC = () => {
                                 {item.descriptionLine1}<br />
                                 {item.descriptionLine2}
                             </p>
+                            {/* 🔥 Botón con ruta específica para cada slide */}
                             <button
                                 className={styles.heroCallToAction}
-                                onClick={handleButtonClick}
+                                onClick={() => handleButtonClick(item.targetRoute)}
                             >
                                 {item.callToAction}
                             </button>
