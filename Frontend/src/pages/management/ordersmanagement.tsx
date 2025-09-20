@@ -328,23 +328,28 @@ const OrdersManagement: React.FC = () => {
     }
   };
 
-  const calculateTotalAmount = useCallback(() => {
-    let total = 0;
-    newOrderForm.formProducts.forEach(fp => {
-      const product = availableProducts.find(p => p._id === fp.productId);
-      if (product) {
-        total += product.price * fp.quantity;
-      }
-      fp.selectedAddOns.forEach(sa => {
-        const addOn = availableAddOns.find(a => a._id === sa.addOnId);
-        if (addOn) {
-          total += addOn.price * sa.quantity;
-        }
-      });
-    });
-    return total;
-  }, [newOrderForm.formProducts, availableProducts, availableAddOns]);
+const calculateTotalAmount = useCallback(() => {
+    let total = 0;
+    newOrderForm.formProducts.forEach(fp => {
+        // Buscar el producto para obtener su precio
+        const product = availableProducts.find(p => p._id === fp.productId);
+        
+        if (product) {
+            // El total del producto principal es su precio multiplicado por su cantidad
+            total += product.price * fp.quantity;
 
+            // Recorrer los adicionales seleccionados para ese producto
+            fp.selectedAddOns.forEach(sa => {
+                const addOn = availableAddOns.find(a => a._id === sa.addOnId);
+                if (addOn) {
+                    // El total del adicional es su precio multiplicado por la cantidad del producto principal
+                    total += addOn.price * fp.quantity;
+                }
+            });
+        }
+    });
+    return total;
+}, [newOrderForm.formProducts, availableProducts, availableAddOns]);
 
   const handleSubmitNewOrder = async (e: React.FormEvent) => {
     e.preventDefault();
