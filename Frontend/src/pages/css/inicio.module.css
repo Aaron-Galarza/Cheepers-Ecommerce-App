@@ -53,32 +53,38 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  contain: paint; /* ← aislamiento del contenedor para Safari */
 }
 
-/* Solución específica para Safari - Animación simplificada */
+/* Animación del slide (sincronizada con JS a 0.9s) */
 .heroSlide {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   opacity: 0;
-  transition: opacity 0.8s ease-in-out;
+  visibility: hidden;            /* ← oculta de verdad los no activos */
+  pointer-events: none;          /* ← no capturan toques/clicks */
+  transition: opacity 0.9s ease-in-out; /* ← 900ms, igual que JS */
   display: flex;
   align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
   padding: 43px;
-  pointer-events: none;
+
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  will-change: opacity; /* Mejora rendimiento en Safari */
+  will-change: opacity;
+
+  /* hints de composición para iOS */
+  contain: layout paint;         /* ← aísla cada slide */
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
 }
 
 .heroSlide.active {
   opacity: 1;
   z-index: 1;
   pointer-events: auto;
+  visibility: visible;           /* ← el activo sí es visible */
 }
 
 .heroImageContainer {
@@ -334,15 +340,9 @@ body {
 
 /* Media Queries para Responsividad */
 @media (max-width: 1024px) {
-  .heroTitle {
-    font-size: 4em;
-  }
-  .heroText {
-    font-size: 1.6em;
-  }
-  .heroCallToAction {
-    font-size: 1.3em;
-  }
+  .heroTitle { font-size: 4em; }
+  .heroText  { font-size: 1.6em; }
+  .heroCallToAction { font-size: 1.3em; }
 }
 
 @media (max-width: 768px) {
@@ -399,10 +399,7 @@ body {
     gap: var(--space-xs);
   }
 
-  .dot {
-    width: 10px;
-    height: 10px;
-  }
+  .dot { width: 10px; height: 10px; }
 
   .aboutContactSection {
     flex-direction: column;
@@ -417,10 +414,7 @@ body {
     box-sizing: border-box;
   }
   
-  .aboutMainTitle {
-    font-size: 1.8em;
-    text-align: center;
-  }
+  .aboutMainTitle { font-size: 1.8em; text-align: center; }
   
   /* RESPETANDO TUS REGLAS DE TEXTO PARA MÓVILES - SIN MODIFICACIONES */
   .aboutParagraph {
@@ -436,19 +430,11 @@ body {
     overflow-wrap: break-word;
   }
   
-  .aboutSubTitle {
-    font-size: 1.4em;
-    text-align: center;
-  }
+  .aboutSubTitle { font-size: 1.4em; text-align: center; }
 
-  .mapEmbedContainer {
-    max-width: 100%;
-    padding: var(--space-sm);
-  }
+  .mapEmbedContainer { max-width: 100%; padding: var(--space-sm); }
 
-  .contactTitle {
-    font-size: 1.5em;
-  }
+  .contactTitle { font-size: 1.5em; }
 
   .contactItem {
     flex-direction: column;
@@ -456,25 +442,15 @@ body {
     text-align: center;
   }
 
-  .contactText {
-    font-size: 0.9em;
-  }
+  .contactText { font-size: 0.9em; }
 
-  .mapEmbedContainer iframe {
-    height: 250px;
-  }
+  .mapEmbedContainer iframe { height: 250px; }
 
-  .openInMapsButton {
-    font-size: 1em;
-    padding: 10px 20px;
-  }
+  .openInMapsButton { font-size: 1em; padding: 10px 20px; }
 }
 
 @media (max-width: 395px) {
-  .heroImageContainer {
-    width: 97%;
-    height: 290px;
-  }
+  .heroImageContainer { width: 97%; height: 290px; }
   
   /* RESPETANDO TUS REGLAS DE TEXTO PARA MÓVILES PEQUEÑOS - SIN MODIFICACIONES */
   .aboutParagraph {
@@ -490,7 +466,6 @@ body {
 }
 
 /* SOLUCIONES ESPECÍFICAS PARA SAFARI */
-/* Detección de Safari usando @supports */
 @supports (-webkit-touch-callout: none) {
   .heroSection {
     -webkit-perspective: 1000px;
@@ -499,13 +474,13 @@ body {
   
   .heroSlide {
     -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    transition: opacity 0.6s ease-in-out !important;
+            transform-style: preserve-3d;
+    transition: opacity 0.9s ease-in-out !important; /* ← sincronizado */
   }
   
   .heroImageContainer, .heroImage {
     -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+            transform: translateZ(0);
   }
 }
 
@@ -514,7 +489,7 @@ body {
   @supports (-webkit-appearance: none) {
     .heroSlide {
       -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
+              backface-visibility: hidden;
       will-change: opacity;
     }
   }
@@ -525,6 +500,6 @@ body {
 .heroImageContainer,
 .heroImage {
   -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+          backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
 }
