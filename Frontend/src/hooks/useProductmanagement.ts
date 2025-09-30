@@ -35,7 +35,7 @@ export const useProductManagement = () => {
       const response = await axios.get<Product[]>(`${API_BASE_URL}/api/products?includeInactive=true`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const allowedCategories = ['Hamburguesas', 'Papas Fritas', 'Pizzas','Lomos' ];
+      const allowedCategories = ['Hamburguesas', 'Papas Fritas', 'Pizzas','Sandwiches' ];
       const filteredData = response.data.filter(p => allowedCategories.includes(p.category));
       setProducts(filteredData);
 
@@ -153,7 +153,7 @@ export const useProductManagement = () => {
     }
   }, [fetchProducts]);
 
-  const ALLOWED_CATEGORIES = ['Hamburguesas', 'Papas Fritas', 'Pizzas', "Lomos"];
+  const ALLOWED_CATEGORIES = ['Hamburguesas', 'Papas Fritas', 'Pizzas', 'Sandwiches'];
 
   const filteredProducts = products
     .filter(p => ALLOWED_CATEGORIES.includes(p.category))

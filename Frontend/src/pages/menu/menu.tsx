@@ -53,7 +53,7 @@ const MenuPage: React.FC = () => {
     const hamburgers = products.filter((p) => p.category === 'Hamburguesas');
     const fries = products.filter((p) => p.category === 'Papas Fritas');
     const pizzas = products.filter((p) => p.category === 'Pizzas');
-    const lomos = products.filter((p) => p.category === 'Lomos');
+    const lomos = products.filter((p) => p.category === 'Sandwiches');
 
     // Verificar si hay productos en cada categoría
     const hasHamburgers = hamburgers.length > 0;
@@ -93,7 +93,7 @@ const MenuPage: React.FC = () => {
                     {hasLomos && (
                         <li>
                             <a onClick={() => scrollToSection(lomosRef)}>
-                                <GiBread className={styles.navIcon} /> Lomos
+                                <GiBread className={styles.navIcon} /> Sandwich
                             </a>
                         </li>
                     )}
@@ -170,8 +170,8 @@ const MenuPage: React.FC = () => {
                 {/* Lomos - Solo se muestra si hay productos */}
                 {hasLomos && (
                     <>
-                        <h1 id="lomos" className={styles.sectionTitle} ref={lomosRef}>
-                            LOMOS
+                        <h1 id="Sandwiches" className={styles.sectionTitle} ref={lomosRef}>
+                            SANDWICHES
                         </h1>
                         <div className={styles.grid}>
                             {lomos.map((p) => (
