@@ -6,10 +6,8 @@ import baconcheep from '../../assets/images/hamburguesa big tasty.jpeg';
 import barbacue from '../../assets/images/con queso con sesamo.jpeg';
 import cheddar from '../../assets/images/papas fritas bacon.jpeg';
 import conqueso from '../../assets/images/con queso.jpeg';
-import lomo from '../../assets/images/lomito.jpeg';
 import pizzas from '../../assets/images/pizzas.jpeg';
-import lomo3 from '../../assets/images/lomito3.jpeg';
-import sandwichVacio from '../../assets/images/sadnwichVacio.jpeg'
+import sandwichVacio from '../../assets/images/vacio.jpeg'
 import { FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // ======== Duraciones sincronizadas ========
