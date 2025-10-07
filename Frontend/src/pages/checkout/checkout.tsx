@@ -46,11 +46,35 @@ const CheckoutPage: React.FC = () => {
 
   const subtotal = calculateCartTotal();
   const [finalTotal, setFinalTotal] = useState<number>(subtotal);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
 
-  useEffect(() => {
-    // Eliminada toda la lógica de descuento
-    setFinalTotal(subtotal);
-  }, [subtotal, cart]);
+  useEffect(() => {
+    const itemsEligibleForDiscount = cart.filter(item =>
+      item.category !== 'Promos' && item.category !== 'Promos Solo en Efectivo'
+    );
+
+    const totalEligible = itemsEligibleForDiscount.reduce((sum, item) => {
+      let itemTotal = item.price; // Costo del producto base
+      if (item.addOns?.length) {
+        itemTotal += item.addOns.reduce(
+          (addOnsSum, addOn) => addOnsSum + addOn.price * addOn.quantity,
+          0
+        );
+      }
+      // La corrección está aquí: multiplicamos el total del ítem (producto + adicionales)
+      // por la cantidad de ese ítem.
+      return sum + (itemTotal * item.quantity);
+    }, 0);
+
+    if (metodo === 'efectivo') {
+      const discount = totalEligible * 0.1;
+      setDiscountAmount(discount);
+      setFinalTotal(subtotal - discount);
+    } else {
+      setDiscountAmount(0);
+      setFinalTotal(subtotal);
+    }
+  }, [metodo, subtotal, cart]);
 
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -308,6 +332,13 @@ const CheckoutPage: React.FC = () => {
             <p className={styles.summaryTotalLabel}>Subtotal:</p>
             <p className={styles.summaryTotalValue}>${subtotal.toFixed(2)}</p>
           </div>
+
+          {metodo === 'efectivo' && discountAmount > 0 && (
+            <div className={styles.summaryDiscountRow}>
+              <p className={styles.summaryDiscountLabel}>Descuento por Efectivo (10%): <br />(No aplica a promos)</p>
+              <p className={styles.summaryDiscountValue}>-${discountAmount.toFixed(2)}</p>
+            </div>
+          )}
 
           <div className={styles.summaryGrandTotalRow}>
             <p className={styles.summaryGrandTotalLabel}>Total:</p>
