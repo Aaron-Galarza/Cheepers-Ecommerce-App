@@ -8,6 +8,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export let isStoreOpen = false;
+export let isDiscountActive = false;
 
 const horarios = {
     DO: { open: '20:00', close: '23:00' },
@@ -29,6 +30,10 @@ export const setupSchedule = () => {
     // Obtener hora actual en Buenos Aires
     const now = dayjs().tz("America/Argentina/Buenos_Aires");
     const currentDay = days[now.day()];
+
+    // Dias con descuento
+    isDiscountActive = currentDay === "VI" || currentDay === "SA" || currentDay === "DO" ? false : true;
+    console.log(`El descuento TEMPORAL está actualmente ${isDiscountActive ? 'ACTIVO' : 'INACTIVO'}.`);
 
     const openTimeParts = horarios[currentDay].open.split(':').map(Number);
     const closeTimeParts = horarios[currentDay].close.split(':').map(Number);

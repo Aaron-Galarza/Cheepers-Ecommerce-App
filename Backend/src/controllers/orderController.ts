@@ -7,6 +7,9 @@ import AddOn, { IAddOn } from '../models/AddOn';
 import Product, { IProduct } from '../models/Product';
 import asyncHandler from 'express-async-handler';
 import { isStoreOpen } from '../utils/schedule'; // <-- IMPORTA EL ESTADO
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone'
+dayjs.extend(timezone);
 
 
 // Definición de tipos para la interfaz de solicitud
@@ -40,7 +43,7 @@ interface CreateOrderRequestBody {
 // @access    Public (solo invitados)
 export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderRequestBody>, res: Response) => {
     // --- VERIFICACIÓN DE HORARIOS ---
-    if (!isStoreOpen) {
+    if (!isStoreOpen ) {
         res.status(400);
         throw new Error('Lo sentimos, estamos fuera del horario de atención. Vuelva más tarde.');
     }
@@ -147,8 +150,13 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         });
     }
 
+    const now = dayjs().tz("America/Argentina/Buenos_Aires");
+    const currentDaysOfWeek = now.day()
+    const isCashDiscountDay = currentDaysOfWeek >= 1 && currentDaysOfWeek <= 4;
+
+
     // Calcular el descuento final y el total
-    const discount = paymentMethod === 'cash' ? discountableAmount * 0.10 : 0;
+    const discount = paymentMethod === 'cash' && isCashDiscountDay ? discountableAmount * 0.10 : 0;
     const finalTotalAmount = totalAmount - discount;
 
     // 3. Crear el nuevo pedido
@@ -275,11 +283,16 @@ export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: R
     
     let newTotalAmount = totalAmount; // Empezamos con el total sin descuento
     
+    // Determinar el día actual para la lógica de descuento (necesario también en el PUT)
+    const now = dayjs().tz("America/Argentina/Buenos_Aires");
+    const currentDayOfWeek = now.day(); 
+    const isCashDiscountDay = currentDayOfWeek >= 1 && currentDayOfWeek <= 4;
+
     // --- LÓGICA DE ACTUALIZACIÓN Y RECALCULO ---
     
     // CASO 1: El nuevo método de pago es 'cash' (Efectivo)
     // Asumimos que quieres aplicar el descuento si el nuevo método es efectivo
-    if (paymentMethod === 'cash') {
+    if (paymentMethod === 'cash' || isCashDiscountDay) {
         const discountableAmount = totalAmount; // Asumimos que todo es con descuento
         const discount = discountableAmount * 0.10;
         newTotalAmount = totalAmount - discount;
