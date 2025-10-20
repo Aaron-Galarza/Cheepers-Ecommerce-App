@@ -6,11 +6,14 @@ import Pedido, { IOrder, IProductItem, ISelectedAddOn, IShippingAddress } from '
 import AddOn, { IAddOn } from '../models/AddOn'; 
 import Product, { IProduct } from '../models/Product';
 import asyncHandler from 'express-async-handler';
-import { isStoreOpen } from '../utils/schedule'; // <-- IMPORTA EL ESTADO
+// REEMPLAZAR importación antigua:
+import { getStoreOpenStatus, getCashDiscountStatus } from '../utils/schedule';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone'
-dayjs.extend(timezone);
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Definición de tipos para la interfaz de solicitud
 declare module 'express-serve-static-core' {
@@ -38,12 +41,13 @@ interface CreateOrderRequestBody {
     notes?: string;
 }
 
-// @desc      Crear un nuevo pedido
-// @route     POST /api/orders
-// @access    Public (solo invitados)
+// @desc      Crear un nuevo pedido
+// @route     POST /api/orders
+// @access    Public (solo invitados)
 export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderRequestBody>, res: Response) => {
-    // --- VERIFICACIÓN DE HORARIOS ---
-    if (!isStoreOpen ) {
+    // --- VERIFICACIÓN DE HORARIOS ACTUALIZADA ---
+    const { isOpen: isStoreOpen } = await getStoreOpenStatus();
+    if (!isStoreOpen) {
         res.status(400);
         throw new Error('Lo sentimos, estamos fuera del horario de atención. Vuelva más tarde.');
     }
@@ -81,7 +85,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
     let discountableAmount = 0;
     const productsForOrder: IProductItem[] = [];
 
-    // --- CAMBIO DE OPTIMIZACIÓN: CONSULTAS FUERA DEL BUCLE ---
+    // Consultas optimizadas fuera del bucle
     const productIds = products.map(p => p.productId);
     const addOnIds = products.flatMap(p => p.addOns ? p.addOns.map(a => a.addOnId) : []);
 
@@ -92,12 +96,10 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         const product = productDocuments.find(p => p._id.toString() === item.productId);
         if (!product) {
             res.status(404);
-            // CORRECCIÓN DE LA PLANTILLA DE STRING
-            throw new Error(`Producto con ID ${item.productId} no encontrado.`); 
+            throw new Error(`Producto con ID ${item.productId} no encontrado.`);
         }
         if (product.isActive === false) {
             res.status(400);
-            // CORRECCIÓN DE LA PLANTILLA DE STRING
             throw new Error(`El producto "${product.name}" (ID: ${item.productId}) no está disponible para la venta actualmente.`);
         }
 
@@ -109,17 +111,9 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
                 const addOn = addOnDocuments.find(a => a._id.toString() === addOnRequest.addOnId);
                 if (!addOn || addOn.isActive === false) {
                     res.status(400);
-                    // CORRECCIÓN DE LA PLANTILLA DE STRING
-                    throw new Error(`Adicional con ID ${addOnRequest.addOnId} no está disponible o no existe.`); 
+                    throw new Error(`Adicional con ID ${addOnRequest.addOnId} no está disponible o no existe.`);
                 }
 
-                // CORRECCIÓN: La lógica anterior no usaba la cantidad, pero aquí la tienes
-                // itemPrice += addOn.price * addOnRequest.quantity; 
-                // Asumo que el formulario ya no envía 'addOnRequest.quantity' 
-                // o que siempre será 1 si está presente. 
-                // Si la cantidad es 1, la línea es correcta, si no, hay que revisar la estructura.
-                
-                // MANTENGO TU CÁLCULO ORIGINAL: 
                 itemPrice += addOn.price * addOnRequest.quantity;
 
                 selectedAddOnsForProduct.push({
@@ -134,7 +128,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         const itemTotal = itemPrice * item.quantity;
         totalAmount += itemTotal;
 
-        // Lógica de descuento, exactamente como la propusiste
+        // Lógica de descuento
         const isDiscountable = !['Promos', 'Promos Solo en Efectivo'].includes(product.category);
         if (isDiscountable) {
             discountableAmount += itemTotal;
@@ -150,13 +144,12 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         });
     }
 
-    const now = dayjs().tz("America/Argentina/Buenos_Aires");
-    const currentDaysOfWeek = now.day()
-    const isCashDiscountDay = currentDaysOfWeek >= 1 && currentDaysOfWeek <= 4;
-
+    // --- LÓGICA DE DESCUENTO ACTUALIZADA ---
+    const { isActive: isDiscountActive, percentage: discountPercentage } = await getCashDiscountStatus();
 
     // Calcular el descuento final y el total
-    const discount = paymentMethod === 'cash' && isCashDiscountDay ? discountableAmount * 0.10 : 0;
+    const shouldApplyCashDiscount = paymentMethod === 'cash' && isDiscountActive;
+    const discount = shouldApplyCashDiscount ? discountableAmount * (discountPercentage / 100) : 0;
     const finalTotalAmount = totalAmount - discount;
 
     // 3. Crear el nuevo pedido
@@ -178,9 +171,9 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
     res.status(201).json({ message: 'Pedido creado exitosamente!', order: createdOrder });
 });
 
-// @desc      Obtener todos los pedidos (con filtro por estado opcional)
-// @route     GET /api/orders?status=pending
-// @access    Private/Admin
+// @desc      Obtener todos los pedidos (con filtro por estado opcional)
+// @route     GET /api/orders?status=pending
+// @access    Private/Admin
 export const getOrders = asyncHandler(async (req: Request, res: Response) => {
     const { status } = req.query;
 
@@ -195,7 +188,6 @@ export const getOrders = asyncHandler(async (req: Request, res: Response) => {
             query.status = lowerCaseStatus;
         } else {
             res.status(400);
-            // CORRECCIÓN DE LA PLANTILLA DE STRING
             throw new Error(`Estado de pedido inválido: "${status}". Los estados permitidos son: ${validStatuses.join(', ')}.`);
         }
     }
@@ -204,9 +196,9 @@ export const getOrders = asyncHandler(async (req: Request, res: Response) => {
     res.status(200).json(orders);
 });
 
-// @desc      Obtener un pedido por ID
-// @route     GET /api/orders/:id
-// @access    Private (solo un admin puede verlo)
+// @desc      Obtener un pedido por ID
+// @route     GET /api/orders/:id
+// @access    Private (solo un admin puede verlo)
 export const getOrderById = asyncHandler(async (req: Request, res: Response) => {
     const order = await Pedido.findById(req.params.id);
 
@@ -218,16 +210,15 @@ export const getOrderById = asyncHandler(async (req: Request, res: Response) => 
     }
 });
 
-// @desc      Actualizar el estado de un pedido
-// @route     PUT /api/orders/:id/status
-// @access    Private/Admin
+// @desc      Actualizar el estado de un pedido
+// @route     PUT /api/orders/:id/status
+// @access    Private/Admin
 export const updateOrderStatus = asyncHandler(async (req: Request, res: Response) => {
-    const { status } = req.body; // Esperamos un campo 'status' en el body
+    const { status } = req.body;
 
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!status || !validStatuses.includes(status)) {
         res.status(400);
-        // CORRECCIÓN DE LA PLANTILLA DE STRING
         throw new Error(`Estado de pedido inválido: "${status}". Los estados permitidos son: ${validStatuses.join(', ')}.`);
     }
 
@@ -243,17 +234,16 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     }
 });
 
-// @desc      Actualizar el paymentMethod y recalcular el precio de un pedido
-// @route     PUT /api/orders/:id/paymentMethod
-// @access    Private/Admin
+// @desc      Actualizar el paymentMethod y recalcular el precio de un pedido
+// @route     PUT /api/orders/:id/paymentMethod
+// @access    Private/Admin
 export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: Response) => {
-    const { paymentMethod } = req.body; // Nuevo método de pago
+    const { paymentMethod } = req.body;
     const orderId = req.params.id;
 
     const validpaymentMethods = ['cash', 'card', 'transfer', 'Efectivo', 'Mercado Pago'];
     if (!paymentMethod || !validpaymentMethods.includes(paymentMethod)) {
         res.status(400);
-        // CORRECCIÓN DE LA PLANTILLA DE STRING
         throw new Error(`El Método de Pago del pedido es inválido: "${paymentMethod}". Los estados permitidos son: ${validpaymentMethods.join(', ')}.`);
     }
 
@@ -266,7 +256,6 @@ export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: R
 
     // Lógica para recalcular el precio total
     let totalAmount = 0;
-    // let discountableAmount = 0; // Ya no es necesario si asumimos que todo es descontable
 
     // Recalcular el total base (suma de precio de productos y adicionales)
     for (const item of order.products) {
@@ -281,25 +270,19 @@ export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: R
         totalAmount += itemTotal;
     }
     
-    let newTotalAmount = totalAmount; // Empezamos con el total sin descuento
+    let newTotalAmount = totalAmount;
     
-    // Determinar el día actual para la lógica de descuento (necesario también en el PUT)
-    const now = dayjs().tz("America/Argentina/Buenos_Aires");
-    const currentDayOfWeek = now.day(); 
-    const isCashDiscountDay = currentDayOfWeek >= 1 && currentDayOfWeek <= 4;
+    // --- LÓGICA DE DESCUENTO ACTUALIZADA ---
+    const { isActive: isDiscountActive, percentage: discountPercentage } = await getCashDiscountStatus();
 
-    // --- LÓGICA DE ACTUALIZACIÓN Y RECALCULO ---
-    
-    // CASO 1: El nuevo método de pago es 'cash' (Efectivo)
-    // Asumimos que quieres aplicar el descuento si el nuevo método es efectivo
-    if (paymentMethod === 'cash' || isCashDiscountDay) {
+    // CASO 1: El nuevo método de pago es 'cash' Y es día de descuento
+    if (paymentMethod === 'cash' && isDiscountActive) {
         const discountableAmount = totalAmount; // Asumimos que todo es con descuento
-        const discount = discountableAmount * 0.10;
+        const discount = discountableAmount * (discountPercentage / 100);
         newTotalAmount = totalAmount - discount;
     } 
-    // CASO 2: El nuevo método de pago es 'card' o 'transfer' (Sin descuento)
-    // El precio se mantiene en el total sin descuento
-    else if (['card', 'transfer', 'Mercado Pago'].includes(paymentMethod)) {
+    // CASO 2: Cualquier otro método o día (sin descuento)
+    else {
         newTotalAmount = totalAmount;
     }
     
@@ -315,13 +298,12 @@ export const updateOrderPaymentMethod = asyncHandler(async (req: Request, res: R
     });
 });
 
-// @desc      Eliminar todos los pedidos
-// @route     DELETE /api/orders/all
-// @access    Private/Admin
+// @desc      Eliminar todos los pedidos
+// @route     DELETE /api/orders/all
+// @access    Private/Admin
 export const deleteAllOrders = asyncHandler(async (req: Request, res: Response) => {
     const result = await Pedido.deleteMany({});
     res.status(200).json({ 
-        // CORRECCIÓN DE LA PLANTILLA DE STRING
         message: `Se eliminaron ${result.deletedCount} pedidos del historial.`, 
     });
 });
