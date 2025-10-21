@@ -84,8 +84,7 @@ function App() {
           <Route path="/promos" element={<PromosPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-
+<Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
           {/* Rutas Protegidas */}
           {/* Protege el Dashboard (si es una ruta independiente) */}
           <Route 

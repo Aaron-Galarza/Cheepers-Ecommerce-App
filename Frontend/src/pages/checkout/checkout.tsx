@@ -1,3 +1,5 @@
+// src/pages/checkout/checkout.tsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../components/layout/checkout/cartcontext';
@@ -21,7 +23,7 @@ const normalizeCityName = (cityName: string) => {
   return normalized;
 };
 
-// NUEVO: Definimos un tipo para la configuración del descuento
+// (El tipo DiscountConfig no cambia)
 interface DiscountConfig {
   isActive: boolean;
   percentage: number;
@@ -29,7 +31,7 @@ interface DiscountConfig {
 }
 
 const CheckoutPage: React.FC = () => {
-  const [email, setEmail] = useState('');
+  // (Estado 'email' eliminado)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
@@ -46,14 +48,13 @@ const CheckoutPage: React.FC = () => {
   const [finalTotal, setFinalTotal] = useState<number>(subtotal);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
 
-  // NUEVO: Estado para guardar la configuración del descuento de la API
   const [discountConfig, setDiscountConfig] = useState<DiscountConfig>({
     isActive: false,
     percentage: 0,
     message: '',
   });
 
-  // NUEVO: useEffect para cargar la configuración del descuento al montar el componente
+  // (useEffect para cargar la configuración de descuento no cambia)
   useEffect(() => {
     const fetchDiscountConfig = async () => {
       try {
@@ -65,17 +66,15 @@ const CheckoutPage: React.FC = () => {
         });
       } catch (error) {
         console.error("Error al cargar la configuración de descuento:", error);
-        // Si falla, simplemente mantenemos el descuento como inactivo
         setDiscountConfig({ isActive: false, percentage: 0, message: '' });
       }
     };
 
     fetchDiscountConfig();
-  }, []); // El array vacío [] asegura que esto solo se ejecute una vez, cuando el componente se carga
+  }, []);
 
-  // MODIFICADO: useEffect para calcular el total. Ahora depende de 'discountConfig'
+  // MODIFICADO: useEffect para calcular el total
   useEffect(() => {
-    // La lógica para encontrar los ítems elegibles sigue igual
     const itemsEligibleForDiscount = cart.filter(item =>
       item.category !== 'Promos' && item.category !== 'Promos Solo en Efectivo'
     );
@@ -91,29 +90,29 @@ const CheckoutPage: React.FC = () => {
       return sum + (itemTotal * item.quantity);
     }, 0);
 
-    // MODIFICADO: La lógica de descuento ahora usa el estado 'discountConfig'
+    // MODIFICADO: Lógica de descuento simplificada (como la pediste)
+    // Solo depende del método de pago y si el descuento está activo
     if (metodo === 'efectivo' && discountConfig.isActive) {
-      // Usamos el porcentaje de la API (ej: 10 / 100 = 0.1)
       const discountRate = discountConfig.percentage / 100;
       const discount = totalEligible * discountRate;
       
       setDiscountAmount(discount);
       setFinalTotal(subtotal - discount);
     } else {
-      // Si el método no es efectivo O el descuento está inactivo, no hay descuento
+      // Si no es efectivo o el descuento está inactivo, no hay descuento
       setDiscountAmount(0);
       setFinalTotal(subtotal);
     }
-    // Añadimos discountConfig a las dependencias
+    // MODIFICADO: 'deliveryType' ya no es una dependencia aquí
   }, [metodo, subtotal, cart, discountConfig]);
 
-  // (La función handleConfirm no necesita cambios, ya que usa 'finalTotal'
-  // que ya está siendo calculado correctamente por el useEffect de arriba)
+  
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setIsLoading(true);
 
+    // (Validaciones de campos... no cambian)
     if (!name || !phone || !metodo || !deliveryType) {
       setErrorMessage('Por favor, completá todos los campos generales y de pago.');
       setIsLoading(false);
@@ -126,10 +125,8 @@ const CheckoutPage: React.FC = () => {
         setIsLoading(false);
         return;
       }
-
       const normalizedCity = normalizeCityName(city);
       const validCities = ['resistencia', 'resistensia', 'resistensía', 'resisténcia'];
-
       if (!validCities.includes(normalizedCity)) {
         setErrorMessage('Solo se permite realizar envíos a la ciudad de Resistencia. Por favor, corregí la ciudad.');
         setIsLoading(false);
@@ -143,6 +140,7 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
+    // (Preparación de orderData... no cambia)
     const productsForOrder = cart.map(item => ({
       productId: item._id,
       quantity: item.quantity,
@@ -157,9 +155,9 @@ const CheckoutPage: React.FC = () => {
     const orderData: any = {
       products: productsForOrder,
       guestName: name,
-      guestEmail: email,
+      // (email eliminado)
       guestPhone: phone,
-      totalAmount: finalTotal, // 'finalTotal' ya tiene el descuento aplicado (si correspondía)
+      totalAmount: finalTotal, 
       paymentMethod: backendPaymentMethod,
       deliveryType,
       notes: '',
@@ -169,18 +167,27 @@ const CheckoutPage: React.FC = () => {
       orderData.shippingAddress = { street, city };
     }
 
+    // MANTENIDO: Lógica de redirección segura (esto ya estaba bien)
     try {
       const response = await axios.post(`${API_BASE_URL}/api/orders`, orderData);
-      console.log('Pedido creado exitosamente:', response.data.order);
-      clearCart();
-      // MODIFICADO: Navegamos a la página de confirmación pasando el ID del pedido
-      // Asumiendo que la respuesta de la API devuelve el ID así: response.data.order._id
-      // Si la ruta es solo /order-confirmation, mantenlo como estaba.
-      // Pero es buena práctica pasar el ID:
-      navigate(`/order-confirmation/${response.data.order._id}`);
-      
+
+      const newOrder = response.data.order;
+
+      // Verificamos que la API nos dio un 'order' y un '_id'
+      if (newOrder && newOrder._id) {
+        // ¡ÉXITO! Limpiamos el carrito y navegamos
+        console.log('Pedido creado exitosamente con ID:', newOrder._id);
+        clearCart();
+        navigate(`/order-confirmation/${newOrder._id}`);
+      } else {
+        // La API respondió OK pero no vino el ID
+        console.error('Error: La API no devolvió un ID de pedido válido.', response.data);
+        setErrorMessage('Hubo un problema al procesar la respuesta de tu pedido. Intenta de nuevo.');
+      }
+
     } catch (error: any) {
-      console.error('Error al confirmar el pedido:', error.response?.data?.message || error.message);
+      // Error de Red (400, 500, etc)
+      console.error('Error (catch) al confirmar el pedido:', error.response?.data?.message || error.message);
       setErrorMessage(error.response?.data?.message || 'Error inesperado al procesar tu pedido.');
     } finally {
       setIsLoading(false);
@@ -190,10 +197,9 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       <h1 className={styles.pageTitle}>Confirmar Pedido</h1>
-      <div className={styles.gridContainer}>
-        {/* ... (El formulario y los inputs de datos generales no cambian) ... */}
-        
+      <div className={styles.gridContainer}>        
         <form onSubmit={handleConfirm} className={styles.formSection}>
+          {/* ... (Datos Generales, Nombre, Teléfono no cambian) ... */}
           <h2 className={styles.sectionTitle}>
             <span className={styles.iconWrapper}><FaUser /></span> Datos Generales
           </h2>
@@ -203,7 +209,6 @@ const CheckoutPage: React.FC = () => {
               <span className={styles.errorMessageSpan}> {errorMessage}</span>
             </div>
           )}
-          {/* ... (Inputs de nombre y teléfono no cambian) ... */}
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><FaUser /></span>
@@ -239,7 +244,6 @@ const CheckoutPage: React.FC = () => {
             <span className={styles.iconWrapper}><FaHome /></span> Tipo de Entrega
           </h3>
           <div className={styles.radioGroup}>
-            {/* ... (Radio 'Envío a Domicilio') ... */}
             <label className={styles.radioLabel}>
               <input
                 type="radio"
@@ -250,7 +254,6 @@ const CheckoutPage: React.FC = () => {
               />
               <span className={styles.radioText}><FaHome /> Envío a Domicilio</span>
             </label>
-            {/* ... (Radio 'Retiro en Sucursal') ... */}
             <label className={styles.radioLabel}>
               <input
                 type="radio"
@@ -264,7 +267,6 @@ const CheckoutPage: React.FC = () => {
           </div>
           {deliveryType === 'delivery' && (
             <>
-             {/* ... (Inputs de Dirección) ... */}
              <h3 className={styles.sectionTitle}>
                <span className={styles.iconWrapper}><FaHome /></span> Dirección de Envío
              </h3>
@@ -314,9 +316,10 @@ const CheckoutPage: React.FC = () => {
                 onChange={() => setMetodo('efectivo')}
                 className={styles.radioInput}
               />
-              {/* MODIFICADO: El texto ahora es dinámico */}
+              {/* MODIFICADO: Texto del descuento (sin 'deliveryType') */}
               <span className={styles.radioText}>
                 Efectivo
+                {discountConfig.isActive && ` (${discountConfig.percentage}% de descuento)`}
               </span>
             </label>
             <label className={styles.radioLabel}>
@@ -331,15 +334,15 @@ const CheckoutPage: React.FC = () => {
             </label>
           </div>
 
-          {/* MODIFICADO: Si el descuento está activo, mostramos el mensaje de la API */}
+          {/* MODIFICADO: Mensaje de la API (sin 'deliveryType') */}
           {discountConfig.isActive && (
             <p className={styles.infoTextSimple}>
               {discountConfig.message}
             </p>
           )}
 
+          {/* (Botones del formulario no cambian) */}
           <div className={styles.formButtons}>
-            {/* ... (Botones no cambian) ... */}
             <Button className={styles.backButton} onClick={() => navigate('/cart')}>
               Atrás
             </Button>
@@ -353,10 +356,11 @@ const CheckoutPage: React.FC = () => {
           </div>
         </form>
 
+        {/* --- SECCIÓN DE RESUMEN --- */}
         <div className={styles.summarySection}>
-          {/* ... (Resumen de pedido no cambia) ... */}
           <h2 className={styles.summaryTitle}>Mi Pedido</h2>
           <div className={styles.summaryItems}>
+            {/* (Mapeo de items no cambia) */}
             {cart.length === 0 ? (
               <p className={styles.summaryEmpty}>No hay productos en el carrito.</p>
             ) : (
@@ -391,9 +395,7 @@ const CheckoutPage: React.FC = () => {
             <p className={styles.summaryTotalValue}>${subtotal.toFixed(2)}</p>
           </div>
 
-          {/* MODIFICADO: El texto del descuento también es dinámico */}
-          {/* Esta condición es correcta: se muestra si se paga en efectivo
-              Y el 'discountAmount' (calculado en el useEffect) es mayor a 0 */}
+          {/* (Lógica de descuento en el resumen no cambia, ya está correcta) */}
           {metodo === 'efectivo' && discountAmount > 0 && (
             <div className={styles.summaryDiscountRow}>
               <p className={styles.summaryDiscountLabel}>
