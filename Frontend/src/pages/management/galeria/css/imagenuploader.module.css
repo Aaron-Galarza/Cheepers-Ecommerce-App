@@ -1,0 +1,99 @@
+/* src/management/styles/imageuploader.module.css */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0; /* Cubre toda la pantalla */
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50; /* Por encima de todo */
+}
+
+.modalContent {
+  background-color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Estilos del Formulario */
+.inputGroup {
+  margin-bottom: 1rem;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #444;
+}
+
+.inputGroup input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Importante para que el padding no rompa el ancho */
+}
+
+/* Estilo básico para el input[type="file"] */
+.inputGroup input[type="file"] {
+  width: 100%;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Estilos de Botones */
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end; /* Alinea botones a la derecha */
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  background-color: #f73434;
+  color: #f7f7f7;
+  border: 1px solid #ddd;
+}
+.cancelButton:hover {
+  background-color: #f01515;
+}
+
+.uploadButton {
+  background-color: #2563eb; /* Mismo azul que el botón de subir */
+  color: white;
+}
+.uploadButton:hover {
+  background-color: #1d4ed8;
+}
+
+.uploadButton:disabled {
+  background-color: #b3b3b3; /* Gris cuando está deshabilitado */
+  cursor: not-allowed;
+}

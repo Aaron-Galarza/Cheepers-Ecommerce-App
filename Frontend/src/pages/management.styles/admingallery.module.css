@@ -1,0 +1,137 @@
+/* Hemos renombrado las clases a camelCase (ej: .galleryContainer) 
+  para que coincidan con el 'styles.galleryContainer' de tu TSX.
+*/
+
+/* --- Layout Básico del Componente --- */
+.galleryContainer {
+  padding: 1rem 2rem;
+  background-color: #f1f5f9;
+  min-height: 100vh;
+  margin-top: 15px;
+  border-radius:   15px;
+}
+
+.galleryHeader {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Esta es la corrección MÁS IMPORTANTE. 
+  Creamos una clase específica para el H1 
+  en lugar de usar un selector descendiente.
+*/
+.galleryTitle {
+ color: #e53e3e;
+  text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.galleryButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.uploadBtn {
+  background-color: #2563eb; /* Azul */
+}
+.uploadBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.deleteBtn {
+  background-color: #dc2626; /* Rojo */
+}
+.deleteBtn:hover {
+  background-color: #b91c1c;
+}
+
+/* --- Layout de la Grilla de Imágenes --- */
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4rem;
+    margin-bottom: 70px;
+
+}
+
+.imageItem {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 4px solid transparent;
+  transition: border-color 0.2s;
+}
+
+/* CSS Modules es inteligente y sabe que este 'img' 
+  solo se aplica a las 'img' dentro de '.imageItem'.
+*/
+.imageItem img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- Estilos de Selección --- */
+.imageItem:hover {
+  border-color: #93c5fd;
+}
+
+/* La clase '.selected' se añade dinámicamente en React.
+  Así es como se define en el CSS Module.
+*/
+.selected {
+  border-color: #3b82f6 !important; /* !important para ganar al hover */
+}
+
+.checkmarkIcon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyGallery {
+  text-align: center;
+  color: #6b7280;
+}
+
+/* ... (todos tus estilos anteriores) ... */
+
+/* 👇 AÑADE ESTA NUEVA CLASE PARA EL BUSCADOR 👇 */
+.searchInput {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid #b4b3b3;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+

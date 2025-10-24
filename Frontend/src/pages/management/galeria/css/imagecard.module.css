@@ -1,0 +1,105 @@
+/* src/management/styles/imagecard.module.css */
+
+.imageItem {
+  position: relative; /* Clave para los overlays */
+  border-radius: 8px;
+  overflow: hidden; /* ¡Importante para que el zoom no se "salga" del borde! */
+  cursor: pointer;
+  border: 4px solid transparent;
+  transition: border-color 0.2s ease-in-out;
+  background-color: #e0e0e0;
+}
+
+.image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease; /* Transición para el zoom */
+}
+
+/* --- EFECTO ZOOM --- */
+.imageItem:hover .image {
+  transform: scale(1.05); /* La imagen se agranda */
+}
+
+/* --- ESTILO DE SELECCIÓN --- */
+.selected {
+  border-color: #3b82f6 !important;
+}
+
+.checkmarkIcon {
+  position: absolute;
+  z-index: 10; /* Por encima del overlay */
+  top: 8px;
+  right: 8px;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  padding: 2px;
+  display: flex;
+}
+
+/* --- OVERLAY DE HOVER (Contiene el botón de copiar) --- */
+.hoverOverlay {
+  position: absolute;
+  inset: 0; /* (Cubre todo el div: top, bottom, left, right = 0) */
+  background: rgba(0, 0, 0, 0); /* Transparente por defecto */
+  transition: background 0.2s ease;
+  
+  /* Posicionamos el botón de copiar */
+  display: flex;
+  align-items: flex-end; /* Abajo */
+  justify-content: flex-start; /* Izquierda */
+  padding: 8px;
+}
+
+.imageItem:hover .hoverOverlay {
+  background: rgba(0, 0, 0, 0.4); /* Velo oscuro al pasar el mouse */
+}
+
+/* --- BOTÓN DE COPIAR --- */
+.copyButton {
+  background: rgba(255, 255, 255, 0.9); /* Blanco semitransparente */
+  color: #000;
+  border: none;
+  border-radius: 50%; /* Círculo */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  
+  opacity: 0; /* Invisible por defecto */
+  transform: translateY(10px); /* Ligeramente abajo */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 5;
+}
+
+/* --- EFECTO HOVER (Mostrar botón de copiar) --- */
+.imageItem:hover .copyButton {
+  opacity: 1; /* Se hace visible */
+  transform: translateY(0); /* Sube a su posición */
+}
+
+.copyButton:hover {
+  background: white; /* Blanco sólido al pasar el mouse sobre él */
+}
+
+/* ... (todos tus estilos anteriores de .imageItem, .hoverOverlay, .copyButton) ... */
+
+.copyButton:hover {
+  background: white;
+}
+
+/* --- NUEVA CLASE PARA FEEDBACK --- */
+.copied {
+  background-color: #28a745; /* Verde éxito */
+  color: white;
+  transform: translateY(0); /* Asegura que se vea */
+  opacity: 1;
+}
+.copied:hover {
+  background-color: #218838; /* Verde más oscuro */
+}
