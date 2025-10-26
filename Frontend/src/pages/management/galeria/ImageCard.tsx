@@ -3,14 +3,10 @@
 import React, { useState } from 'react'; // Importamos useState
 // Importamos FaCheck para el feedback de copiado
 import { FaCheckCircle, FaLink, FaCheck } from 'react-icons/fa';
+import { GalleryImage } from './AdminGallery'; // Asegúrate de que esta ruta sea correcta
 
 import styles from './css/imagecard.module.css'; 
 
-interface GalleryImage {
-  id: string; 
-  url: string;
-  name: string;
-}
 
 interface ImageCardProps {
   image: GalleryImage;

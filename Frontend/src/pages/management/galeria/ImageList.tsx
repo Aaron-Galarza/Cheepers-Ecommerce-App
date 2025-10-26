@@ -4,13 +4,9 @@ import React from 'react';
 import ImageCard from './ImageCard';
 // Usamos los estilos de la galería (para la grilla)
 import styles from '../../management.styles/admingallery.module.css'; 
+import { GalleryImage } from './AdminGallery'; // Asegúrate de que esta ruta sea correcta
 
 // Definimos la interfaz de la imagen (puedes moverla a un archivo types.ts)
-interface GalleryImage {
-  id: string; 
-  url: string;
-  name: string;
-}
 
 // Definimos las props que este componente espera recibir
 interface ImageListProps {
