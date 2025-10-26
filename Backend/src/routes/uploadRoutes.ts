@@ -8,13 +8,9 @@ const router = express.Router();
 
 // 1. GET /api/uploads/list - Listar imágenes (Solo lectura, Admin)
 router.route('/list').get(protect, admin, listImages);
-
 // 2. POST /api/uploads/sign - Obtener firma para subida (Admin)
-// Nota: Usamos POST porque requiere un body con el publicId, aunque no crea un recurso.
 router.route('/sign').post(protect, admin, getUploadSignature);
-
 // 3. DELETE /api/uploads/:publicId - Eliminar imagen (Admin)
-// El publicId en la URL NO incluye el nombre de la carpeta, el controlador lo añade.
 router.route('/:publicId').delete(protect, admin, deleteImage);
 
 export default router;
