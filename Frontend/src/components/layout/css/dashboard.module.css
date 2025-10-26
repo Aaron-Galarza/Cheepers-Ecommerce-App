@@ -1,6 +1,6 @@
 .dashboardContainer {
   display: flex;
-  height: 100vh;
+  height: 100%;
   overflow: hidden; /* Por defecto, oculto para desktop */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -43,8 +43,8 @@
   align-items: center;
   gap: 10px;
   transition: 0.3s;
-  padding: 12px 0;
-  margin-top: 3px;
+  padding: 9px 0;
+  margin-top: 2px;
 }
 
 .navItem:hover {

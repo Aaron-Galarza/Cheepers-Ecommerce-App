@@ -1,26 +1,21 @@
 // Backend/src/index.ts
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application, Request, Response, NextFunction } from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
-// ELIMINAR ESTA LÍNEA: import { setupSchedule } from './utils/schedule';
 import configRoutes from './routes/configRoutes'; 
 import scheduleRoutes from './routes/schedulesRoutes';
+import uploadRoutes from './routes/uploadRoutes'; // Tu ruta de uploads
 
 // Importamos tus rutas
 import orderRoutes from './routes/orderRoutes';
 import productRoutes from './routes/productRoutes';
 import authRoutes from './routes/authRoutes';
 import addOnRoutes from './routes/addOnRoutes';
-
-dotenv.config();
-
-if (!process.env.JWT_SECRET) {
-    console.error('ERROR: La variable de entorno JWT_SECRET no está definida. Por favor, añádela a tu archivo .env');
-    process.exit(1);
-}
 
 const app: Application = express();
 
@@ -29,8 +24,6 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize());
-
-// ELIMINAR ESTA LÍNEA: setupSchedule(); // <-- YA NO SE NECESITA
 
 // --- CONFIGURACIÓN DE CORS ---
 const allowedOrigins = [
@@ -52,6 +45,12 @@ app.use(cors({
     optionsSuccessStatus: 204
 }));
 
+
+if (!process.env.JWT_SECRET) {
+    console.error('ERROR: La variable de entorno JWT_SECRET no está definida. Por favor, añádela a tu archivo .env');
+    process.exit(1);
+}
+
 // Importar la conexión a la base de datos
 import connectDB from './config/db';
 connectDB();
@@ -63,6 +62,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/addons', addOnRoutes);
 app.use('/api/config', configRoutes);
 app.use('/api/schedule', scheduleRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {
@@ -96,5 +96,5 @@ app.listen(PORT, () => {
     console.log(`Servidor de Backend Cheepers corriendo en http://localhost:${PORT}`);
     console.log(`Para probar el registro: POST http://localhost:${PORT}/api/negocio/register`);
     console.log(`Para probar el login: POST http://localhost:${PORT}/api/negocio/login`);
-    console.log('✅ Sistema de horarios dinámicos activado - Consultando base de datos en tiempo real');
+    console.log('Sistema de horarios dinámicos activado - Consultando base de datos en tiempo real');
 });

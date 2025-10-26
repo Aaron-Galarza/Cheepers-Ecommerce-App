@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../css/dashboard.module.css';
-import { FaHamburger, FaPizzaSlice, FaUserShield, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList } from 'react-icons/fa';
+import { FaHamburger, FaPizzaSlice, FaImages, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ProductManagement from '../../../pages/management/productmanagement';
 import OrdersManagement from '../../../pages/management/ordersmanagement'; // Importa el componente OrdersManagement
 import PromoManagement from '../../../pages/management/promomanagement'; // Gestión de promociones
 import VentasManagement from '../../../pages/management/ventasmanagement'; // Importa el componente VentasManagement
 import authService from '../../../services/authservice'; // Servicio de autenticación
-
+import AdminGallery from '../../../pages/management/galeria/AdminGallery'
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('welcome');
@@ -41,6 +41,8 @@ const Dashboard: React.FC = () => {
         return <VentasManagement />; // ¡Aquí se renderiza VentasManagement!
       case 'orders': // Caso para la gestión de pedidos
         return <OrdersManagement />; {/* Renderiza el componente OrdersManagement */}
+        case 'gallery': // Caso para la gestión de pedidos
+        return <AdminGallery/>; {/* Renderiza el componente OrdersManagement */}
       case 'welcome':
       default:
         return (
@@ -89,6 +91,9 @@ const Dashboard: React.FC = () => {
           </a>
           <a href="#" className={styles.navItem} onClick={() => setActiveSection('orders')}>
             <span><FaClipboardList /></span> Pedidos
+          </a>
+          <a href="#" className={styles.navItem} onClick={() => setActiveSection('gallery')}>
+            <span><FaImages /></span> Galeria
           </a>
         </nav>
       </aside>
