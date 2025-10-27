@@ -20,6 +20,7 @@ interface DailySalesTableProps {
 
 const DailySalesTable: React.FC<DailySalesTableProps> = ({
   dailySalesTableData,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dailyTotalSales,
   rowsToShow,
   setRowsToShow,

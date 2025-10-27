@@ -80,8 +80,10 @@ export const useSalesData = () => {
       const token = localStorage.getItem('adminToken');
       const responseConfig = { headers: { Authorization: `Bearer ${token}` } };
 
+      // Solicitar productos incluyendo los inactivos para poder mostrar
+      // los nombres de productos desactivados (no eliminados).
       const [productsResponse, addOnsResponse, ordersResponse] = await Promise.all([
-        axios.get<Product[]>(`${API_BASE_URL}/api/products`, responseConfig),
+        axios.get<Product[]>(`${API_BASE_URL}/api/products?includeInactive=true`, responseConfig),
         axios.get<IAddOn[]>(`${API_BASE_URL}/api/addons?includeInactive=true`, responseConfig),
         axios.get<Order[]>(`${API_BASE_URL}/api/orders`, responseConfig),
       ]);
