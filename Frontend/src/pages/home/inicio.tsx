@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './../css/inicio.module.css';
 import { useNavigate } from 'react-router-dom';
 
-import baconcheep from '../../assets/images/hamburguesa big tasty.jpeg';
-import barbacue from '../../assets/images/con queso con sesamo.jpeg';
-import cheddar from '../../assets/images/papas fritas bacon.jpeg';
-import conqueso from '../../assets/images/con queso.jpeg';
-import pizzas from '../../assets/images/pizzas.jpeg';
-import sandwichVacio from '../../assets/images/vacio.jpeg'
+import baconcheep from '../../assets/images/hamburguesa-big-tasty.webp';
+import barbacue from '../../assets/images/con-queso-con-sesamo.webp';
+import cheddar from '../../assets/images/papas fritas bacon.webp';
+import conqueso from '../../assets/images/con-queso.webp'
+import pizzas from '../../assets/images/pizzas.webp';
+import sandwichVacio from '../../assets/images/vacio.webp'
 import { FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // ======== Duraciones sincronizadas ========

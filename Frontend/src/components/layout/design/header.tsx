@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import logo from '../../../assets/images/logocheepers.png';
+import logo from '../../../assets/images/logocheepers.webp';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { useCart } from '../checkout/cartcontext';
