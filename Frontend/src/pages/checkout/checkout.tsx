@@ -369,7 +369,7 @@ const CheckoutPage: React.FC = () => {
 
           {/* (Botones del formulario no cambian) */}
           <div className={styles.formButtons}>
-            <Button className={styles.backButton} onClick={() => navigate('/menu')}>
+            <Button className={styles.backButton} onClick={() => navigate('/carrito')}>
               Atrás
             </Button>
             <Button
