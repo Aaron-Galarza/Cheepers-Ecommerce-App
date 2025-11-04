@@ -17,14 +17,10 @@ export const getUploadSignature = async (publicId: string) => {
     return data;
 };
 
-export const listGalleryImages = async (cursor?: string, options?: { signal?: AbortSignal }) => {
+export const listGalleryImages = async (cursor?: string) => {
     const config = getConfig();
     const url = cursor ? `${API_URL}/list?cursor=${cursor}` : `${API_URL}/list`;
-
-    // Merge axios config with optional AbortSignal (axios soporta 'signal' en versiones recientes)
-    const axiosConfig = { ...config, signal: options?.signal } as any;
-
-    const { data } = await axios.get(url, axiosConfig);
+    const { data } = await axios.get(url, config);
     return data;
 };
 
