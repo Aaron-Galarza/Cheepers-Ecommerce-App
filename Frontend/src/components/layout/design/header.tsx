@@ -47,13 +47,6 @@ const Header: React.FC = () => {
         >
           Promos
         </NavLink>
-         <NavLink
-          to="/premios"
-          className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}
-          onClick={() => setIsMobileMenuOpen(false)} // Cierra el menú al hacer clic
-        >
-          Premios
-        </NavLink>
       </nav>
 
       {/* Unificamos los botones de acción y el toggle de menú en un solo contenedor */}

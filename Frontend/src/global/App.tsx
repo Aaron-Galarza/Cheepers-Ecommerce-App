@@ -12,7 +12,7 @@ import Dashboard from '../components/layout/admin/dashboard';
 import CheckoutPage from '../pages/checkout/checkout';
 import OrderConfirmationPage from '../pages/checkout/ordenconfirmation';
 import ScrollToTop from '../lib/ScrollToTop';
-import PremiosPage from '../pages/prize/premios';
+
 
 // Importa el componente ProtectedRoute
 import ProtectedRoute from '../components/layout/admin/protectedroute';
@@ -84,8 +84,6 @@ function App() {
           <Route path="/promos" element={<PromosPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
-    <Route path="/premios" element={<PremiosPage />} />
-
 <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
           {/* Rutas Protegidas */}
           {/* Protege el Dashboard (si es una ruta independiente) */}
