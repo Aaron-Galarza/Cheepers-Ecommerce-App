@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import styles from './../css/checkout.module.css';
 import Button from '../../components/layout/design/button';
-import { FaUser, FaPhone, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
+import { FaUser, FaPhone, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore,FaAddressCard } from 'react-icons/fa';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -13,7 +13,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 // (La función normalizeCityName no cambia)
 const normalizeCityName = (cityName: string) => {
   const accentsMap: Record<string, string> = {
-    á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u', ñ: 'n',
+    'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u', 'ñ': 'n',
   };
   const lower = cityName.trim().toLowerCase();
   const normalized = lower
@@ -34,6 +34,7 @@ const CheckoutPage: React.FC = () => {
   // (Estado 'email' eliminado)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+    const [DNI, setDNI] = useState('');
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
@@ -155,7 +156,7 @@ const CheckoutPage: React.FC = () => {
     const orderData: any = {
       products: productsForOrder,
       guestName: name,
-      // (email eliminado)
+     guestDNI: DNI.trim(),
       guestPhone: phone,
       totalAmount: finalTotal, 
       paymentMethod: backendPaymentMethod,
@@ -197,7 +198,7 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       <h1 className={styles.pageTitle}>Confirmar Pedido</h1>
-      <div className={styles.gridContainer}>        
+      <div className={styles.gridContainer}>        
         <form onSubmit={handleConfirm} className={styles.formSection}>
           {/* ... (Datos Generales, Nombre, Teléfono no cambian) ... */}
           <h2 className={styles.sectionTitle}>
@@ -209,7 +210,11 @@ const CheckoutPage: React.FC = () => {
               <span className={styles.errorMessageSpan}> {errorMessage}</span>
             </div>
           )}
+
+          {/* --- INICIO DE LA CORRECCIÓN --- */}
+          {/* Este div envuelve los 3 inputs */}
           <div className={styles.inputGroup}>
+            
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><FaUser /></span>
               <input
@@ -224,6 +229,7 @@ const CheckoutPage: React.FC = () => {
                 title="El nombre no puede contener números ni símbolos."
               />
             </div>
+            
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><FaPhone /></span>
               <input
@@ -237,7 +243,27 @@ const CheckoutPage: React.FC = () => {
                 title="El teléfono debe tener entre 8 y 15 números y sin letras."
               />
             </div>
-          </div>
+            
+            {/* El div de DNI ahora está dentro de inputGroup y ya no tiene 
+                un inputGroup extra adentro */}
+            <div className={styles.inputWrapper}> 
+              <span className={styles.inputIcon}><FaAddressCard /></span>
+              <input
+                type="tel"
+                placeholder="DNI (opcional)"
+                value={DNI}
+                onChange={e => setDNI(e.target.value)}
+                className={styles.inputField}
+                pattern="^[0-9]{7,9}$"
+                title="El DNI debe tener entre 7 y 9 números, sin puntos."
+              />
+            </div>
+            <p className={styles.infoTextSimple}>
+                🎁 ¡Ingresando tu DNI sumás puntos con tu compra!
+              </p>
+          </div> 
+          {/* --- FIN DE LA CORRECCIÓN --- */}
+
 
           {/* ... (Tipo de Entrega y Dirección no cambian) ... */}
           <h3 className={styles.sectionTitle}>
@@ -409,8 +435,7 @@ const CheckoutPage: React.FC = () => {
 
           <div className={styles.summaryGrandTotalRow}>
             <p className={styles.summaryGrandTotalLabel}>Total:</p>
-            <p className={styles.summaryGrandTotalValue}>${finalTotal.toFixed(2)}</p>
-          </div>
+<p className={styles.summaryGrandTotalValue}>${finalTotal.toFixed(2)}</p>          </div>
         </div>
       </div>
     </div>
