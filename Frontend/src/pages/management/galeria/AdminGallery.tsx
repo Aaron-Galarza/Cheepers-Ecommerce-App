@@ -86,6 +86,48 @@ const AdminGallery: React.FC = () => {
     });
   };
 
+  // Nuevo: cache de todas las imágenes para búsqueda global (lazy)
+  const [allImages, setAllImages] = useState<GalleryImage[] | null>(null);
+  const fetchAllImages = useCallback(async () => {
+    if (allImages) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      let cursor: string | undefined = undefined;
+      const accumulated: any[] = [];
+      do {
+        const cached = galleryCache.getPage(cursor);
+        if (cached) {
+          accumulated.push(...cached.images);
+          cursor = cached.nextCursor;
+          continue;
+        }
+        const data = await listGalleryImages(cursor);
+        galleryCache.setPage(cursor, { images: data.images, nextCursor: data.nextCursor });
+        accumulated.push(...data.images);
+        cursor = data.nextCursor;
+      } while (cursor);
+      setAllImages(mapImages(accumulated));
+    } catch (err: any) {
+      const errorMsg = axios.isAxiosError(err) ? (err.response?.data?.message || 'Error al descargar todas las imágenes.') : 'Error desconocido.';
+      setError(errorMsg);
+      toast.error(`Error al obtener todas las imágenes: ${errorMsg}`, { position: "bottom-center" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [allImages]);
+  
+  // Si hay query, cargar (una vez) todas las páginas y mantener en memoria para búsquedas rápidas
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      // limpiar el conjunto global si el usuario borra la búsqueda
+      setAllImages(null);
+      return;
+    }
+    // lanzar carga completa solo si aún no está en memoria
+    if (!allImages) fetchAllImages();
+  }, [searchQuery, allImages, fetchAllImages]);
+  
   // Carga inicial
   useEffect(() => { 
     fetchImages(undefined, true);
@@ -169,12 +211,13 @@ const AdminGallery: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
-  // Filtrar imágenes basado en búsqueda (client-side, ya que tenemos pocas por página)
+  // Filtrar imágenes basado en búsqueda (client-side, ahora sobre todo el set si hay búsqueda)
   const filteredImages = useMemo(() => {
-    return !searchQuery ? images : images.filter(image => 
+    const source = searchQuery.trim() ? (allImages ?? images) : images;
+    return !searchQuery ? source : source.filter(image =>
       image.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [images, searchQuery]);
+  }, [images, allImages, searchQuery]);
 
   const canGoBack = pageHistory.length > 0;
   const canGoForward = hasNextPage;
