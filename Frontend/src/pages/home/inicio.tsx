@@ -7,7 +7,7 @@ import barbacue from '../../assets/images/con-queso-con-sesamo.webp';
 import cheddar from '../../assets/images/papas fritas bacon.webp';
 import conqueso from '../../assets/images/con-queso.webp'
 import pizzas from '../../assets/images/pizzas.webp';
-import sandwichVacio from '../../assets/images/vacio.webp'
+import sandwichVacio from '../../assets/images/hamburguesa pan arabe.webp'
 import { FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // ======== Duraciones sincronizadas ========
@@ -16,7 +16,7 @@ const AUTOSLIDE_MS = 6000;   // auto-avance
 
 // Definición de los elementos del banner
 const bannerItems = [
-  { image: sandwichVacio,  title: 'SÁNDWICH DE VACÍO',    descriptionLine1: 'Vacío desmechado a las leñas', callToAction: '¡Probalo ahora!', altText: 'Lomito', targetRoute: '/menu' },
+  { image: sandwichVacio,  title: 'BURGUER PAN ARABE',    descriptionLine1: 'Sabrosa hamburguesa en pan arabe de 18cm', callToAction: '¡Probala ahora!', altText: 'Lomito', targetRoute: '/menu' },
   { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty', targetRoute: '/menu' },
   { image: barbacue,   title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso', targetRoute: '/menu' },
   { image: cheddar,    title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon', targetRoute: '/menu' },
