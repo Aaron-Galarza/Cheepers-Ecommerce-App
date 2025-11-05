@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Pedido, { IOrder, IProductItem, ISelectedAddOn, IShippingAddress } from '../models/Pedido';
 import AddOn, { IAddOn } from '../models/AddOn'; 
+import { processOrderPoints } from '../services/loyaltyService';
 import Product, { IProduct } from '../models/Product';
 import asyncHandler from 'express-async-handler';
 // REEMPLAZAR importación antigua:
@@ -35,6 +36,7 @@ interface CreateOrderRequestBody {
     guestEmail?: string;
     guestPhone: string;
     guestName: string;
+    guestDni?: string;
     paymentMethod: 'cash' | 'card' | 'transfer';
     deliveryType: 'delivery' | 'pickup';
     shippingAddress?: { street: string; city: string };
@@ -52,7 +54,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         throw new Error('Lo sentimos, estamos fuera del horario de atención. Vuelva más tarde.');
     }
     
-    const { products, shippingAddress, paymentMethod, notes, guestEmail, guestName, guestPhone, deliveryType } = req.body;
+    const { products, shippingAddress, paymentMethod, notes, guestEmail, guestName, guestPhone, guestDni, deliveryType } = req.body;
 
     // 1. Validaciones básicas iniciales
     if (!products || products.length === 0 || !paymentMethod || !guestPhone || !guestName || !deliveryType) {
@@ -157,6 +159,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         guestEmail: guestEmail,
         guestPhone: guestPhone,
         guestName: guestName,
+        guestDni: guestDni || undefined,
         products: productsForOrder,
         totalAmount: finalTotalAmount,
         paymentMethod: paymentMethod,
@@ -164,6 +167,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         shippingAddress: finalShippingAddress,
         notes: notes || '',
         status: 'pending',
+        pointsEarned: false,
     });
 
     const createdOrder = await newOrder.save();
@@ -225,8 +229,31 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     const order = await Pedido.findById(req.params.id);
 
     if (order) {
+        // 1. Guardar el estado antiguo para la validación
+        const oldStatus = order.status; 
+        
+        // 2. Actualizar el estado del pedido
         order.status = status;
         const updatedOrder = await order.save();
+        
+        // 3. --- LÓGICA DE LEALTAD ---
+        // Verificar si el nuevo estado es 'delivered' y el anterior no lo era
+        if (status === 'delivered' && oldStatus !== 'delivered') {
+            const pointsAssigned = await processOrderPoints(updatedOrder);
+            
+            // Puedes añadir una bandera en la respuesta si quieres notificar al frontend
+            const loyaltyMessage = pointsAssigned 
+                ? 'Puntos de lealtad asignados correctamente.' 
+                : 'No se asignaron puntos (DNI no ingresado o ya se habían asignado).';
+            
+            res.status(200).json({ 
+                message: 'Estado del pedido actualizado exitosamente', 
+                loyaltyMessage, // Mensaje para el Admin
+                order: updatedOrder 
+            });
+            return; // Termina la ejecución aquí para enviar la respuesta con el mensaje de lealtad
+        }
+
         res.status(200).json({ message: 'Estado del pedido actualizado exitosamente', order: updatedOrder });
     } else {
         res.status(404);

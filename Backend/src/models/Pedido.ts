@@ -53,6 +53,8 @@ export interface IOrder extends Document {
     guestEmail?: string;
     guestPhone: string;
     guestName: string;
+    guestDni?: string;
+    pointsEarned: Boolean;
     products: IProductItem[];
     totalAmount: number;
     shippingAddress?: IShippingAddress;
