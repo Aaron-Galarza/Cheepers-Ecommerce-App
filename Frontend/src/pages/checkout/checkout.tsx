@@ -316,11 +316,8 @@ const CheckoutPage: React.FC = () => {
                 onChange={() => setMetodo('efectivo')}
                 className={styles.radioInput}
               />
-              {/* MODIFICADO: Texto del descuento (sin 'deliveryType') */}
-              <span className={styles.radioText}>
-                Efectivo
-                {discountConfig.isActive && ` (${discountConfig.percentage}% de descuento)`}
-              </span>
+              {/* MODIFICADO: eliminar el texto de descuento dentro del input seleccionable */}
+              <span className={styles.radioText}>Efectivo</span>
             </label>
             <label className={styles.radioLabel}>
               <input
@@ -334,10 +331,10 @@ const CheckoutPage: React.FC = () => {
             </label>
           </div>
 
-          {/* MODIFICADO: Mensaje de la API (sin 'deliveryType') */}
+          {/* MODIFICADO: Mensaje de la API (ahora aclara que no aplica a promos) */}
           {discountConfig.isActive && (
             <p className={styles.infoTextSimple}>
-              {discountConfig.message}
+              {discountConfig.message} (No aplica a promos)
             </p>
           )}
 
