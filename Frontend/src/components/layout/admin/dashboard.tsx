@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../css/dashboard.module.css';
-import { FaHamburger, FaPizzaSlice, FaImages, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList } from 'react-icons/fa';
+import { FaHamburger, FaPizzaSlice, FaImages, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList,FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ProductManagement from '../../../pages/management/productmanagement';
 import OrdersManagement from '../../../pages/management/ordersmanagement'; // Importa el componente OrdersManagement
@@ -8,6 +8,7 @@ import PromoManagement from '../../../pages/management/promomanagement'; // Gest
 import VentasManagement from '../../../pages/management/ventasmanagement'; // Importa el componente VentasManagement
 import authService from '../../../services/authservice'; // Servicio de autenticación
 import AdminGallery from '../../../pages/management/galeria/AdminGallery'
+import Puntosmanagement from '../../../pages/management/puntos/puntosmanagement';
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('welcome');
@@ -43,6 +44,8 @@ const Dashboard: React.FC = () => {
         return <OrdersManagement />; {/* Renderiza el componente OrdersManagement */}
         case 'gallery': // Caso para la gestión de pedidos
         return <AdminGallery/>; {/* Renderiza el componente OrdersManagement */}
+        case 'points':
+        return <Puntosmanagement/>; {/* Renderiza el componente OrdersManagement */}
       case 'welcome':
       default:
         return (
@@ -95,6 +98,10 @@ const Dashboard: React.FC = () => {
           <a href="#" className={styles.navItem} onClick={() => setActiveSection('gallery')}>
             <span><FaImages /></span> Galeria
           </a>
+            <a href="#" className={styles.navItem} onClick={() => setActiveSection('points')}>
+            <span><FaStar /></span> Puntos
+          </a>
+          
         </nav>
       </aside>
 
