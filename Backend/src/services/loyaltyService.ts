@@ -10,6 +10,12 @@ import mongoose from 'mongoose';
 const AMOUNT_THRESHOLD = 1000;
 const POINTS_PER_THRESHOLD = 50; 
 
+interface LoyaltyInfo {
+    totalPoints: number;
+    history: any[]; // Usar ILoyaltyHistory[] si está importada
+    exists: boolean;
+}
+
 /**
  * Calcula los puntos a otorgar. En un MVP, suele ser un porcentaje del monto.
  * @param amount El monto total de la compra.
@@ -185,4 +191,31 @@ export const redeemReward = async (dni: string, rewardId: string) => {
     } finally {
         session.endSession();
     }
+};
+
+// @desc Obtiene los puntos totales y el historial de transacciones de un cliente.
+export const getClientLoyaltyInfo = async (dni: string): Promise<LoyaltyInfo> => {
+    // 1. Buscar el usuario de lealtad
+    const user = await LoyaltyUser.findOne({ dni });
+
+    if (!user) {
+        // Si el DNI no existe en el sistema de lealtad
+        return {
+            totalPoints: 0,
+            history: [],
+            exists: false,
+        };
+    }
+
+    // 2. Buscar el historial de movimientos
+    // Ordenamos por fecha descendente (los más recientes primero)
+    const history = await LoyaltyHistory.find({ dni })
+        .sort({ date: -1 }); // Los más nuevos al principio
+
+    // 3. Devolver los datos
+    return {
+        totalPoints: user.totalPoints,
+        history,
+        exists: true,
+    };
 };

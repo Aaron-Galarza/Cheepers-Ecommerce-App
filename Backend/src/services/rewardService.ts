@@ -86,3 +86,11 @@ export const getRewardByIdInDB = async (id: string) => {
     }
     return await Reward.findById(id);
 };
+
+/**
+ * @desc Obtiene todos los premios que están marcados como activos (para uso público/cliente).
+ */
+export const getActiveRewards = async () => {
+    return await Reward.find({isActive: true});
+    
+}

@@ -7,18 +7,20 @@ import {
     updateReward, 
     deleteReward, 
     getRewardById,
-    getAllRewardsForAdmin // Nuevo endpoint para el listado Admin
+    getAllRewardsForAdmin,
+    listActiveRewards
 } from '../controllers/rewardControllers'; 
 
 const router = express.Router();
 
+// Ruta de base
+router.route('/')
+    .get(listActiveRewards) // GET: Para el cliente, lista solo los activos.
+    .post(protect, admin, createReward); // POST: Crear premio
+
 // Ruta de listado Admin
 router.route('/admin')
     .get(protect, admin, getAllRewardsForAdmin); // GET: Todos los premios (incluye inactivos)
-
-// Ruta de creación
-router.route('/')
-    .post(protect, admin, createReward); // POST: Crear premio
 
 // Rutas por ID
 router.route('/:id')
@@ -26,6 +28,5 @@ router.route('/:id')
     .put(protect, admin, updateReward)  
     .delete(protect, admin, deleteReward);
 
-// La ruta pública para el cliente (GET /rewards) la crearemos después.
 
 export default router;

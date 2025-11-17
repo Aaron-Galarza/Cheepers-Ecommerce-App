@@ -7,7 +7,8 @@ import {
     updateRewardInDB, 
     deactivateRewardInDB, 
     getRewardByIdInDB,
-    getAllRewardsAdmin // Importar las funciones del servicio
+    getAllRewardsAdmin,
+    getActiveRewards
 } from '../services/rewardService'; 
 
 // Interfaz para el cuerpo de la solicitud (puede ser la misma)
@@ -83,3 +84,17 @@ export const deleteReward = asyncHandler(async (req: Request<{ id: string }>, re
     const result = await deactivateRewardInDB(id); 
     res.json(result);
 });
+
+// @desc    Obtener todos los premios activos (para uso de Cliente)
+// @route   GET /api/rewards
+// @access  Public (solo requiere autenticación básica si el resto de tu app la requiere)
+export const listActiveRewards = asyncHandler(async(req: Request, res: Response) => {
+    const rewards = await getActiveRewards()
+
+    if (!rewards) {
+        res.status(204).json({"message":"No hay productos activos para mostrar. Por favor consulte el Panel Admin"})
+    } else {
+        res.status(200).json(rewards)
+
+    }
+})
