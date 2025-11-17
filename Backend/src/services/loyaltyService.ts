@@ -3,6 +3,7 @@
 import Pedido, { IOrder } from '../models/Pedido'; // Necesitas importar Pedido
 import LoyaltyUser from '../models/LoyaltyUser';
 import LoyaltyHistory from '../models/LoyaltyHistory';
+import Reward from '../models/Reward';
 import mongoose from 'mongoose';
 
 // 1. Regla de Asignación: Puntos basados en el monto de la compra (50 x 1000).
@@ -97,3 +98,91 @@ export const processOrderPoints = async (order: IOrder): Promise<boolean> => {
 // NOTA: Se ha usado una Transacción de Mongoose. Esto es crucial para la lógica de negocio:
 // O se actualiza el saldo, se registra el historial Y se marca el pedido como "puntos otorgados", 
 // O nada de eso ocurre. La integridad está garantizada.
+
+/**
+ * @desc Lógica transaccional para canjear un premio por puntos.
+ * @param dni El DNI del cliente.
+ * @param rewardId El ID del premio a canjear.
+ * @returns Un objeto con el resultado del canje.
+ */
+export const redeemReward = async (dni: string, rewardId: string) => {
+    // 1. Validar DNI y RewardId (Validación: Solo números y longitud. Esto idealmente es un middleware/joi)
+    if (!dni || !/^\d{7,10}$/.test(dni)) { 
+        throw new Error('DNI no válido. Debe ser solo números (7-10 dígitos).');
+    }
+    if (!mongoose.Types.ObjectId.isValid(rewardId)) {
+        throw new Error('ID de premio no válido.');
+    }
+
+    // 2. Buscar Usuario y Premio
+    const loyaltyUser = await LoyaltyUser.findOne({ dni });
+    const reward = await Reward.findById(rewardId);
+
+    if (!loyaltyUser) {
+        throw new Error(`Usuario con DNI ${dni} no encontrado en el sistema de lealtad.`);
+    }
+
+    // (Validación: verificar que reward esté activo)
+    if (!reward || !reward.isActive) {
+        throw new Error('Premio no encontrado o está inactivo.');
+    }
+
+    const costPoints = reward.costPoints;
+
+    // (Validación: verificar puntos suficientes)
+    if (loyaltyUser.totalPoints < costPoints) {
+        throw new Error(`Puntos insuficientes. El premio cuesta ${costPoints} puntos y el usuario tiene ${loyaltyUser.totalPoints}.`);
+    }
+
+    // --- Lógica Transaccional para garantizar la integridad (Restar y Registrar) ---
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        // 3. Restar Puntos del Usuario
+        loyaltyUser.totalPoints -= costPoints;
+        await loyaltyUser.save({ session });
+        
+        // 4. Guardar Movimiento en LoyaltyHistory
+        const historyEntry = new LoyaltyHistory({
+            dni,
+            type: 'redeem',
+            points: -costPoints, // Negativo para indicar egreso
+            reference: rewardId, // Referencia al ID del premio
+            rewardName: reward.name, 
+            date: new Date(),
+        });
+        await historyEntry.save({ session });
+
+        // 5. Commit de la Transacción
+        await session.commitTransaction();
+        
+        return {
+            message: 'Canje de premio exitoso.',
+            reward: reward.name,
+            pointsUsed: costPoints,
+            remainingPoints: loyaltyUser.totalPoints,
+        };
+
+    } catch (error: any) {
+        await session.abortTransaction();
+        console.error(`[LoyaltyService] Error en transacción de canje para DNI ${dni}:`, error);
+        
+        // --- INICIO DE CORRECCIÓN ---
+        // Propagar el mensaje de error original (ej. "Puntos insuficientes" o el error de Mongoose)
+        if (error.name === 'ValidationError') {
+            // Si es un error de validación de Mongoose, lanzamos el primer mensaje de error encontrado
+            const validationErrors = Object.values(error.errors).map((e: any) => e.message);
+            throw new Error(`Error de Validación: ${validationErrors.join('; ')}`);
+        } else if (error.message.includes('Puntos insuficientes')) {
+            // Error de negocio específico que lanzamos arriba
+            throw error; 
+        } else {
+            // Error genérico (ej. de conexión a DB)
+            throw new Error('Ocurrió un error interno desconocido al procesar el canje.');
+        }
+        // --- FIN DE CORRECCIÓN ---
+    } finally {
+        session.endSession();
+    }
+};

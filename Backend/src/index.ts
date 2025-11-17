@@ -16,6 +16,8 @@ import orderRoutes from './routes/orderRoutes';
 import productRoutes from './routes/productRoutes';
 import authRoutes from './routes/authRoutes';
 import addOnRoutes from './routes/addOnRoutes';
+import rewardRoutes from './routes/rewardRoutes';
+import loyaltyRoutes from './routes/loyaltyRoutes'
 
 const app: Application = express();
 
@@ -63,6 +65,8 @@ app.use('/api/addons', addOnRoutes);
 app.use('/api/config', configRoutes);
 app.use('/api/schedule', scheduleRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/rewards', rewardRoutes);
+app.use('/api/loyalty', loyaltyRoutes)
 
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {

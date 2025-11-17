@@ -38,7 +38,7 @@ const LoyaltyHistorySchema: Schema = new Schema({
     points: {
         type: Number,
         required: [true, 'La cantidad de puntos es obligatoria.'],
-        min: [1, 'El movimiento debe ser de al menos 1 punto.'],
+        //min: [1, 'El movimiento debe ser de al menos 1 punto.'],
     },
     
     // reference: Permite auditar el origen/destino del movimiento.
@@ -48,6 +48,15 @@ const LoyaltyHistorySchema: Schema = new Schema({
         required: [true, 'La referencia del movimiento (ID de pedido/premio) es obligatoria.'],
     },
 
+    rewardName: { // <-- NUEVO CAMPO: Nombre desnormalizado para el Front-end
+        type: String,
+        required: function() { 
+            // Hacemos el nombre obligatorio SÓLO si el tipo es 'redeem'
+            return this.type === 'redeem';
+        },
+        trim: true,
+    },
+    
     // date: Almacenado como un índice separado de 'createdAt' para facilitar las consultas por rango de fechas (aunque 'createdAt' podría usarse).
     date: {
         type: Date,

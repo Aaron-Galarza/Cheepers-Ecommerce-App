@@ -81,6 +81,10 @@ const orderSchema: Schema = new Schema({
         type: String,
         required: true,
     },
+    guestDni: {
+        type: String,
+        required: false,
+    },
     products: [IProductItemSchema], // Ahora IProductItemSchema incluye `addOns`
     totalAmount: {
         type: Number,
