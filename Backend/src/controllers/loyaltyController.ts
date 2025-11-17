@@ -3,7 +3,7 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 // Asegúrate de importar la función del servicio
-import { processOrderPoints, redeemReward, getClientLoyaltyInfo } from '../services/loyaltyService'; 
+import { processOrderPoints, redeemReward, getClientLoyaltyInfo, getClientTotalPoints } from '../services/loyaltyService'; 
 // Asumo que tienes una interfaz de Request personalizada si quieres usar req.user
 
 // Interfaz para el cuerpo de canje
@@ -11,6 +11,37 @@ interface RedeemBody {
     dni: string;
     rewardId: string;
 }
+
+// @desc    Consultar puntos por DNI (Endpoint público para clientes)
+// @route   GET /api/loyalty/public/points/:dni
+// @access  Public
+export const getClientPointsByDni = asyncHandler(async(req: Request, res: Response) => {
+    const { dni } = req.params;
+
+    if (!dni) {
+        res.status(400);
+        throw new Error ('Debe proporcionar un DNI para ver su saldo')
+    }
+
+    const totalPoints = await getClientTotalPoints(dni)
+    if (totalPoints <= 0) {
+        res.status(200).json({
+            dni,
+            message: 'El DNI no tiene puntos para canjear',
+            totalPoints: 0
+            
+        })
+    } else {
+        res.status(200).json({
+            dni,
+            message: 'El DNI tiene la sieguiente cantidad:',
+            totalPoints
+            
+        })
+
+    }
+})
+
 
 // @desc    Canjear un premio
 // @route   POST /api/loyalty/redeem

@@ -91,10 +91,5 @@ export const deleteReward = asyncHandler(async (req: Request<{ id: string }>, re
 export const listActiveRewards = asyncHandler(async(req: Request, res: Response) => {
     const rewards = await getActiveRewards()
 
-    if (!rewards) {
-        res.status(204).json({"message":"No hay productos activos para mostrar. Por favor consulte el Panel Admin"})
-    } else {
         res.status(200).json(rewards)
-
-    }
 })

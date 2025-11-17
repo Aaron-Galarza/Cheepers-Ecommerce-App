@@ -17,6 +17,16 @@ interface LoyaltyInfo {
 }
 
 /**
+ * @desc Obtiene solo los puntos totales de un cliente.
+ * @param dni El DNI del cliente.
+ * @returns El total de puntos (number), o 0 si no existe.
+ */
+export const getClientTotalPoints = async (dni: string): Promise<number> => {
+    const loyaltyInfo = await getClientLoyaltyInfo(dni);
+    return loyaltyInfo.totalPoints;
+};
+
+/**
  * Calcula los puntos a otorgar. En un MVP, suele ser un porcentaje del monto.
  * @param amount El monto total de la compra.
  * @returns Los puntos a asignar (redondeados).
