@@ -1,19 +1,19 @@
-// src/pages/admin/components/RewardCard.tsx (o donde lo ubiques)
+// src/pages/admin/components/RewardCard.tsx
 
 import React from 'react';
 import { FaPen, FaTrash } from 'react-icons/fa';
 import styles from './css/puntosmanagement.module.css';
-// Copiamos la 'type' para que el componente sea modular
+
+// 1. CORRECCIÓN: Usamos '_id' y 'costPoints' para coincidir con la API
 export type Reward = {
-  id: string;
+  _id: string; // <-- ID de MongoDB
   name: string;
-  pointsCost: number;
+  costPoints: number; // <-- Puntos
   isActive: boolean;
   description?: string;
   imageUrl?: string;
 };
 
-// Definimos las 'props' que este componente espera recibir
 interface RewardCardProps {
   reward: Reward;
   onEdit: (reward: Reward) => void;
@@ -28,24 +28,21 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward, onEdit, onToggleActive,
       <div className={styles.cardBody}>
         <h3 className={styles.cardTitle}>{reward.name}</h3>
         <p className={styles.cardDescription}>{reward.description}</p>
-        
-        <p className={styles.cardMeta}>{reward.pointsCost} Puntos</p>
-        
-        <p className={styles.cardInfo}>
-          Categoría: Premio
-        </p>
+        <p className={styles.cardMeta}>{reward.costPoints} Puntos</p> 
+        <p className={styles.cardInfo}>Categoría: Premio</p>
         <p className={styles.cardInfo}>
           Estado: <span className={reward.isActive ? styles.statusActive : styles.statusInactive}>{reward.isActive ? 'Activo' : 'Inactivo'}</span>
         </p>
       </div>
       <div className={styles.cardActions}>
-        <button className={styles.buttonPrimary} onClick={() => onToggleActive(reward.id)}>
+        {/* 2. CORRECCIÓN: Pasamos 'reward._id' a las funciones */}
+        <button className={styles.buttonPrimary} onClick={() => onToggleActive(reward._id)}>
           {reward.isActive ? 'Desactivar' : 'Activar'}
         </button>
         <button className={styles.buttonSecondary} onClick={() => onEdit(reward)}>
           <FaPen />
         </button>
-        <button className={styles.buttonDanger} onClick={() => onDelete(reward.id)}>
+        <button className={styles.buttonDanger} onClick={() => onDelete(reward._id)}>
           <FaTrash />
         </button>
       </div>

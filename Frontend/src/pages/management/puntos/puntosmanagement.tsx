@@ -1,12 +1,13 @@
 // src/pages/admin/PuntosManagement.tsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 import styles from './css/puntosmanagement.module.css';
-// 1. Importamos los nuevos componentes
-import RewardCard, { Reward } from './RewardCard';
-import HistoryTable, { Redemption } from './HistoryTable';
+import RewardCard, { Reward } from './RewardCard'; // Importa el tipo Reward corregido
+import HistoryTable, { Redemption } from './HistoryTable'; // Importa el tipo Redemption corregido
+import RewardForm from './RewardForm';
+import { apiClient } from '../../../services/authservice';
+import { FaPen, FaTrash } from 'react-icons/fa';
 
-// Mensajes centralizados (para i18n / fácil reemplazo)
+// Mensajes (sin cambios)
 const MESSAGES = {
   CONFIRM_DELETE: '¿Eliminar este premio? Esta acción no se puede deshacer.',
   ALERT_INVALID_FORM: 'Nombre y costo de puntos válidos son obligatorios.',
@@ -19,115 +20,230 @@ const MESSAGES = {
   ERROR_NOT_ENOUGH_POINTS: 'No tiene puntos suficientes.',
 };
 
-// (Las 'type' de Reward y Redemption ahora vienen de los componentes, 
-// solo necesitamos Client)
-type Client = {
-  dni: string;
-  name: string;
-  points: number;
-};
-
-// ... (IDs de Storage y mock clients)
-const STORAGE_REWARDS = 'pm_rewards_v1';
-const STORAGE_REDEMS = 'pm_redems_v1';
-const mockClientsInitial: Client[] = [
-  // Hardcoded demo clients — REEMPLAZAR por fetch/API real si corresponde
-  { dni: '20123456', name: 'María Pérez', points: 1200 },
-  { dni: '30111222', name: 'Juan López', points: 350 },
-  { dni: '27123456', name: 'Ana García', points: 80 },
-];
-const uid = (prefix = '') => prefix + Math.random().toString(36).slice(2, 9);
-
-
-// Replaced several individual form state hooks and related handlers with a compact form object
-type FormState = { name: string; pointsCost: number; description: string; imageUrl: string; active: boolean };
-const initialForm: FormState = { name: '', pointsCost: 0, description: '', imageUrl: '', active: true };
+// Tipos
+type Client = { dni: string; name: string; points: number; };
+const uid = (prefix = '') => prefix + Math.random().toString(36).slice(2, 9); // Para historial MOCK
 
 const PuntosManagement: React.FC = () => {
-  // --- STATE Y LÓGICA (Todo se queda aquí) ---
-  // Data (kept as before)
-  const [rewards, setRewards] = useState<Reward[]>(() => {
-    const raw = localStorage.getItem(STORAGE_REWARDS);
-    return raw ? JSON.parse(raw) as Reward[] : [
-      // Premios iniciales hardcodeados — REEMPLAZAR con seed desde backend si se desea
-      { id: uid('r_'), name: 'Café Gratis', pointsCost: 200, isActive: true, description: 'Café chico', imageUrl: 'https://via.placeholder.com/400x300.png?text=Cafe' },
-      { id: uid('r_'), name: '10% Descuento', pointsCost: 500, isActive: true, description: 'En próxima compra', imageUrl: 'https://via.placeholder.com/400x300.png?text=10%25+Off' },
-    ];
-  });
-  const [redemptions, setRedemptions] = useState<Redemption[]>(() => {
-    const raw = localStorage.getItem(STORAGE_REDEMS);
-    return raw ? JSON.parse(raw) as Redemption[] : [];
-  });
-  const [clients, setClients] = useState<Client[]>(mockClientsInitial);
+  // --- STATE ---
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [isLoadingRewards, setIsLoadingRewards] = useState(true);
+  
 
-  // UI state
+  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+  
+  // UI
   const [tab, setTab] = useState<'premios' | 'nuevo' | 'historial'>('premios');
   const [editing, setEditing] = useState<Reward | null>(null);
+  const [form, setForm] = useState({ name: '', costPoints: 0, description: '', imageUrl: '', active: true });
 
-  // Compact form state (replaces multiple useState for form fields)
-  const [form, setForm] = useState<FormState>(initialForm);
-
-  // Nuevo canje (kept compact but readable)
+  // Canje
   const [searchDni, setSearchDni] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
   const [canjeError, setCanjeError] = useState<string | null>(null);
+  const [isLoadingClient, setIsLoadingClient] = useState(false);
 
-  // Persistencia combinada en una sola effect (reducción de líneas, mismo comportamiento)
+  // Historial
+  const [historyFilterDni, setHistoryFilterDni] = useState('');
+
+
+  // Carga de Premios (API)
   useEffect(() => {
-    localStorage.setItem(STORAGE_REWARDS, JSON.stringify(rewards));
-    localStorage.setItem(STORAGE_REDEMS, JSON.stringify(redemptions));
-  }, [rewards, redemptions]);
+    let mounted = true;
+    const fetchRewards = async () => {
+      setIsLoadingRewards(true);
+      try {
+        const adminResp = await apiClient.get<Reward[]>('/api/rewards/admin');
+        if (mounted && adminResp?.data) {
+          setRewards(adminResp.data);
+        }
+      } catch (err: any) {
+        console.warn('/api/rewards/admin falló, intentando /api/rewards:', err?.response?.status || err?.message);
+        try {
+          const resp = await apiClient.get<Reward[]>('/api/rewards');
+          if (mounted && resp?.data) setRewards(resp.data);
+        } catch (finalErr: any) {
+          console.error('Error cargando premios (ambas rutas fallaron):', finalErr?.response?.status || finalErr?.message);
+        }
+      } finally {
+        if (mounted) setIsLoadingRewards(false);
+      }
+    };
+    fetchRewards();
+    return () => { mounted = false; };
+  }, []);
 
-  // --- HANDLERS (Toda la lógica se queda en el padre) ---
-
-  const clearForm = () => { setEditing(null); setForm(initialForm); };
+  // --- HANDLERS (Formulario de Premios - CONECTADOS) ---
+  const clearForm = () => {
+    setEditing(null);
+    setForm({ name: '', costPoints: 0, description: '', imageUrl: '', active: true });
+  };
 
   const handleEdit = (r: Reward) => {
     setEditing(r);
-    setForm({ name: r.name, pointsCost: r.pointsCost, description: r.description || '', imageUrl: r.imageUrl || '', active: r.isActive });
+    setForm({ name: r.name, costPoints: r.costPoints, description: r.description || '', imageUrl: r.imageUrl || '', active: r.isActive });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSaveReward = () => {
-    if (!form.name.trim() || form.pointsCost <= 0) return void window.alert(MESSAGES.ALERT_INVALID_FORM);
-    const rewardData = { name: form.name.trim(), pointsCost: Math.floor(form.pointsCost), isActive: form.active, description: form.description.trim(), imageUrl: form.imageUrl.trim() };
-    setRewards(prev => editing ? prev.map(p => p.id === editing.id ? { ...p, ...rewardData } : p) : [{ id: uid('r_'), ...rewardData }, ...prev]);
-    clearForm();
+  const handleSaveReward = async () => {
+    if (!form.name.trim() || form.costPoints <= 0) return void window.alert(MESSAGES.ALERT_INVALID_FORM);
+    const payload = { name: form.name.trim(), description: form.description.trim(), costPoints: Math.floor(form.costPoints), imageUrl: form.imageUrl.trim(), isActive: form.active };
+    try {
+      if (editing) {
+        // Usa '_id' para editar
+        const resp = await apiClient.put<Reward>(`/api/rewards/${editing._id}`, payload);
+        if (resp?.data) setRewards(prev => prev.map(p => p._id === editing._id ? resp.data : p));
+      } else {
+        const resp = await apiClient.post<Reward>('/api/rewards', payload);
+        if (resp?.data) setRewards(prev => [resp.data, ...prev]);
+      }
+      clearForm();
+    } catch (err: any) {
+      console.error('saveReward failed:', err);
+    }
   };
 
-  const toggleActive = (id: string) => setRewards(prev => prev.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r));
+  // 'id' aquí es el '_id'
+  const toggleActive = async (id: string) => {
+    const reward = rewards.find(r => r._id === id);
+    if (!reward) return;
+    const newIsActive = !reward.isActive;
 
-  const deleteReward = (id: string) => { if (!window.confirm(MESSAGES.CONFIRM_DELETE)) return; setRewards(prev => prev.filter(r => r.id !== id)); };
-
-  const handleSearchClient = () => {
-    const found = clients.find(c => c.dni === searchDni.trim());
-    setSelectedClient(found || null);
-    setCanjeError(found ? null : MESSAGES.ERROR_CLIENT_NOT_FOUND);
+    try {
+      const resp = await apiClient.put(`/api/rewards/${id}`, { isActive: newIsActive });
+      if (resp?.data) {
+         setRewards(prev => prev.map(r => r._id === id ? { ...r, ...resp.data } : r));
+      }
+    } catch (err: any) {
+      console.error('toggleActive failed:', err);
+    }
   };
 
-  const handleRegisterCanje = () => {
-    if (!selectedClient) return setCanjeError(MESSAGES.ERROR_SEARCH_CLIENT);
-    if (!selectedRewardId) return setCanjeError(MESSAGES.ERROR_SELECT_REWARD);
-    const reward = rewards.find(r => r.id === selectedRewardId); if (!reward) return setCanjeError(MESSAGES.ERROR_REWARD_INVALID);
-    if (!reward.isActive) return setCanjeError(MESSAGES.ERROR_REWARD_INACTIVE);
-    if (selectedClient.points < reward.pointsCost) return setCanjeError(MESSAGES.ERROR_NOT_ENOUGH_POINTS);
+  // CONECTADO (DELETE /api/rewards/:id)
+  const deleteReward = async (id: string) => {
+    if (!window.confirm(MESSAGES.CONFIRM_DELETE)) return;
+    
+    // Guardamos estado por si falla
+    const originalRewards = [...rewards];
+    
 
-    setClients(prev => prev.map(c => c.dni === selectedClient.dni ? { ...c, points: c.points - reward.pointsCost } : c));
-    const newRed: Redemption = { id: uid('rd_'), dni: selectedClient.dni, clientName: selectedClient.name, rewardId: reward.id, rewardName: reward.name, pointsUsed: reward.pointsCost, date: new Date().toISOString() };
-    setRedemptions(prev => [newRed, ...prev]);
-    setSelectedRewardId(null); setCanjeError(null); window.alert(MESSAGES.ALERT_CANJE_OK);
+    setRewards(prev => prev.filter(r => r._id !== id)); 
+    
+    try {
+      // Llamamos a la API (que hace el borrado físico)
+      await apiClient.delete(`/api/rewards/${id}`);
+      // Si funciona, la UI ya está actualizada.
+      
+    } catch (err: any) {
+      console.error('deleteReward failed:', err);
+      // Si falla, revertimos
+      setRewards(originalRewards);
+    }
+  };
+  const handleSearchClient = async () => {
+    setCanjeError(null);
+    setSelectedClient(null);
+    const dni = searchDni.trim();
+    if (!dni) return setCanjeError('Ingresá un DNI.');
+    
+    setIsLoadingClient(true);
+    try {
+      // Usamos la ruta /admin
+      const resp = await apiClient.get(`/api/loyalty/${encodeURIComponent(dni)}/admin`);
+      if (resp.data) {
+        const { totalPoints, name } = resp.data;
+        setSelectedClient({ dni, name: name || 'Cliente', points: Number(totalPoints || 0) });
+      } else {
+        setCanjeError(MESSAGES.ERROR_CLIENT_NOT_FOUND);
+      }
+    } catch (err: any) {
+      console.error('Error al buscar cliente:', err);
+      setCanjeError(err?.response?.data?.message || MESSAGES.ERROR_CLIENT_NOT_FOUND);
+    } finally {
+      setIsLoadingClient(false);
+    }
   };
 
-  const [historyFilterDni, setHistoryFilterDni] = useState('');
-  const filteredHistory = useMemo(() => historyFilterDni.trim() ? redemptions.filter(r => r.dni.includes(historyFilterDni.trim())) : redemptions, [historyFilterDni, redemptions]);
+  const handleRegisterCanje = async () => {
+    if (!selectedClient) { setCanjeError(MESSAGES.ERROR_SEARCH_CLIENT); return; }
+    if (!selectedRewardId) { setCanjeError(MESSAGES.ERROR_SELECT_REWARD); return; }
+    const reward = rewards.find(r => r._id === selectedRewardId);
+    if (!reward) { setCanjeError(MESSAGES.ERROR_REWARD_INVALID); return; }
+    if (!reward.isActive) { setCanjeError(MESSAGES.ERROR_REWARD_INACTIVE); return; }
+    if (selectedClient.points < reward.costPoints) { setCanjeError(MESSAGES.ERROR_NOT_ENOUGH_POINTS); return; }
 
+    try {
+      const resp = await apiClient.post('/api/loyalty/redeem', { 
+        dni: selectedClient.dni, 
+        rewardId: reward._id 
+      });
 
-  // --- RENDER ---
+      if (resp?.data) {
+        const { remainingPoints, rewardName, pointsUsed } = resp.data;
+        const updatedPoints = Number(remainingPoints);
+        setSelectedClient(prev => prev ? { ...prev, points: updatedPoints } : null);
+
+        // Actualizamos el historial (sigue siendo local, pero ahora se basa en la respuesta)
+        const newRed: Redemption = {
+          _id: uid('rd_'),
+          dni: selectedClient.dni,
+          clientName: selectedClient.name,
+          rewardId: reward._id,
+          rewardName: rewardName ?? reward.name,
+          pointsUsed: pointsUsed ?? reward.costPoints,
+          date: new Date().toISOString(),
+        };
+        setRedemptions(prev => [newRed, ...prev]);
+
+        setSelectedRewardId(null);
+        setCanjeError(null);
+        window.alert(MESSAGES.ALERT_CANJE_OK);
+      }
+    } catch (err: any) {
+      console.error('registerCanje failed:', err);
+      setCanjeError(err?.response?.data?.message || 'Error al procesar el canje.');
+    }
+  };
+
+  const handleSearchHistory = async () => {
+    const dni = historyFilterDni.trim();
+    if (!dni) {
+      setRedemptions([]); // Limpia si no hay DNI
+      return;
+    }
+    
+    try {
+      const resp = await apiClient.get(`/api/loyalty/${encodeURIComponent(dni)}/admin`);
+      if (resp.data && resp.data.history) {
+        const { history, name } = resp.data;
+        
+        const fetchedRedeems: Redemption[] = (history || [])
+          .filter((h: any) => h.type === 'redeem') // Filtramos solo canjes
+          .map((h: any) => ({
+            _id: h._id || uid('rd_'),
+            dni: h.dni,
+            clientName: name || 'Cliente',
+            rewardId: h.rewardId || '',
+            rewardName: h.rewardName || h.reference || 'N/A',
+            pointsUsed: Math.abs(Number(h.points || 0)),
+            date: h.date || new Date().toISOString(),
+          }));
+          
+        setRedemptions(fetchedRedeems);
+      } else {
+        setRedemptions([]); // Si no hay historial, vaciamos
+      }
+    } catch (err: any) {
+      console.error('Error al buscar historial:', err);
+      setRedemptions([]); // Limpiamos si hay error
+    }
+  };
+  
+  
   return (
     <div className={styles.container}>
       <div className={styles.pageWrapper}>
-
         <header className={styles.header}>
           <h1 className={styles.pageTitle}>Gestión de Puntos</h1>
           <nav className={styles.tabs}>
@@ -138,64 +254,39 @@ const PuntosManagement: React.FC = () => {
         </header>
 
         <main className={styles.main}>
-          {/* --- Pestaña PREMIOS (Formulario + Grid) --- */}
           {tab === 'premios' && (
             <>
-              {/* Formulario (se queda aquí) */}
-              <section className={styles.section}>
-                <h2 className={styles.sectionTitle}>{editing ? 'Editar Premio' : 'Crear Nuevo Premio'}</h2>
-                <div className={styles.formLayout}>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="name" className={styles.label}>Nombre del Premio</label>
-                    <input id="name" className={styles.input} placeholder="Ej: 1/2 Pizza Muzzarella" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="cost" className={styles.label}>Puntos necesarios</label>
-                    <input id="cost" className={styles.input} type="number" placeholder="Ej: 250" value={form.pointsCost} onChange={e => setForm({ ...form, pointsCost: Number(e.target.value) })} />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="desc" className={styles.label}>Descripción</label>
-                    <textarea id="desc" className={styles.textarea} placeholder="Ej: Canjeá tus puntos por..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="imgUrl" className={styles.label}>URL de la Imagen</label>
-                    <input id="imgUrl" className={styles.input} placeholder="https://..." value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })} />
-                  </div>
-                </div>
-                <div className={styles.formActions}>
-                  <label className={styles.checkboxWrapper}>
-                    <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} /> Activo
-                  </label>
-                  <div className={styles.formButtons}>
-                    {editing && <button className={styles.buttonGhost} onClick={clearForm}>Cancelar</button>}
-                    <button className={styles.buttonPrimary} onClick={handleSaveReward}>
-                      {editing ? 'Guardar Cambios' : 'Crear Premio'}
-                    </button>
-                  </div>
-                </div>
-              </section>
+              {/* REEMPLAZADO: form extraído a RewardForm */}
+              <RewardForm
+                form={form}
+                setForm={setForm}
+                editing={editing}
+                clearForm={clearForm}
+                handleSaveReward={handleSaveReward}
+              />
 
-              {/* Grid de Premios (Refactorizado) */}
+              {/* Grid de Premios (sin cambios) */}
               <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Premios Existentes</h2>
-                <div className={styles.grid}>
-                  {rewards.length === 0 && <p className={styles.empty}>No hay premios creados.</p>}
-                  
-                  {rewards.map(r => (
-                    <RewardCard 
-                      key={r.id}
-                      reward={r}
-                      onEdit={handleEdit}
-                      onToggleActive={toggleActive}
-                      onDelete={deleteReward}
-                    />
-                  ))}
-                </div>
+                {isLoadingRewards ? <p className={styles.empty}>Cargando premios...</p> : (
+                  <div className={styles.grid}>
+                    {rewards.length === 0 && <p className={styles.empty}>No hay premios creados.</p>}
+                    {rewards.map(r => (
+                      <RewardCard 
+                        key={r._id}
+                        reward={r} 
+                        onEdit={handleEdit} 
+                        onToggleActive={toggleActive} 
+                        onDelete={deleteReward} 
+                      />
+                    ))}
+                  </div>
+                )}
               </section>
             </>
           )}
 
-          {/* --- Pestaña NUEVO CANJE (Sin cambios) --- */}
+          {/* --- Pestaña NUEVO CANJE (Conectada) --- */}
           {tab === 'nuevo' && (
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Registrar Nuevo Canje</h2>
@@ -204,7 +295,7 @@ const PuntosManagement: React.FC = () => {
                   <label className={styles.label}>Buscar DNI del Cliente</label>
                   <div className={styles.searchDniWrapper}>
                     <input className={styles.input} placeholder="Ingresar DNI..." value={searchDni} onChange={e => setSearchDni(e.target.value)} />
-                    <button className={styles.buttonPrimary} onClick={handleSearchClient}>Buscar</button>
+                    <button className={styles.buttonPrimary} onClick={handleSearchClient} disabled={isLoadingClient}>{isLoadingClient ? 'Buscando...' : 'Buscar'}</button>
                   </div>
                 </div>
               </div>
@@ -221,15 +312,13 @@ const PuntosManagement: React.FC = () => {
                       <select className={styles.select} value={selectedRewardId ?? ''} onChange={e => setSelectedRewardId(e.target.value || null)}>
                         <option value="">Seleccionar premio...</option>
                         {rewards.filter(r => r.isActive).map(r => (
-                          <option key={r.id} value={r.id} disabled={selectedClient.points < r.pointsCost}>
-                            {r.name} — {r.pointsCost} pts {selectedClient.points < r.pointsCost ? '(Puntos insuficientes)' : ''}
+                          <option key={r._id} value={r._id} disabled={selectedClient.points < r.costPoints}>
+                            {r.name} — {r.costPoints} pts {selectedClient.points < r.costPoints ? '(Puntos insuficientes)' : ''}
                           </option>
                         ))}
                       </select>
                     </div>
-                    <button className={styles.buttonConfirmCanje} onClick={handleRegisterCanje} disabled={!selectedRewardId}>
-                      Confirmar Canje
-                    </button>
+                    <button className={styles.buttonConfirmCanje} onClick={handleRegisterCanje} disabled={!selectedRewardId}>Confirmar Canje</button>
                   </div>
                 </div>
               )}
@@ -239,12 +328,13 @@ const PuntosManagement: React.FC = () => {
             </section>
           )}
 
-          {/* --- Pestaña HISTORIAL (Refactorizado) --- */}
+          {/* --- Pestaña HISTORIAL (CONECTADA) --- */}
           {tab === 'historial' && (
             <HistoryTable 
-              filteredHistory={filteredHistory}
+              items={redemptions} // Pasamos el historial filtrado
               historyFilterDni={historyFilterDni}
               setHistoryFilterDni={setHistoryFilterDni}
+              onSearchHistory={handleSearchHistory} // Pasamos la función de búsqueda
             />
           )}
         </main>

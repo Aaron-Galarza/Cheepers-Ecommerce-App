@@ -1,11 +1,12 @@
-// src/pages/admin/components/HistoryTable.tsx (o donde lo ubiques)
+// src/pages/admin/components/HistoryTable.tsx
 
 import React from 'react';
 import styles from './css/puntosmanagement.module.css';
+import { FaSearch } from 'react-icons/fa'; // Importamos el ícono
 
-// Copiamos la 'type'
+// 1. Definimos el 'type' Redemption (asegúrate de que coincida)
 export type Redemption = {
-  id: string;
+  _id: string; // <-- Usamos _id
   dni: string;
   clientName: string;
   rewardId: string;
@@ -14,23 +15,47 @@ export type Redemption = {
   date: string;
 };
 
-// Definimos las 'props'
+// 2. CORRECCIÓN: Definimos las props que SÍ estamos recibiendo
 interface HistoryTableProps {
-  filteredHistory: Redemption[];
+  items: Redemption[]; // <-- Acepta 'items'
   historyFilterDni: string;
   setHistoryFilterDni: (dni: string) => void;
+  onSearchHistory: () => void; // Función para buscar
 }
 
-const HistoryTable: React.FC<HistoryTableProps> = ({ filteredHistory, historyFilterDni, setHistoryFilterDni }) => {
+const HistoryTable: React.FC<HistoryTableProps> = ({ 
+  items, // <-- Recibe 'items'
+  historyFilterDni, 
+  setHistoryFilterDni,
+  onSearchHistory 
+}) => {
+  
+  const handleSearchClick = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearchHistory(); // Llama a la función del padre
+  };
+
   return (
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>Historial de Canjes</h2>
-      <div className={styles.formRow}>
+      
+      <form className={styles.formRow} onSubmit={handleSearchClick}>
         <div className={styles.inputGroup}>
-          <label className={styles.label}>Filtrar por DNI</label>
-          <input className={styles.input} placeholder="Buscar por DNI..." value={historyFilterDni} onChange={e => setHistoryFilterDni(e.target.value)} />
+          <label className={styles.label}>Buscar Historial por DNI</label>
+          <div className={styles.searchDniWrapper}>
+            <input 
+              className={styles.input} 
+              placeholder="Ingresar DNI..." 
+              value={historyFilterDni} 
+              onChange={e => setHistoryFilterDni(e.target.value)} 
+            />
+            <button type="submit" className={styles.buttonPrimary}>
+              <FaSearch />
+              Buscar Historial
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
 
       <div className={styles.tableWrap}>
         <table className={styles.table}>
@@ -44,11 +69,12 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ filteredHistory, historyFil
             </tr>
           </thead>
           <tbody>
-            {filteredHistory.length === 0 && (
-              <tr><td colSpan={5} className={styles.empty}>Sin canjes registrados.</td></tr>
+            {/* 3. La tabla ahora usa 'items' */}
+            {items.length === 0 && (
+              <tr><td colSpan={5} className={styles.empty}>No se encontró historial.</td></tr>
             )}
-            {filteredHistory.map(r => (
-              <tr key={r.id}>
+            {items.map(r => (
+              <tr key={r._id}>
                 <td>{r.dni}</td>
                 <td>{r.clientName}</td>
                 <td>{r.rewardName}</td>
