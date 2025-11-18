@@ -34,7 +34,7 @@ const CheckoutPage: React.FC = () => {
   // (Estado 'email' eliminado)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-    const [DNI, setDNI] = useState('');
+  const [dni, setDni] = useState('');
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
@@ -156,7 +156,7 @@ const CheckoutPage: React.FC = () => {
     const orderData: any = {
       products: productsForOrder,
       guestName: name,
-     guestDNI: DNI.trim(),
+      guestDni: dni.trim(),
       guestPhone: phone,
       totalAmount: finalTotal, 
       paymentMethod: backendPaymentMethod,
@@ -251,8 +251,8 @@ const CheckoutPage: React.FC = () => {
               <input
                 type="tel"
                 placeholder="DNI (opcional)"
-                value={DNI}
-                onChange={e => setDNI(e.target.value)}
+                value={dni}
+                onChange={e => setDni(e.target.value)}
                 className={styles.inputField}
                 pattern="^[0-9]{7,9}$"
                 title="El DNI debe tener entre 7 y 9 números, sin puntos."
