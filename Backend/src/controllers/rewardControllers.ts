@@ -5,7 +5,7 @@ import asyncHandler from 'express-async-handler';
 import { 
     createRewardInDB, 
     updateRewardInDB, 
-    deactivateRewardInDB, 
+    deleteRewardInDB, 
     getRewardByIdInDB,
     getAllRewardsAdmin,
     getActiveRewards
@@ -80,9 +80,9 @@ export const getAllRewardsForAdmin = asyncHandler(async (req: Request, res: Resp
 export const deleteReward = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
     const { id } = req.params;
     
-    // Delegación al servicio (maneja la validación y el cambio a isActive: false)
-    const result = await deactivateRewardInDB(id); 
-    res.json(result);
+    await deleteRewardInDB(id); 
+    res.status(200).json({ message: 'Premio eliminado exitosamente' });
+
 });
 
 // @desc    Obtener todos los premios activos (para uso de Cliente)

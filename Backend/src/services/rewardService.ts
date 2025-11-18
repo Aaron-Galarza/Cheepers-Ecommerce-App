@@ -54,7 +54,7 @@ export const updateRewardInDB = async (id: string, data: Partial<RewardData>) =>
 /**
  * @desc Desactiva (Elimina lógicamente) un premio por ID.
  */
-export const deactivateRewardInDB = async (id: string) => {
+export const deleteRewardInDB = async (id: string) => {
     if (!Types.ObjectId.isValid(id)) {
         throw new Error('ID de premio no válido.');
     }
@@ -65,9 +65,7 @@ export const deactivateRewardInDB = async (id: string) => {
         throw new Error('Premio no encontrado.');
     }
 
-    reward.isActive = false; // Desactivar en lugar de eliminar
-    await reward.save();
-    return { message: 'Premio marcado como inactivo (eliminado lógicamente).' };
+    return await reward.deleteOne();
 };
 
 /**
