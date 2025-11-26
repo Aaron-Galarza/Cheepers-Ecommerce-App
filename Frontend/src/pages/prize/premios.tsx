@@ -1,147 +1,99 @@
-// src/pages/premios/Premios.tsx
-
-import React, { useState, useEffect } from 'react'; // 1. Añadimos useEffect
-import { FaSearch, FaGift, FaWhatsapp, FaAddressCard } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaSearch, FaGift, FaAddressCard } from 'react-icons/fa';
 import styles from '../css/premios.module.css';
-import axios from 'axios'; // 2. Importamos axios
+import axios from 'axios';
+// Importamos el componente separado
+import PremioCard from '../../components/layout/design/PremioCard';
 
-// --- 3. Definimos la URL base de la API ---
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-// --- 4. El 'type' ahora debe coincidir con la API ---
-// (Tu API usa '_id' y 'costPoints')
+// --- CORRECCIÓN AQUÍ ---
+// La interfaz debe coincidir con lo que espera 'PremioCard' (y con la API)
 interface IPremio {
-  _id: string; // ID de MongoDB
-  name: string; // <-- Corregido (antes 'nombre')
-  description: string; // <-- Corregido (antes 'descripcion')
-  imageUrl: string; // <-- Corregido (antes 'imagenUrl')
-  costPoints: number; // Dato real de la API
+  _id: string;
+  name: string;
+  description: string;
+  imageUrl: string; // <-- CAMBIADO: De 'imagenUrl' a 'imageUrl'
+  costPoints: number;
   isActive: boolean;
 }
 
-const WHATSAPP_NUMBER = '543624001122'; // Reemplazá con tu número
+const WHATSAPP_NUMBER = '543624001122';
 
 const PremiosPage: React.FC = () => {
   const [dni, setDni] = useState('');
   const [puntosUsuario, setPuntosUsuario] = useState<number | null>(null);
-
-  // --- 5. Estados para manejar la carga de la API ---
   const [premios, setPremios] = useState<IPremio[]>([]);
   const [isLoadingPremios, setIsLoadingPremios] = useState(true);
   const [isLoadingPuntos, setIsLoadingPuntos] = useState(false);
   const [errorPremios, setErrorPremios] = useState<string | null>(null);
 
-  // --- 6. useEffect para cargar los premios ACTIVOS al montar ---
   useEffect(() => {
     const fetchPremios = async () => {
       setIsLoadingPremios(true);
       setErrorPremios(null);
       try {
-        // Llamamos a GET /api/rewards (trae solo los activos para clientes)
         const response = await axios.get<IPremio[]>(`${API_BASE_URL}/api/rewards`);
-        setPremios(response.data); // Guarda los datos tal como vienen de la API
+        setPremios(response.data);
       } catch (err) {
         console.error("Error al cargar premios:", err);
-        setErrorPremios("No se pudieron cargar los premios. Intenta de nuevo más tarde.");
+        setErrorPremios("No se pudieron cargar los premios.");
       } finally {
         setIsLoadingPremios(false);
       }
     };
-
     fetchPremios();
-  }, []); // El array vacío asegura que se ejecute solo una vez
+  }, []);
 
-
-  // --- 7. Conectamos handleConsultarPuntos a la API ---
   const handleConsultarPuntos = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dni.trim()) {
-      alert('Por favor, ingresá un DNI para consultar.');
-      return;
-    }
+    if (!dni.trim()) return alert('Por favor, ingresá un DNI.');
     
     setIsLoadingPuntos(true);
-    setPuntosUsuario(null); // Reseteamos puntos anteriores
+    setPuntosUsuario(null);
     
     try {
-      // ========================================================================
-      // === BACKEND DEBE CREAR ESTE ENDPOINT PÚBLICO (sin /admin) ===
-      // ========================================================================
       const response = await axios.get(`${API_BASE_URL}/api/loyalty/${dni.trim()}`); 
-      
-      if (response.data && response.data.totalPoints !== undefined) {
-        setPuntosUsuario(response.data.totalPoints);
-      } else {
-        setPuntosUsuario(0); // Si el cliente existe pero no tiene puntos
+      if (response.data) {
+        setPuntosUsuario(response.data.totalPoints || 0);
       }
     } catch (err: any) {
-      console.error("Error al consultar puntos:", err);
-      if (err.response && (err.response.status === 404 || err.response.status === 400)) {
-        alert('Cliente no encontrado. Asegurate de estar registrado.');
-      } else if (err.response && err.response.status === 401) {
-         alert('Error de autenticación. Esta función es solo para admins.');
-      } else {
-        alert('Error al consultar puntos. Intenta de nuevo.');
-      }
-      setPuntosUsuario(null);
+      if (err.response?.status === 404) alert('Cliente no encontrado.');
+      else alert('Error al consultar puntos.');
     } finally {
       setIsLoadingPuntos(false);
     }
   };
 
-  // --- 8. Lógica de Canjear (ajustada a costPoints) ---
   const handleCanjear = (premio: IPremio) => {
-    if (!dni.trim()) {
-      alert('Por favor, ingresá tu DNI antes de canjear un premio.');
-      return;
-    }
-    if (puntosUsuario === null) {
-      alert('Por favor, consultá tus puntos primero.');
-      return;
-    }
-    // Usamos costPoints
-    if (puntosUsuario < premio.costPoints) {
-      alert(`No tenés suficientes puntos para canjear este premio. Necesitás ${premio.costPoints} puntos.`);
-      return;
-    }
-    
-    // Usamos 'name' (de la API)
-    const mensaje = `Hola, ¿qué tal? Soy el cliente con el DNI: ${dni}, y me interesa canjear el siguiente premio: ${premio.name} (${premio.costPoints} puntos)`;
-    const mensajeCodificado = encodeURIComponent(mensaje);
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${mensajeCodificado}`;
+    const mensaje = `Hola, soy el cliente con DNI: ${dni}, quiero canjear: ${premio.name} (${premio.costPoints} pts)`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
   };
 
   return (
-    // TU DISEÑO ORIGINAL (Sin cambios de clases)
     <div className={styles.premiosContainer}>
-      {/* Header con efecto visual */}
+      
       <div className={styles.heroSection}>
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>
-            <FaGift className={styles.heroIcon} />
-            CANJEÁ TUS PUNTOS
+            <FaGift className={styles.heroIcon} /> CANJEÁ TUS PUNTOS
           </h1>
-          <p className={styles.heroSubtitle}>
-            Cada compra te acerca a premios increíbles
-          </p>
+          <p className={styles.heroSubtitle}>Cada compra te acerca a premios increíbles</p>
         </div>
         <div className={styles.floatingGifts}>
-          <div className={styles.gift} style={{ '--delay': '0s', '--x': '10%' } as React.CSSProperties}>🎁</div>
-          <div className={styles.gift} style={{ '--delay': '1s', '--x': '30%' } as React.CSSProperties}>🎁</div>
-          <div className={styles.gift} style={{ '--delay': '2s', '--x': '50%' } as React.CSSProperties}>🎁</div>
-          <div className={styles.gift} style={{ '--delay': '3s', '--x': '70%' } as React.CSSProperties}>🎁</div>
-          <div className={styles.gift} style={{ '--delay': '4s', '--x': '90%' } as React.CSSProperties}>🎁</div>
+           <div className={styles.gift} style={{ '--delay': '0s', '--x': '10%' } as React.CSSProperties}>🎁</div>
+           <div className={styles.gift} style={{ '--delay': '1s', '--x': '30%' } as React.CSSProperties}>🎁</div>
+           <div className={styles.gift} style={{ '--delay': '2s', '--x': '50%' } as React.CSSProperties}>🎁</div>
+           <div className={styles.gift} style={{ '--delay': '4s', '--x': '90%' } as React.CSSProperties}>🎁</div>
         </div>
       </div>
 
       <div className={styles.disclaimerBanner}>
-        <p className={styles.disclaimer}>
-          💫 Aclaración: El canje será validado por WhatsApp o en caja
-        </p>
+        <p className={styles.disclaimer}>Aclaración: El canje se valida por WhatsApp o en caja</p>
       </div>
 
-      {/* Sección de consulta de puntos */}
+      {/* Consulta de Puntos */}
       <div className={styles.consultaSection}>
         <div className={styles.consultaCard}>
           <div className={styles.consultaHeader}>
@@ -154,23 +106,13 @@ const PremiosPage: React.FC = () => {
               <input 
                 type="tel"
                 className={styles.dniInput}
-                placeholder="Ingresá tu DNI sin puntos"
+                placeholder="DNI sin puntos"
                 value={dni}
                 onChange={(e) => setDni(e.target.value)}
-                pattern="[0-9]{7,9}"
-                title="Ingresá solo números, sin puntos."
               />
             </div>
-            
             <button type="submit" className={styles.botonConsultar} disabled={isLoadingPuntos}>
-              {isLoadingPuntos ? (
-                <div className={styles.spinner}></div> 
-              ) : (
-                <>
-                  <FaSearch />
-                  Consultar Puntos
-                </>
-              )}
+              {isLoadingPuntos ? 'Cargando...' : <><FaSearch /> Consultar</>}
             </button>
           </form>
 
@@ -185,90 +127,42 @@ const PremiosPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Sección de premios */}
+      {/* Sección de Premios */}
       <div className={styles.premiosSection}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>
-            <FaGift className={styles.sectionIcon} />
-            PREMIOS DISPONIBLES
-          </h2>
-          <p className={styles.sectionSubtitle}>
-            Canjeá tus puntos por estas deliciosas recompensas
-          </p>
+          <h2 className={styles.sectionTitle}>PREMIOS DISPONIBLES</h2>
         </div>
 
-        {/* ============================================================== */}
-        {/* === CAMBIO 9: Manejamos Carga, Error y mapeo de 'premios' === */}
-        {/* ============================================================== */}
         {isLoadingPremios ? (
           <div className={styles.loadingContainer}>Cargando premios...</div>
         ) : errorPremios ? (
           <div className={styles.errorContainer}>{errorPremios}</div>
         ) : (
           <div className={styles.premiosGrid}>
-            {/* Ahora mapeamos 'premios' del estado */}
+            
+            {/* Usamos el componente PremioCard */}
             {premios.map((premio) => (
-              <div key={premio._id} className={styles.premioCard}>
-                <div className={styles.imageContainer}>
-                  <img 
-                    // Usamos 'imageUrl' (de la API)
-                    src={premio.imageUrl || 'https://via.placeholder.com/400x300.png?text=Premio'}
-                    alt={premio.name} // Usamos 'name' (de la API)
-                    className={styles.premioImage}
-                  />
-                </div>
-                
-                <div className={styles.premioContent}>
-                  {/* Usamos 'name' (de la API) */}
-                  <h3 className={styles.premioNombre}>{premio.name}</h3>
-                  {/* Usamos 'description' (de la API) */}
-                  <p className={styles.premioDescripcion}>{premio.description}</p>
-
-                  <div className={styles.premioFooter}>
-                    <div className={styles.puntosContainer}>
-                      <span className={styles.puntosText}>PUNTOS</span>
-                      {/* Usamos 'costPoints' (de la API) */}
-                      <span className={styles.puntosValor}>{premio.costPoints}</span>
-                    </div>
-                    
-                    <button 
-                      className={styles.botonCanjear}
-                      onClick={() => handleCanjear(premio)}
-                      // Usamos 'costPoints'
-                      disabled={puntosUsuario === null || puntosUsuario < premio.costPoints}
-                    >
-                      <FaWhatsapp className={styles.whatsappIcon} />
-                      Canjear
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <PremioCard 
+                key={premio._id}
+                premio={premio} 
+                puntosUsuario={puntosUsuario}
+                onCanjear={() => handleCanjear(premio)}
+              />
             ))}
+            
           </div>
         )}
       </div>
 
-      {/* Info adicional (Sin cambios) */}
+      {/* Info adicional */}
       <div className={styles.infoSection}>
         <div className={styles.infoCard}>
           <h3 className={styles.infoTitle}>¿Cómo acumular puntos?</h3>
           <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <div className={styles.infoNumber}>1</div>
-              <p>Realizá pedidos en nuestro local</p>
-            </div>
-            <div className={styles.infoItem}>
-              <div className={styles.infoNumber}>2</div>
-              <p>Presentá tu DNI al hacer el pedido</p>
-            </div>
-            <div className={styles.infoItem}>
-              <div className={styles.infoNumber}>3</div>
-              <p>Acumulá puntos con cada compra</p>
-            </div>
-            <div className={styles.infoItem}>
-              <div className={styles.infoNumber}>4</div>
-              <p>Canjeá por premios increíbles</p>
-            </div>
+            <div className={styles.infoItem}><div className={styles.infoNumber}>1</div><p>Realizá pedidos en cheepers</p></div>
+            <div className={styles.infoItem}><div className={styles.infoNumber}>2</div><p>Ingresa tu DNI o dictalo en caja</p></div>
+            <div className={styles.infoItem}><div className={styles.infoNumber}>3</div><p>Mientras más valor de compra más puntos</p></div>
+            <div className={styles.infoItem}><div className={styles.infoNumber}>4</div><p>Canjeá por premios</p></div>
           </div>
         </div>
       </div>
