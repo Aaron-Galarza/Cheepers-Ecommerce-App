@@ -18,7 +18,7 @@ interface IPremio {
   isActive: boolean;
 }
 
-const WHATSAPP_NUMBER = '543624001122';
+const WHATSAPP_NUMBER = '5493624063011';
 
 const PremiosPage: React.FC = () => {
   const [dni, setDni] = useState('');
