@@ -4,8 +4,8 @@ import styles from '../css/menu.module.css';
 import { Product } from '../../components/layout/checkout/productlist';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 
-// Importa los íconos de React Icons
-import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiBread } from 'react-icons/gi';
+// Importa los íconos de React Icons (Agregamos GiCutlet para Milanesas)
+import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiBread, GiSteak } from 'react-icons/gi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -20,6 +20,7 @@ const MenuPage: React.FC = () => {
     const friesRef = useRef<HTMLHeadingElement>(null);
     const pizzasRef = useRef<HTMLHeadingElement>(null);
     const lomosRef = useRef<HTMLHeadingElement>(null);
+    const milanesasRef = useRef<HTMLHeadingElement>(null); // NUEVA REF
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -54,12 +55,14 @@ const MenuPage: React.FC = () => {
     const fries = products.filter((p) => p.category === 'Papas Fritas');
     const pizzas = products.filter((p) => p.category === 'Pizzas');
     const lomos = products.filter((p) => p.category === 'Sandwiches');
+    const milanesas = products.filter((p) => p.category === 'Milanesas'); // NUEVO FILTRO
 
     // Verificar si hay productos en cada categoría
     const hasHamburgers = hamburgers.length > 0;
     const hasFries = fries.length > 0;
     const hasPizzas = pizzas.length > 0;
     const hasLomos = lomos.length > 0;
+    const hasMilanesas = milanesas.length > 0; // NUEVO BOOLEANO
 
     if (loading) return <div className={styles.menuContainer}>Cargando productos...</div>;
 
@@ -94,6 +97,14 @@ const MenuPage: React.FC = () => {
                         <li>
                             <a onClick={() => scrollToSection(lomosRef)}>
                                 <GiBread className={styles.navIcon} /> Sandwich
+                            </a>
+                        </li>
+                    )}
+                    {/* NUEVO BOTÓN NAV */}
+                    {hasMilanesas && (
+                        <li>
+                            <a onClick={() => scrollToSection(milanesasRef)}>
+                                <GiSteak className={styles.navIcon} /> Milanesas
                             </a>
                         </li>
                     )}
@@ -175,6 +186,28 @@ const MenuPage: React.FC = () => {
                         </h1>
                         <div className={styles.grid}>
                             {lomos.map((p) => (
+                                <div key={p._id} className={styles.card}>
+                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
+                                    <div className={styles.info}>
+                                        <h2 className={styles.title}>{p.name}</h2>
+                                        <p className={styles.description}>{p.description}</p>
+                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                {/* NUEVA SECCIÓN: Milanesas */}
+                {hasMilanesas && (
+                    <>
+                        <h1 id="milanesas" className={styles.sectionTitle} ref={milanesasRef}>
+                            MILANESAS
+                        </h1>
+                        <div className={styles.grid}>
+                            {milanesas.map((p) => (
                                 <div key={p._id} className={styles.card}>
                                     <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
                                     <div className={styles.info}>
