@@ -3,7 +3,7 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 // Asegúrate de importar la función del servicio
-import { processOrderPoints, redeemReward, getClientLoyaltyInfo, getClientTotalPoints } from '../services/loyaltyService'; 
+import { processOrderPoints, redeemReward, getClientLoyaltyInfo, getClientTotalPoints, validateArgentineDNI } from '../services/loyaltyService'; 
 // Asumo que tienes una interfaz de Request personalizada si quieres usar req.user
 
 // Interfaz para el cuerpo de canje
@@ -22,6 +22,11 @@ export const getClientPointsByDni = asyncHandler(async(req: Request, res: Respon
         res.status(400);
         throw new Error ('Debe proporcionar un DNI para ver su saldo')
     }
+
+    if (!validateArgentineDNI(dni)) {
+        res.status(400);
+        throw new Error('El DNI proporcionado no tiene un formato válido (7-8 dígitos, sin ceros iniciales).');
+    }
 
     const totalPoints = await getClientTotalPoints(dni)
     if (totalPoints <= 0) {
@@ -54,6 +59,11 @@ export const redeemPoints = asyncHandler(async (req: Request<{}, {}, RedeemBody>
         throw new Error('Debe proporcionar el DNI del cliente y el ID del premio (rewardId).');
     }
 
+    if (!validateArgentineDNI(dni)) {
+        res.status(400);
+        throw new Error('El DNI proporcionado no tiene un formato válido (7-8 dígitos, sin ceros iniciales).');
+    }
+
     // 2. Delegamos la lógica al servicio, que contiene todas las validaciones
     const result = await redeemReward(dni, rewardId);
 
@@ -70,6 +80,11 @@ export const getLoyaltyInfoByDni = asyncHandler(async (req: Request, res: Respon
         res.status(400);
         throw new Error('Debe proporcionar el DNI del cliente.');
     }
+
+    if (!validateArgentineDNI(dni)) {
+        res.status(400);
+        throw new Error('El DNI proporcionado no tiene un formato válido (7-8 dígitos, sin ceros iniciales).');
+    }
 
     // Delegamos la lógica al servicio
     const result = await getClientLoyaltyInfo(dni);

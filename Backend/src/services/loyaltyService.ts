@@ -17,6 +17,14 @@ interface LoyaltyInfo {
 }
 
 /**
+ * @desc Valida que el DNI tenga un formato básico de DNI argentino (7 u 8 dígitos, no empieza con 0).
+ */
+export const validateArgentineDNI = (dni: string): boolean => {
+    // Regex: [1-9] (no comienza con 0), \d{6,7} (seguido de 6 o 7 dígitos)
+    return /^[1-9]\d{6,7}$/.test(dni); 
+};
+
+/**
  * @desc Obtiene solo los puntos totales de un cliente.
  * @param dni El DNI del cliente.
  * @returns El total de puntos (number), o 0 si no existe.
@@ -123,9 +131,10 @@ export const processOrderPoints = async (order: IOrder): Promise<boolean> => {
  */
 export const redeemReward = async (dni: string, rewardId: string) => {
     // 1. Validar DNI y RewardId (Validación: Solo números y longitud. Esto idealmente es un middleware/joi)
-    if (!dni || !/^\d{7,10}$/.test(dni)) { 
-        throw new Error('DNI no válido. Debe ser solo números (7-10 dígitos).');
+    if (!dni || !validateArgentineDNI(dni)) { 
+        throw new Error('DNI no válido. Debe ser un número de 7 u 8 dígitos (sin ceros iniciales).');
     }
+
     if (!mongoose.Types.ObjectId.isValid(rewardId)) {
         throw new Error('ID de premio no válido.');
     }
@@ -156,8 +165,24 @@ export const redeemReward = async (dni: string, rewardId: string) => {
 
     try {
         // 3. Restar Puntos del Usuario
-        loyaltyUser.totalPoints -= costPoints;
-        await loyaltyUser.save({ session });
+        const updatedUser = await LoyaltyUser.findOneAndUpdate(
+            { 
+                dni, 
+                // CRÍTICO: Condición atómica para asegurar que el saldo es suficiente antes de restar.
+                // Usamos findOneAndUpdate con $inc y la condición atómica
+                totalPoints: { $gte: costPoints } 
+            },
+            { $inc: { totalPoints: -costPoints } }, // Resta atómica de los puntos
+            { new: true, session }
+        );
+
+        if (!updatedUser) {
+            await session.abortTransaction();
+            // Esto sucede si otro proceso/canje bajó el saldo por debajo del costo en el mismo instante.
+            throw new Error(`Error de concurrencia. Saldo insuficiente para completar el canje en este momento.`);
+        }
+        
+        const remainingPoints = updatedUser.totalPoints;
         
         // 4. Guardar Movimiento en LoyaltyHistory
         const historyEntry = new LoyaltyHistory({
@@ -177,7 +202,7 @@ export const redeemReward = async (dni: string, rewardId: string) => {
             message: 'Canje de premio exitoso.',
             reward: reward.name,
             pointsUsed: costPoints,
-            remainingPoints: loyaltyUser.totalPoints,
+            remainingPoints: remainingPoints
         };
 
     } catch (error: any) {
