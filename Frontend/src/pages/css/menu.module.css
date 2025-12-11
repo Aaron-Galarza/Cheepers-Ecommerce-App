@@ -314,3 +314,14 @@ body {
     font-size: 0.55rem;
   }
 }
+
+/* Dentro de styles/menu.module.css */
+
+.promotionalLabel {
+    /* Estilo para la etiqueta promocional */
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #ff0000; /* Color rojo para llamar la atención (como tu imagen) */
+    margin: 0;
+    margin-top: 5px;
+}

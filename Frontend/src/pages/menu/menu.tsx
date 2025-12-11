@@ -3,6 +3,7 @@ import axios from 'axios';
 import styles from '../css/menu.module.css';
 import { Product } from '../../components/layout/checkout/productlist';
 import { useCart } from '../../components/layout/checkout/cartcontext';
+import { PromoFormatter } from '../../lib/markdownFormatter';
 
 // Importa los íconos de React Icons (Agregamos GiCutlet para Milanesas)
 import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiBread, GiSteak } from 'react-icons/gi';
@@ -126,6 +127,10 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                        {p.promotionalLabel && (
+                                            <p className={styles.promotionalLabel}>
+                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
+                                        )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
                                 </div>
@@ -148,6 +153,11 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                        {p.promotionalLabel && (
+                                            <p className={styles.promotionalLabel}>
+                                                {p.promotionalLabel}
+                                            </p>
+                                        )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
                                 </div>
@@ -170,6 +180,11 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                                                                {p.promotionalLabel && (
+                                            <p className={styles.promotionalLabel}>
+                                                {p.promotionalLabel}
+                                            </p>
+                                        )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
                                 </div>
@@ -192,6 +207,11 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                                                                {p.promotionalLabel && (
+                                            <p className={styles.promotionalLabel}>
+                                                {p.promotionalLabel}
+                                            </p>
+                                        )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
                                 </div>
@@ -214,6 +234,11 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                                                                {p.promotionalLabel && (
+                                            <p className={styles.promotionalLabel}>
+                                                {p.promotionalLabel}
+                                            </p>
+                                        )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
                                 </div>

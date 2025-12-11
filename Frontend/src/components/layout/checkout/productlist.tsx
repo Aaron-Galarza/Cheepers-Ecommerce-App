@@ -5,6 +5,7 @@ export interface Product {
     name: string;
     description: string;
     price: number;
+    promotionalLabel: string;
     imageUrl?: string;
     category: string; // Ej. "Hamburguesas", "Pizzas", "Papas Fritas"
     isActive: boolean; // Para saber si está disponible

@@ -8,6 +8,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  promotionalLabel: string;
   imageUrl: string;
   category: string;
   isActive: boolean;

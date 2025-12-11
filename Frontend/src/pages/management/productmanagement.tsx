@@ -172,6 +172,18 @@ const ProductManagement: React.FC = () => {
           />
           <input
             type="text"
+            placeholder="Etiqueta Promocional (Opcional)"
+            // Asegúrate de que el valor sea string, si es null/undefined, usar ''
+            value={editingProduct ? editingProduct.promotionalLabel || '' : newProduct.promotionalLabel || ''}
+            onChange={(e) => 
+              editingProduct 
+                ? setEditingProduct({ ...editingProduct, promotionalLabel: e.target.value }) 
+                : setNewProduct({ ...newProduct, promotionalLabel: e.target.value })
+            }
+            className={styles.inputField}
+          />
+          <input
+            type="text"
             placeholder="URL de la Imagen"
             // Asegúrate de que el valor sea string, si es null/undefined, usar ''
             value={editingProduct ? editingProduct.imageUrl || '' : newProduct.imageUrl || ''}
