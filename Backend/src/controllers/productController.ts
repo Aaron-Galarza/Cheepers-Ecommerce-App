@@ -60,7 +60,7 @@ export const getProductById = asyncHandler(async (req: Request, res: Response) =
 // @access  Private/Admin
 export const createProduct = asyncHandler(async (req: Request, res: Response) => {
     // INCLUYE 'tags' EN LA DESESTRUCTURACIÓN
-    const { name, description, price, category, imageUrl, isActive, tags } = req.body;
+    const { name, description, price, category, imageUrl, isActive, tags, promotionalLabel } = req.body;
 
     if (!name || typeof price !== 'number' || price < 0 || !category) {
         res.status(400);
@@ -70,7 +70,8 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
     const newProduct = new Product({ 
         name, 
         description, 
-        price, 
+        price,
+        promotionalLabel,
         category, 
         imageUrl,
         tags, // <-- ASIGNA EL NUEVO CAMPO
@@ -86,7 +87,7 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
 // @access  Private/Admin
 export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
     // INCLUYE 'tags' EN LA DESESTRUCTURACIÓN
-    const { name, description, price, category, imageUrl, isActive, tags } = req.body;
+    const { name, description, price, category, imageUrl, isActive, tags, promotionalLabel } = req.body;
 
     const product = await Product.findById(req.params.id);
 
@@ -94,6 +95,7 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
         product.name = name || product.name;
         product.description = description || product.description;
         product.price = typeof price === 'number' && price >= 0 ? price : product.price;
+        product.promotionalLabel =  promotionalLabel  // <-- ASIGNA EL NUEVO CAMPO
         product.category = category || product.category;
         product.imageUrl = imageUrl || product.imageUrl;
         product.isActive = isActive !== undefined ? isActive : product.isActive;

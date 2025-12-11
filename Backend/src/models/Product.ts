@@ -6,6 +6,7 @@ export interface IProduct extends Document {
   name: string;
   description?: string; // El '?' indica que este campo es opcional
   price: number;
+  promotionalLabel?: string;
   imageUrl?: string; // URL de la imagen, opcional
   category: string; // Categoría del producto
   tags?: string[]; // <-- NUEVO CAMPO: Array de strings opcional
@@ -19,6 +20,7 @@ const ProductSchema: Schema = new Schema({
   name: { type: String, required: true, unique: true }, // Nombre del producto, obligatorio y único
   description: { type: String }, // Descripción del producto
   price: { type: Number, required: true }, // Precio del producto, obligatorio
+  promotionalLabel: {type: String, required: false, default: null},
   imageUrl: { type: String }, // URL de la imagen del producto
   category: { type: String }, // Categoría del producto
   tags: { type: [String] },
