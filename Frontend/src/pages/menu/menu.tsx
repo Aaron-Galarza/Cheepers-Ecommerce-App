@@ -155,8 +155,7 @@ const MenuPage: React.FC = () => {
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
                                         {p.promotionalLabel && (
                                             <p className={styles.promotionalLabel}>
-                                                {p.promotionalLabel}
-                                            </p>
+                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
                                         )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
@@ -180,10 +179,9 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                                                                {p.promotionalLabel && (
+                                        {p.promotionalLabel && (
                                             <p className={styles.promotionalLabel}>
-                                                {p.promotionalLabel}
-                                            </p>
+                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
                                         )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
@@ -207,10 +205,9 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                                                                {p.promotionalLabel && (
+                                        {p.promotionalLabel && (
                                             <p className={styles.promotionalLabel}>
-                                                {p.promotionalLabel}
-                                            </p>
+                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
                                         )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
@@ -234,10 +231,9 @@ const MenuPage: React.FC = () => {
                                         <h2 className={styles.title}>{p.name}</h2>
                                         <p className={styles.description}>{p.description}</p>
                                         <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                                                                {p.promotionalLabel && (
+                                        {p.promotionalLabel && (
                                             <p className={styles.promotionalLabel}>
-                                                {p.promotionalLabel}
-                                            </p>
+                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
                                         )}
                                         <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
                                     </div>
