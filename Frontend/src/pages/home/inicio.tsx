@@ -230,8 +230,7 @@ const Inicio: React.FC = () => {
               </span>
               <div className={styles.contactText}>
                 <p><strong>Horario de Atención:</strong></p>
-                <p>Lunes a Domingo: 20:00 - 23:00 hs</p>
-                <p>Viernes: hasta las 23:30</p>
+                <p>Lunes a Domingo: 20:00 - 23:30 hs</p>
                 <p>Sabados: hasta las 00:00</p>
               </div>
             </div>
