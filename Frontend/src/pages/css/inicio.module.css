@@ -1,14 +1,17 @@
+/* IMPORTAMOS FUENTES ELEGANTES Y MODERNAS */
 
 :root {
-  --color-primary: #e53e3e; /* Rojo Cheepers */
-  --color-secondary: #f6ad55; /* Naranja */
-  --color-dark-text: #2d3748; /* Gris oscuro para texto principal */
-  --color-medium-text: #4a5568; /* Gris medio para texto secundario */
-  --color-light-text: #718096; /* Gris claro para texto terciario */
+  /* --- PALETA CRISTAL BAR --- */
+  --color-primary: #4a3b32; /* Marrón Café (Color Principal) */
+  --color-secondary: #c5a065; /* Dorado (Detalles) */
+  
+  --color-dark-text: #2d2a2a; 
+  --color-medium-text: #5c5555;
+  --color-light-text: #718096;
   --color-white: #ffffff;
-  --color-off-white: #FDFDF5; /* CAMBIO: Blanco roto a un crema muy sutil para fondos generales */
-  --color-grey-background: #edf2f7; /* Gris muy claro para fondos */
-  --color-hero-background: #FFF8E1; /* CAMBIO: Color de fondo del hero a un crema más cálido */
+  --color-off-white: #F9F7F2; /* Crema suave para fondo general */
+  --color-grey-background: #edf2f7;
+  --color-hero-background: #4a3b32; /* Fondo base del hero */
 
   --space-xs: 8px;
   --space-sm: 16px;
@@ -21,10 +24,10 @@
   --border-radius-lg: 24px;
   --border-radius-full: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -38,33 +41,34 @@ body {
   background-color: var(--color-off-white);
 }
 
-/* SECCIÓN DEL BANNER PRINCIPAL */
+/* --- SECCIÓN DEL BANNER PRINCIPAL (HERO) --- */
 .heroSection {
   position: relative;
   width: 100%;
   min-height: 600px;
   overflow: hidden;
-  border-radius: 70px;
-  background-color: var(--color-hero-background);
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><path d="M75 15c-20.7 0-37.5 16.8-37.5 37.5s16.8 37.5 37.5 37.5 37.5-16.8 37.5-37.5-16.8-37.5-37.5-37.5zM75 97.5c-20.7 0-37.5-16.8-37.5-37.5s16.8-37.5 37.5-37.5 37.5 16.8 37.5 37.5-16.8 37.5-37.5 37.5z" fill="%23f0e68c" opacity="0.08" /></svg>');
-  background-size: 150px 150px;
-  background-repeat: repeat;
+  border-radius: 70px; /* Mantengo tu borde */
+  
+  /* FONDO CRISTAL: Degradado Marrón Elegante */
+  background: linear-gradient(135deg, #5f493b 0%, #4a3b32 100%);
+  
   margin-bottom: var(--space-xl);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
-  contain: paint; /* ← aislamiento del contenedor para Safari */
+  contain: paint; 
+  margin-top: 10px;
 }
 
-/* Animación del slide (sincronizada con JS a 0.9s) */
+/* Animación del slide (Tu lógica intacta) */
 .heroSlide {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   opacity: 0;
-  visibility: hidden;            /* ← oculta de verdad los no activos */
-  pointer-events: none;          /* ← no capturan toques/clicks */
-  transition: opacity 0.9s ease-in-out; /* ← 900ms, igual que JS */
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.9s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -75,29 +79,29 @@ body {
   backface-visibility: hidden;
   will-change: opacity;
 
-  /* hints de composición para iOS */
-  contain: layout paint;         /* ← aísla cada slide */
+  contain: layout paint;
   -webkit-transform: translateZ(0);
-          transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .heroSlide.active {
   opacity: 1;
   z-index: 1;
   pointer-events: auto;
-  visibility: visible;           /* ← el activo sí es visible */
+  visibility: visible;
 }
 
 .heroImageContainer {
   position: relative;
   width: 550px;
-  height: 400px;
+  height: 390px;
   max-width: 45%;
   overflow: hidden;
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-lg);
+  /* Sombra dorada suave */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   z-index: 1;
-  -webkit-transform: translateZ(0); /* Aceleración por hardware para Safari */
+  -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
 
@@ -107,7 +111,7 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius-md);
-  -webkit-backface-visibility: hidden; /* Previene parpadeo en Safari */
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
@@ -120,23 +124,23 @@ body {
   padding-left: var(--space-md);
   text-align: left;
   z-index: 2;
-  color: var(--color-dark-text);
+  color: var(--color-white); /* Texto blanco sobre fondo marrón */
 }
 
 .heroTitle {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Playfair Display', serif; /* Fuente elegante */
   font-size: 4.5em;
-  color: var(--color-primary);
+  color: var(--color-secondary); /* Dorado */
   margin: 0 0 var(--space-sm) 0;
   line-height: 1.1;
   letter-spacing: -1px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .heroText {
   font-family: 'Open Sans', sans-serif;
   font-size: 2em;
-  color: var(--color-medium-text);
+  color: rgba(255,255,255,0.9); /* Blanco suave */
   margin-bottom: var(--space-md);
   line-height: 1.3;
 }
@@ -145,10 +149,10 @@ body {
   font-family: 'Montserrat', sans-serif;
   font-size: 1.5em;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-white);
   background-color: transparent;
   padding: var(--space-sm) var(--space-md);
-  border: 2px solid var(--color-primary);
+  border: 2px solid var(--color-secondary); /* Borde dorado */
   border-radius: var(--border-radius-full);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
@@ -158,12 +162,14 @@ body {
 }
 
 .heroCallToAction:hover {
-  background-color: var(--color-primary);
-  color: var(--color-white);
+  background-color: var(--color-secondary);
+  color: #2d2a2a; /* Texto oscuro al hover */
   transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 5px 15px rgba(197, 160, 101, 0.4);
 }
 
+/* --- INDICADORES (PUNTITOS) --- */
+/* MANTENGO TU POSICIONAMIENTO EXACTO */
 .bannerDots {
   position: absolute;
   bottom: var(--space-md);
@@ -177,21 +183,21 @@ body {
 .dot {
   width: 12px;
   height: 12px;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.3); /* Blancos semi-transparentes */
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .dot:hover {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(255, 255, 255, 0.8);
   transform: scale(1.1);
 }
 
 .dot.active {
-  background-color: var(--color-primary);
+  background-color: var(--color-secondary); /* Dorado activo */
   transform: scale(1.2);
-  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.2);
+  box-shadow: 0 0 0 4px rgba(197, 160, 101, 0.3);
 }
 
 /* SECCIÓN SOBRE NOSOTROS / CONTACTO */
@@ -201,7 +207,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   padding: var(--space-xl) var(--space-md);
-  background-color: var(--color-white);
+  background-color: var(  --color-background-medium);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   gap: var(--space-lg);
@@ -217,12 +223,11 @@ body {
   font-family: 'Montserrat', sans-serif;
   font-size: 2.8em;
   font-weight: 800;
-  color: var(--color-dark-text);
+  color: var(--color-primary);
   margin-bottom: var(--space-lg);
   line-height: 1.2;
 }
 
-/* RESPETANDO TUS REGLAS DE TEXTO - SIN MODIFICACIONES */
 .aboutParagraph {
   font-family: 'Open Sans', sans-serif;
   font-size: 1.1em;
@@ -232,9 +237,9 @@ body {
 }
 
 .aboutSubTitle {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 1.8em;
-  font-weight: 700;
+  font-family:  'Montserrat', serif;
+  font-size: 2.7em;
+  font-weight: 800;
   color: var(--color-primary);
   margin-top: var(--space-lg);
   margin-bottom: var(--space-md);
@@ -250,6 +255,7 @@ body {
   flex-direction: column;
   background-color: var(--color-white);
   padding: var(--space-md);
+  border: 1px solid #eee;
 }
 
 .contactInfoBlock {
@@ -260,10 +266,10 @@ body {
 }
 
 .contactTitle {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Playfair Display', serif;
   font-size: 1.8em;
   font-weight: 700;
-  color: var(--color-dark-text);
+  color: var(--color-primary);
   margin-bottom: var(--space-sm);
   text-align: center;
 }
@@ -278,15 +284,15 @@ body {
 
 .contactIconWrapper {
   font-size: 1.4em;
-  color: var(--color-primary);
-  background-color: var(--color-off-white);
-  border-radius: var(--border-radius-sm);
+  color: rgb(77, 45, 8); /* Dorado */
+  background-color: transparent;
+  border: 1px solid var(--color-secondary);
+  border-radius: 50%; /* Redondo fino */
   padding: var(--space-xs);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
 }
 
 .contactText {
@@ -312,6 +318,7 @@ body {
   border: 0;
   border-radius: var(--border-radius-md);
   margin-bottom: var(--space-md);
+  filter: grayscale(10%); /* Mapa un poco más sobrio */
 }
 
 .openInMapsButton {
@@ -319,7 +326,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  background-color: var(--color-primary);
+  background-color: var(--color-primary); /* Marrón */
   color: var(--color-white);
   border: none;
   padding: var(--space-sm) var(--space-md);
@@ -331,6 +338,7 @@ body {
   transition: all 0.3s ease-in-out;
   box-shadow: var(--shadow-md);
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .openInMapsButton:hover {
@@ -352,7 +360,7 @@ body {
     min-height: 605px;
     flex-direction: column;
     padding: var(--space-md);
-    margin-top: 65px;
+    margin-top: 85px;
     border-radius: 40px;
   }
 
@@ -365,7 +373,7 @@ body {
 
   .heroImageContainer {
     width: 95%;
-    height: 290px;
+    height: 295px;
     margin-bottom: var(--space-md);
     max-width: none;
     margin-top: 0px;
@@ -395,6 +403,7 @@ body {
     margin-bottom: 6px;
   }
 
+  /* MANTENIENDO TUS PUNTITOS MÓVILES INTACTOS */
   .bannerDots {
     bottom: 6px;
     gap: var(--space-xs);
@@ -417,7 +426,6 @@ body {
   
   .aboutMainTitle { font-size: 1.8em; text-align: center; }
   
-  /* RESPETANDO TUS REGLAS DE TEXTO PARA MÓVILES - SIN MODIFICACIONES */
   .aboutParagraph {
     font-size: 1.05em;
     line-height: 1.7;
@@ -453,7 +461,6 @@ body {
 @media (max-width: 395px) {
   .heroImageContainer { width: 97%; height: 290px; }
   
-  /* RESPETANDO TUS REGLAS DE TEXTO PARA MÓVILES PEQUEÑOS - SIN MODIFICACIONES */
   .aboutParagraph {
     font-size: 1em;
     line-height: 1.6;
@@ -476,7 +483,7 @@ body {
   .heroSlide {
     -webkit-transform-style: preserve-3d;
             transform-style: preserve-3d;
-    transition: opacity 0.9s ease-in-out !important; /* ← sincronizado */
+    transition: opacity 0.9s ease-in-out !important; 
   }
   
   .heroImageContainer, .heroImage {

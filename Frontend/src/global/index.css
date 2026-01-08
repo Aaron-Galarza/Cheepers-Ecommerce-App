@@ -3,13 +3,13 @@ body.dashboardPage {
 }
 :root {
   /* Colores de Marca Cheepers */
-  --color-primary: #D32F2F; /* Rojo: para botones, acentos, precios */
-  --color-secondary: #FFC107; /* Amarillo/Ámbar: para elementos secundarios, fondos suaves */
+  --color-primary: #5a280c; /* Rojo: para botones, acentos, precios */
+  --color-secondary: #cfa01c; /* Amarillo/Ámbar: para elementos secundarios, fondos suaves */
   --color-tertiary: #4E342E; /* Marrón oscuro: para texto principal, fondos oscuros */
 
   /* Colores de Fondo */
-  --color-background-light: #FFF8E1; /* Beige/Crema suave: para fondos de sección claros */
-  --color-background-medium: #FFECB3; /* Amarillo pastel: para destacar bloques (ej. info contacto) */
+  --color-background-light: #eee2bc; /* Beige/Crema suave: para fondos de sección claros */
+  --color-background-medium: #faf6e8; /* Amarillo pastel: para destacar bloques (ej. info contacto) */
   --color-background-dark: #A13B3B; /* Rojo oscuro o marrón rojizo: para secciones oscuras (opcional) */
 
   /* Colores de Texto */
@@ -51,12 +51,11 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-osx-smoothing: grayscale;
-  background-image: url(../assets/images/fondo.webp);
   background-size: cover;
   color: var(--color-text-dark); 
   box-sizing: border-box; 
   line-height: 1.5; 
-}
+background-image:  linear-gradient(135deg, #eaddcf 25%, transparent 25%), linear-gradient(225deg, #eaddcf 25%, transparent 25%), linear-gradient(45deg, #eaddcf 25%, transparent 25%), linear-gradient(315deg, #eaddcf 25%, transparent 25%);}
 
 @media (min-width: 768px) {
   body{

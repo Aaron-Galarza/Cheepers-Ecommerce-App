@@ -1,10 +1,13 @@
+/* --- FOOTER CRISTAL BAR (Solo Colores y Fuentes) --- */
+
 /* Contenedor principal */
 .footer-container {
-  background-color: #1b1b1b;
-  color: #d1d5db;
-  padding: 0.4rem 0.3rem; /* Menor padding */
-  font-family: Arial, sans-serif;
-  font-size: 0.8rem; /* Menor font-size */
+  background-color: #4a3b32; /* Marrón Café */
+  color: #fdfbf7; /* Crema suave */
+  padding: 0.4rem 0.3rem; 
+  font-family: 'Montserrat', sans-serif; /* Fuente Cuerpo */
+  font-size: 0.8rem;
+  border-top: 2px solid #c5a065; /* Detalle fino dorado arriba */
 }
 
 .footer-content {
@@ -12,7 +15,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem; /* Menor espacio entre elementos */
+  gap: 0.7rem; 
   text-align: center;
 }
 
@@ -21,34 +24,37 @@
   width: 100%;
 }
 
+/* Títulos con fuente elegante y color dorado */
 .copyright-text, .footer-title {
-  font-size: 1rem; /* Menor font-size */
+  font-family: 'Playfair Display', serif; /* Fuente Títulos */
+  font-size: 1rem; 
   font-weight: 600;
-  color: #ff9800; /* Naranja para el texto resaltado */
-  margin-bottom: 0.2rem; /* Menor margen */
+  color: #c5a065; /* Dorado Cristal */
+  margin-bottom: 0.2rem; 
 }
 
 .footer-text, .footer-contact, .footer-developer, .footer-support-title {
-  font-size: 0.9rem; /* Menor font-size */
-  opacity: 0.8;
+  font-size: 0.9rem; 
+  opacity: 0.9;
   margin: 0;
+  color: #fdfbf7; /* Crema */
 }
 
 /* Redes Sociales */
 .social-media-icons {
   display: flex;
   justify-content: center;
-  gap: 0.8rem; /* Menor espacio */
-  margin-bottom: 0.4rem; /* Menor margen */
+  gap: 0.8rem; 
+  margin-bottom: 0.4rem; 
 }
 
 .icon-link {
-  color: #d1d5db;
+  color: #fdfbf7; /* Iconos color crema */
   transition: color 0.3s ease;
 }
 
 .icon-link:hover {
-  color: #fff;
+  color: #c5a065; /* Dorado al pasar el mouse */
 }
 
 /* Contacto del desarrollador */
@@ -56,7 +62,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem; /* Menor espacio */
+  gap: 0.3rem; 
   margin-top: 0;
 }
 
@@ -64,17 +70,17 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  color: #d1d5db;
+  color: #c5a065; /* Link dorado */
   text-decoration: none;
-  font-size: 0.75rem; /* Menor font-size */
+  font-size: 0.75rem; 
   transition: color 0.3s ease;
 }
 
 .contact-link:hover {
-  color: #fff;
+  color: #ffffff; /* Blanco al pasar el mouse */
 }
 
-/* Estilos para escritorio */
+/* Estilos para escritorio (Sin cambios estructurales) */
 @media (min-width: 768px) {
   .footer-content {
     flex-direction: row;

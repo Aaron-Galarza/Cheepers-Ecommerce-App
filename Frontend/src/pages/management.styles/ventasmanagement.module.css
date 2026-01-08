@@ -50,7 +50,7 @@
 .title {
     font-size: 2.8rem;
     font-weight: 800;
-    color: var(--color-cheepers-red); /* Rojo Cheepers */
+        color: #551010; /* Rojo Cheepers */
     text-align: center;
     margin-bottom: 45px;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
@@ -197,7 +197,7 @@
 
 .metricIconContainer {
     font-size: 1.9rem; /* REDUCIDO: de 2.2rem a 2rem */
-    color: var(--color-primary-blue); /* Azul primario para el ícono */
+    color: rgb(48, 26, 6); /* Azul primario para el ícono */
     margin-bottom: 10px; /* REDUCIDO: de 18px a 15px */
     background-color: var(--color-very-light-blue); /* Fondo azul muy claro para el ícono */
     border-radius: var(--border-radius-full);
@@ -206,7 +206,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.25); /* Sombra azul para el ícono */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); /* Sombra azul para el ícono */
 }
 
 .metricCard h3 {
@@ -219,7 +219,7 @@
 .metricCard p {
     font-size: 2rem; /* REDUCIDO: de 2.2rem a 2rem */
     font-weight: 800;
-    color: var(--color-primary-blue); /* Azul primario para los valores */
+ color: rgb(114, 34, 23);  /* Azul primario para los valores */
 }
 
 /* Contenedor de Gráficos y Lista */

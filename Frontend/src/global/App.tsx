@@ -47,7 +47,7 @@ const Footer: FC = () => {
 
         {/* Columna Central */}
         <div className="footer-column footer-center">
-          <p className="footer-text">Todos los derechos reservados. <br /> © 2025 Cheepers TBH</p>
+          <p className="footer-text">Todos los derechos reservados. <br /> © 2025 Cristal Bar</p>
         </div>
 
         {/* Columna Derecha */}

@@ -75,7 +75,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className={styles.dashboardContainer}>
       <aside className={styles.sidebar}>
-        <h2 className={styles.logo}>CHEEPERS <span className={styles.admin}>ADMIN</span></h2>
+        <h2 className={styles.logo}>CRISTAL <span className={styles.admin}>ADMIN</span></h2>
         <nav className={styles.nav}>
           <a href="#" className={styles.navItem} onClick={() => setActiveSection('welcome')}>
             <span><FaThLarge /></span> Panel

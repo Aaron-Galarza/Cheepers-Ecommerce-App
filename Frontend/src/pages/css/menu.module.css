@@ -133,7 +133,7 @@ body {
 /* ** Mini-header fijo y responsive ** */
 .stickyNav {
   position: fixed;
-  top: 100px;
+  top: 110px;
   z-index: 100;
   background-color: white;
   padding: 1rem 0;
@@ -202,7 +202,7 @@ body {
   }
 
   .stickyNav {
-    top: 72px;
+    top: 82px;
     padding: 0.5rem 0;
   }
   
