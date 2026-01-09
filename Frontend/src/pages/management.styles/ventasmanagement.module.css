@@ -1,6 +1,6 @@
 :root {
   --color-cheepers-red: #e53e3e; /* Rojo Cheepers para título, errores, exportar */
-  --color-primary-blue: #2c86ec; /* Azul primario para métricas, porcentajes, foco */
+  --color-primary-blue: #502d11; /* Azul primario para métricas, porcentajes, foco */
   --color-light-blue: #a0c4ff; /* Azul claro para bordes de input, scrollbar */
   --color-very-light-blue: #e7f3ff; /* Azul muy claro para fondos de iconos/porcentajes */
   --color-background-light: #f8f9fa; /* Fondo general más claro */
@@ -199,7 +199,7 @@
     font-size: 1.9rem; /* REDUCIDO: de 2.2rem a 2rem */
     color: rgb(48, 26, 6); /* Azul primario para el ícono */
     margin-bottom: 10px; /* REDUCIDO: de 18px a 15px */
-    background-color: var(--color-very-light-blue); /* Fondo azul muy claro para el ícono */
+    background-color: b; /* Fondo azul muy claro para el ícono */
     border-radius: var(--border-radius-full);
     width: 55px; /* REDUCIDO: de 65px a 60px */
     height: 55px; /* REDUCIDO: de 65px a 60px */
@@ -263,7 +263,7 @@
     overflow-y: auto;
     padding: 10px;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-light-blue) var(--color-background-light); /* Azul claro para scrollbar */
+    scrollbar-color: brown; /* Azul claro para scrollbar */
 }
 
 .bestSellingList ul {
@@ -368,7 +368,7 @@
 
 .bestDaysItem span:last-child {
     font-weight: 700;
-    color: var(--color-primary-blue); /* Azul primario para los valores de ventas */
+    color: rgb(71, 41, 16); /* Azul primario para los valores de ventas */
 }
 
 /* NUEVA SECCIÓN: Tabla de Ventas Diarias */
@@ -435,7 +435,7 @@
 
 .dailySalesTable tfoot {
     font-weight: 700;
-    background-color: var(--color-primary-blue); /* Fondo azul primario para el pie de tabla */
+    background-color: rgb(21, 177, 204); /* Fondo azul primario para el pie de tabla */
     color: var(--color-white);
 }
 
