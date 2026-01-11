@@ -32,8 +32,8 @@ const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:5173',
     'https://cheepersapp.vercel.app',
-    'https://cheepersapp-ad52rj7a7-aaron-galarzas-projects.vercel.app/',
-    '/\.vercel\.app$/'
+    'https://cheepersapp-ad52rj7a7-aaron-galarzas-projects.vercel.app',
+    /\.vercel\.app$/
 ];
 app.use(cors({
     origin: function (origin, callback) {
