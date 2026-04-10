@@ -17,9 +17,6 @@ const AUTOSLIDE_MS = 6000;   // auto-avance
 
 // Definición de los elementos del banner
 const bannerItems = [
-  { image: SandwichMilanesa,  title: 'SANDWICH MILANESA',    descriptionLine1: 'Sabroso sandwich de milanesa de carne o pollo', callToAction: '¡Pedilo ahora!', altText: 'Lomito', targetRoute: '/menu' },
-  { image: sandwichVacio,  title: 'BURGUER PAN ARABE',    descriptionLine1: 'Sabrosa hamburguesa en pan arabe de 18cm', callToAction: '¡Probala ahora!', altText: 'Lomito', targetRoute: '/menu' },
-  { image: baconcheep, title: 'BIG TASTY', descriptionLine1: 'El sabor ahumado', descriptionLine2: 'con bacon crujiente.', callToAction: '¡Probala ahora!', altText: 'Hamburguesa Big Tasty', targetRoute: '/menu' },
   { image: barbacue,   title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso', targetRoute: '/menu' },
   { image: cheddar,    title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon', targetRoute: '/menu' },
   { image: pizzas,     title: 'PIZZAS', descriptionLine1: 'Gran variedad de pizzas ', descriptionLine2: 'No te quedes sin probar.', callToAction: '¡Probalas!', altText: 'Pizzas', targetRoute: '/menu' },
