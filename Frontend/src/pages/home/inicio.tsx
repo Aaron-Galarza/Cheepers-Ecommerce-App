@@ -7,7 +7,6 @@ import barbacue from '../../assets/images/con-queso-con-sesamo.webp';
 import cheddar from '../../assets/images/papas fritas bacon.webp';
 import conqueso from '../../assets/images/con-queso.webp'
 import pizzas from '../../assets/images/pizzas.webp';
-import sandwichVacio from '../../assets/images/hamburguesa pan arabe.webp'
 import SandwichMilanesa from '../../assets/images/sandwichmilanesa.webp'
 import { FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
