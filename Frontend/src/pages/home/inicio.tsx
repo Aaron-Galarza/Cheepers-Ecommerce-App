@@ -108,7 +108,7 @@ const Inicio: React.FC = () => {
 
   const whatsappPedidoMessage = 'Hola! Quisiera hacer un pedido.';
   const mapsUrl =
-    'https://www.google.com/maps?q=Cheepers,Corrientes+1200,Resistencia,Chaco&ll=-27.439181,-58.997090&z=17';
+    'https://maps.app.goo.gl/8JZ1HVo3tgEz3WDE6';
 
   return (
     <div className={styles.inicioContainer}>
@@ -230,8 +230,8 @@ const Inicio: React.FC = () => {
               </span>
               <div className={styles.contactText}>
                 <p><strong>Horario de Atención:</strong></p>
-                <p>Lunes a Domingo: 20:00 - 23:30 hs</p>
-                <p>Sabados: hasta las 00:00</p>
+                <p>Miercoles a Domingo: 20:00 - 23:00 hs</p>
+                <p>Viernes y Sabados: hasta las 00:00</p>
               </div>
             </div>
 
@@ -240,7 +240,7 @@ const Inicio: React.FC = () => {
                 <FaMapMarkerAlt />
               </span>
               <p className={styles.contactText}>
-                Ubicados en Corrientes 1200, Resistencia - Chaco{' '}
+                Ubicados en San Juan 1360, Resistencia - Chaco{' '}
                 (<a href={mapsUrl} target="_blank" rel="noopener noreferrer">Ver en Mapa</a>)
               </p>
             </div>
