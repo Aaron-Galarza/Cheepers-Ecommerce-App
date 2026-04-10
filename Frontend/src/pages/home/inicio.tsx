@@ -247,7 +247,7 @@ const Inicio: React.FC = () => {
           </div>
 
           <iframe
-            src=src="https://maps.google.com/maps?width=100%&amp;height =100%&amp;hl=en&amp;q=San Juan 1360&amp;t=&amp;z=14&a mp;ie=UTF8&amp;iwloc=B&amp ;output=embed"
+            src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3541.1827666545196!2d-58.99226062454237!3d-27.432414276341238!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjfCsDI1JzU2LjciUyA1OMKwNTknMjIuOSJX!5e0!3m2!1ses!2sar!4v1775826081352!5m2!1ses!2sar"
             width="100%"
             height="100%"
             style={{ border: 0 }}
