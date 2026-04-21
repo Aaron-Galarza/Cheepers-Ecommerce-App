@@ -5,10 +5,29 @@ import { Product } from '../../components/layout/checkout/productlist';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import { PromoFormatter } from '../../lib/markdownFormatter';
 
-// Importa los íconos de React Icons (Agregamos GiCutlet para Milanesas)
-import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiBread, GiSteak, GiWineGlass } from 'react-icons/gi';
+import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiSteak, GiSodaCan, GiStarFormation } from 'react-icons/gi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+// 1. EL DICCIONARIO DE ÍCONOS
+const categoryIcons: Record<string, React.ElementType> = {
+    'Hamburguesas': GiHamburger,
+    'Papas Fritas': GiFrenchFries,
+    'Pizzas': GiPizzaSlice,
+    'Milanesas': GiSteak,
+    'Bebidas': GiSodaCan
+};
+
+// 2. LA "WHITELIST" (LISTA VIP)
+// Solo estas categorías van a aparecer en la página y exactamente en este orden. 
+// Chau promos raras, chau lomos fantasma.
+const CATEGORIAS_PERMITIDAS = [
+    'Hamburguesas', 
+    'Papas Fritas', 
+    'Pizzas', 
+    'Milanesas', 
+    'Bebidas'
+];
 
 const MenuPage: React.FC = () => {
     const { addToCart } = useCart();
@@ -16,13 +35,7 @@ const MenuPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Crea las referencias para cada sección
-    const hamburgersRef = useRef<HTMLHeadingElement>(null);
-    const friesRef = useRef<HTMLHeadingElement>(null);
-    const pizzasRef = useRef<HTMLHeadingElement>(null);
-    const lomosRef = useRef<HTMLHeadingElement>(null);
-    const milanesasRef = useRef<HTMLHeadingElement>(null); // NUEVA REF
-    const bebidasRef = useRef<HTMLHeadingElement>(null);
+    const sectionRefs = useRef<{ [key: string]: HTMLHeadingElement | null }>({});
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -42,242 +55,79 @@ const MenuPage: React.FC = () => {
         fetchProducts();
     }, []);
 
-    // ** Función de scroll mejorada para un desplazamiento más preciso **
-    // CORRECCIÓN: Aceptar RefObject<HTMLHeadingElement | null>
-    const scrollToSection = (ref: React.RefObject<HTMLHeadingElement | null>) => {
-        if (ref.current) {
+    const scrollToCategory = (category: string) => {
+        const ref = sectionRefs.current[category];
+        if (ref) {
             const yOffset = -150;
-            const y = ref.current.getBoundingClientRect().top + window.scrollY + yOffset;
-            
+            const y = ref.getBoundingClientRect().top + window.scrollY + yOffset;
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
     };
 
-    const hamburgers = products.filter((p) => p.category === 'Hamburguesas');
-    const fries = products.filter((p) => p.category === 'Papas Fritas');
-    const pizzas = products.filter((p) => p.category === 'Pizzas');
-    const lomos = products.filter((p) => p.category === 'Sandwiches');
-    const milanesas = products.filter((p) => p.category === 'Milanesas'); // NUEVO FILTRO
-    const bebidas = products.filter((p) => p.category === 'Bebidas');
-
-    // Verificar si hay productos en cada categoría
-    const hasHamburgers = hamburgers.length > 0;
-    const hasFries = fries.length > 0;
-    const hasPizzas = pizzas.length > 0;
-    const hasLomos = lomos.length > 0;
-    const hasMilanesas = milanesas.length > 0; // NUEVO BOOLEANO
-    const hasBebidas = bebidas.length > 0;
+    // 3. LA MAGIA FILTRADA: 
+    // Comparamos nuestra Lista VIP con lo que viene de la base de datos.
+    // Solo creamos la sección si la categoría está en la lista Y tiene productos adentro.
+    const activeCategories = CATEGORIAS_PERMITIDAS.filter(categoryName => 
+        products.some(p => p.category === categoryName)
+    );
 
     if (loading) return <div className={styles.menuContainer}>Cargando productos...</div>;
-
     if (error) return <div className={styles.menuContainer} style={{ color: 'red' }}>{error}</div>;
 
     return (
         <>
             <nav className={styles.stickyNav}>
                 <ul className={styles.navList}>
-                    {hasHamburgers && (
-                        <li>
-                            <a onClick={() => scrollToSection(hamburgersRef)}>
-                                <GiHamburger className={styles.navIcon} /> Hamburguesas
-                            </a>
-                        </li>
-                    )}
-                    {hasFries && (
-                        <li>
-                            <a onClick={() => scrollToSection(friesRef)}>
-                                <GiFrenchFries className={styles.navIcon} /> Papas
-                            </a>
-                        </li>
-                    )}
-                    {hasPizzas && (
-                        <li>
-                            <a onClick={() => scrollToSection(pizzasRef)}>
-                                <GiPizzaSlice className={styles.navIcon} /> Pizzas
-                            </a>
-                        </li>
-                    )}
-                    {hasLomos && (
-                        <li>
-                            <a onClick={() => scrollToSection(lomosRef)}>
-                                <GiBread className={styles.navIcon} /> Sandwich
-                            </a>
-                        </li>
-                    )}
-                    {/* NUEVO BOTÓN NAV */}
-                    {hasMilanesas && (
-                        <li>
-                            <a onClick={() => scrollToSection(milanesasRef)}>
-                                <GiSteak className={styles.navIcon} /> Milanesas
-                            </a>
-                        </li>
-                    )}
-                    {hasBebidas && (
-                        <li>
-                            <a onClick={() => scrollToSection(bebidasRef)}>
-                                <GiWineGlass className={styles.navIcon} /> Bebidas
-                            </a>
-                        </li>
-                    )}
+                    {activeCategories.map((category) => {
+                        const IconComponent = categoryIcons[category] || GiStarFormation;
+                        return (
+                            <li key={`nav-${category}`}>
+                                <a onClick={() => scrollToCategory(category)}>
+                                    <IconComponent className={styles.navIcon} /> {category}
+                                </a>
+                            </li>
+                        );
+                    })}
                 </ul>
             </nav>
             
             <div className={styles.menuContainer}>
-                {/* Hamburguesas */}
-                {hasHamburgers && (
-                    <>
-                        <h1 id="hamburguesas" className={styles.sectionTitle} ref={hamburgersRef}>
-                            HAMBURGUESAS
-                        </h1>
-                        <div className={styles.grid}>
-                            {hamburgers.map((p) => (
-                                <div key={p._id} className={styles.card}>
-                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
-                                    <div className={styles.info}>
-                                        <h2 className={styles.title}>{p.name}</h2>
-                                        <p className={styles.description}>{p.description}</p>
-                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                        {p.promotionalLabel && (
-                                            <p className={styles.promotionalLabel}>
-                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
-                                        )}
-                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
+                {activeCategories.map((category) => {
+                    const categoryProducts = products.filter(p => p.category === category);
 
-                {/* Papas Fritas */}
-                {hasFries && (
-                    <>
-                        <h1 id="papas-fritas" className={styles.sectionTitle} ref={friesRef}>
-                            PAPAS FRITAS
-                        </h1>
-                        <div className={styles.grid}>
-                            {fries.map((p) => (
-                                <div key={p._id} className={styles.card}>
-                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
-                                    <div className={styles.info}>
-                                        <h2 className={styles.title}>{p.name}</h2>
-                                        <p className={styles.description}>{p.description}</p>
-                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                        {p.promotionalLabel && (
-                                            <p className={styles.promotionalLabel}>
-                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
-                                        )}
-                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
+                    return (
+                        <React.Fragment key={`section-${category}`}>
+                            <h1 
+                                id={`section-${category.toLowerCase().replace(/\s+/g, '-')}`} 
+                                className={styles.sectionTitle} 
+                                ref={(el) => { sectionRefs.current[category] = el; }}
+                            >
+                                {category.toUpperCase()}
+                            </h1>
+                            
+                            <div className={styles.grid}>
+                                {categoryProducts.map((p) => (
+                                    <div key={p._id} className={styles.card}>
+                                        <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
+                                        <div className={styles.info}>
+                                            <h2 className={styles.title}>{p.name}</h2>
+                                            <p className={styles.description}>{p.description}</p>
+                                            <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                            {p.promotionalLabel && (
+                                                <p className={styles.promotionalLabel}>
+                                                    <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            
+                                                </p>
+                                            )}
+                                            <button className={styles.button} onClick={() => addToCart(p)}>
+                                                Agregar al carrito
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {/* Pizzas */}
-                {hasPizzas && (
-                    <>
-                        <h1 id="pizzas" className={styles.sectionTitle} ref={pizzasRef}>
-                            PIZZAS
-                        </h1>
-                        <div className={styles.grid}>
-                            {pizzas.map((p) => (
-                                <div key={p._id} className={styles.card}>
-                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
-                                    <div className={styles.info}>
-                                        <h2 className={styles.title}>{p.name}</h2>
-                                        <p className={styles.description}>{p.description}</p>
-                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                        {p.promotionalLabel && (
-                                            <p className={styles.promotionalLabel}>
-                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
-                                        )}
-                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {/* Lomos - Solo se muestra si hay productos */}
-                {hasLomos && (
-                    <>
-                        <h1 id="Sandwiches" className={styles.sectionTitle} ref={lomosRef}>
-                            SANDWICHES
-                        </h1>
-                        <div className={styles.grid}>
-                            {lomos.map((p) => (
-                                <div key={p._id} className={styles.card}>
-                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
-                                    <div className={styles.info}>
-                                        <h2 className={styles.title}>{p.name}</h2>
-                                        <p className={styles.description}>{p.description}</p>
-                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                        {p.promotionalLabel && (
-                                            <p className={styles.promotionalLabel}>
-                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
-                                        )}
-                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {/* NUEVA SECCIÓN: Milanesas */}
-                {hasMilanesas && (
-                    <>
-                        <h1 id="milanesas" className={styles.sectionTitle} ref={milanesasRef}>
-                            MILANESAS
-                        </h1>
-                        <div className={styles.grid}>
-                            {milanesas.map((p) => (
-                                <div key={p._id} className={styles.card}>
-                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
-                                    <div className={styles.info}>
-                                        <h2 className={styles.title}>{p.name}</h2>
-                                        <p className={styles.description}>{p.description}</p>
-                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                        {p.promotionalLabel && (
-                                            <p className={styles.promotionalLabel}>
-                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
-                                        )}
-                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {/* NUEVA SECCIÓN: Bebidas */}
-                {hasBebidas && (
-                    <>
-                        <h1 id="bebidas" className={styles.sectionTitle} ref={bebidasRef}>
-                            BEBIDAS
-                        </h1>
-                        <div className={styles.grid}>
-                            {bebidas.map((p) => (
-                                <div key={p._id} className={styles.card}>
-                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
-                                    <div className={styles.info}>
-                                        <h2 className={styles.title}>{p.name}</h2>
-                                        <p className={styles.description}>{p.description}</p>
-                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
-                                        {p.promotionalLabel && (
-                                            <p className={styles.promotionalLabel}>
-                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
-                                        )}
-                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
+                                ))}
+                            </div>
+                        </React.Fragment>
+                    );
+                })}
             </div>
         </>
     );
