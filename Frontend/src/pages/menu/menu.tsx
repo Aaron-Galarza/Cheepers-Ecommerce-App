@@ -6,7 +6,7 @@ import { useCart } from '../../components/layout/checkout/cartcontext';
 import { PromoFormatter } from '../../lib/markdownFormatter';
 
 // Importa los íconos de React Icons (Agregamos GiCutlet para Milanesas)
-import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiBread, GiSteak } from 'react-icons/gi';
+import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiBread, GiSteak, GiWineGlass } from 'react-icons/gi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -22,6 +22,7 @@ const MenuPage: React.FC = () => {
     const pizzasRef = useRef<HTMLHeadingElement>(null);
     const lomosRef = useRef<HTMLHeadingElement>(null);
     const milanesasRef = useRef<HTMLHeadingElement>(null); // NUEVA REF
+    const bebidasRef = useRef<HTMLHeadingElement>(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -57,6 +58,7 @@ const MenuPage: React.FC = () => {
     const pizzas = products.filter((p) => p.category === 'Pizzas');
     const lomos = products.filter((p) => p.category === 'Sandwiches');
     const milanesas = products.filter((p) => p.category === 'Milanesas'); // NUEVO FILTRO
+    const bebidas = products.filter((p) => p.category === 'Bebidas');
 
     // Verificar si hay productos en cada categoría
     const hasHamburgers = hamburgers.length > 0;
@@ -64,6 +66,7 @@ const MenuPage: React.FC = () => {
     const hasPizzas = pizzas.length > 0;
     const hasLomos = lomos.length > 0;
     const hasMilanesas = milanesas.length > 0; // NUEVO BOOLEANO
+    const hasBebidas = bebidas.length > 0;
 
     if (loading) return <div className={styles.menuContainer}>Cargando productos...</div>;
 
@@ -106,6 +109,13 @@ const MenuPage: React.FC = () => {
                         <li>
                             <a onClick={() => scrollToSection(milanesasRef)}>
                                 <GiSteak className={styles.navIcon} /> Milanesas
+                            </a>
+                        </li>
+                    )}
+                    {hasBebidas && (
+                        <li>
+                            <a onClick={() => scrollToSection(bebidasRef)}>
+                                <GiWineGlass className={styles.navIcon} /> Bebidas
                             </a>
                         </li>
                     )}
@@ -225,6 +235,32 @@ const MenuPage: React.FC = () => {
                         </h1>
                         <div className={styles.grid}>
                             {milanesas.map((p) => (
+                                <div key={p._id} className={styles.card}>
+                                    <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
+                                    <div className={styles.info}>
+                                        <h2 className={styles.title}>{p.name}</h2>
+                                        <p className={styles.description}>{p.description}</p>
+                                        <p className={styles.price}>${p.price?.toFixed(2) || 'N/A'}</p>
+                                        {p.promotionalLabel && (
+                                            <p className={styles.promotionalLabel}>
+                                            <PromoFormatter text={p.promotionalLabel} className={styles.promotionalLabel} />                                            </p>
+                                        )}
+                                        <button className={styles.button} onClick={() => addToCart(p)}>Agregar al carrito</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                {/* NUEVA SECCIÓN: Bebidas */}
+                {hasBebidas && (
+                    <>
+                        <h1 id="bebidas" className={styles.sectionTitle} ref={bebidasRef}>
+                            BEBIDAS
+                        </h1>
+                        <div className={styles.grid}>
+                            {bebidas.map((p) => (
                                 <div key={p._id} className={styles.card}>
                                     <img src={p.imageUrl || '/default-image.jpg'} alt={p.name} className={styles.image} />
                                     <div className={styles.info}>
