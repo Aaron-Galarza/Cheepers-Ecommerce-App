@@ -5,7 +5,7 @@ import { Product } from '../../components/layout/checkout/productlist';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import { PromoFormatter } from '../../lib/markdownFormatter';
 
-import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiSteak, GiSodaCan, GiStarFormation } from 'react-icons/gi';
+import { GiHamburger, GiFrenchFries, GiPizzaSlice, GiSteak, GiSodaCan, GiStarFormation,GiDumpling} from 'react-icons/gi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -15,7 +15,8 @@ const categoryIcons: Record<string, React.ElementType> = {
     'Papas Fritas': GiFrenchFries,
     'Pizzas': GiPizzaSlice,
     'Milanesas': GiSteak,
-    'Bebidas': GiSodaCan
+    'Bebidas': GiSodaCan,
+    'Empanadas': GiDumpling
 };
 
 // 2. LA "WHITELIST" (LISTA VIP)
@@ -26,7 +27,8 @@ const CATEGORIAS_PERMITIDAS = [
     'Papas Fritas', 
     'Pizzas', 
     'Milanesas', 
-    'Bebidas'
+    'Bebidas',
+    'Empanadas'
 ];
 
 const MenuPage: React.FC = () => {
