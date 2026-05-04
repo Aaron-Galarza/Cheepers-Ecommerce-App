@@ -36,7 +36,7 @@ interface CreateOrderRequestBody {
     guestPhone: string;
     guestName: string;
     paymentMethod: 'cash' | 'card' | 'transfer';
-    deliveryType: 'delivery' | 'pickup';
+    deliveryType: 'delivery' | 'pickup' | 'Dine in';
     shippingAddress?: { street: string; city: string };
     notes?: string;
 }
@@ -78,7 +78,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         }
     } else {
         res.status(400);
-        throw new Error('Tipo de entrega inválido. Debe ser "delivery" o "pickup".');
+        throw new Error('Tipo de entrega inválido. Debe ser "delivery" o "pickup" o "Dine in".');
     }
 
     let totalAmount = 0;
