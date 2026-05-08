@@ -72,7 +72,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
             street: shippingAddress.street,
             city: shippingAddress.city || 'Resistencia',
         };
-    } else if (deliveryType === 'pickup') {
+    } else if (deliveryType === 'pickup' || deliveryType === 'Dine in') {
         if (shippingAddress && (shippingAddress.street || shippingAddress.city)) {
             console.warn('Advertencia: Se recibió información de dirección para un pedido de retiro en sucursal. Se ignorará.');
         }
