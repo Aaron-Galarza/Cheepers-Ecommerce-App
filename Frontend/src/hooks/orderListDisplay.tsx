@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   FaCalendarAlt, FaUser, FaBox, FaMoneyBillWave,
   FaCheckCircle, FaTimesCircle, FaPhone, FaPlayCircle, FaPrint
@@ -34,7 +34,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
   const [isUpdatingPayment, setIsUpdatingPayment] = useState<Record<string, boolean>>({});
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'yesterday'>('all');
 
-  // Función para filtrar órdenes por fecha
+  // FunciÃ³n para filtrar Ã³rdenes por fecha
   const getDateFilteredOrders = () => {
     if (dateFilter === 'all') return filteredOrders;
     
@@ -58,7 +58,13 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
 
   const dateFilteredOrders = getDateFilteredOrders();
 
-  // Función para generar el enlace de WhatsApp
+
+  const getDeliveryTypeLabel = (deliveryType: OrderDisplay['deliveryType']): string => {
+    if (deliveryType === 'delivery') return 'Envío a domicilio';
+    if (deliveryType === 'Dine in') return 'Comer aquí';
+    return 'Retiro en sucursal';
+  };
+  // FunciÃ³n para generar el enlace de WhatsApp
   const generateWhatsAppMessageLink = (order: OrderDisplay): string => {
     let cleanedPhoneNumber = order.guestPhone.replace(/\D/g, '');
 
@@ -77,8 +83,8 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
       order.paymentMethod === 'card' ? 'Mercado Pago' :
       'Transferencia';
 
-    let message = `¡Hola ${order.guestName}!\n`;
-    message += `Tu pedido Cheepers ha sido ACEPTADO y está siendo preparado.\n\n`;
+    let message = `Â¡Hola ${order.guestName}!\n`;
+    message += `Tu pedido Cheepers ha sido ACEPTADO y estÃ¡ siendo preparado.\n\n`;
     message += `Detalles de tu pedido:\n`;
     order.products.forEach(p => {
       message += `- ${p.name} (x${p.quantity})\n`;
@@ -90,18 +96,18 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
     });
 
     message += `\nTotal: $${order.totalAmount.toFixed(2)}\n`;
-    message += `Método de pago: ${paymentMethodDisplay}\n`;
-    message += `Tipo de entrega: ${order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}`;
+    message += `MÃ©todo de pago: ${paymentMethodDisplay}\n`;
+    message += `Tipo de entrega: ${getDeliveryTypeLabel(order.deliveryType)}`;
     if (order.deliveryType === 'delivery' && order.shippingAddress) {
-      message += `\nDirección: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
+      message += `\nDirecciÃ³n: ${order.shippingAddress.street}, ${order.shippingAddress.city}`;
     }
-    message += `\n\n¿Quieres agregar algo más?`;
+    message += `\n\nÂ¿Quieres agregar algo mÃ¡s?`;
 
     const encodedMessage = encodeURIComponent(message);
     return `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
   };
 
-  // Función para imprimir comanda
+  // FunciÃ³n para imprimir comanda
   const handlePrintComanda = (order: OrderDisplay) => {
     const comandaHtml = generateComandaHTML(order);
     const printWindow = window.open('', '_blank');
@@ -114,7 +120,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
         printWindow.print();
       };
     } else {
-      alert('No se pudo abrir la ventana de impresión. Por favor, permite ventanas emergentes.');
+      alert('No se pudo abrir la ventana de impresiÃ³n. Por favor, permite ventanas emergentes.');
     }
   };
 
@@ -128,7 +134,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
         paymentMethod: newMethod,
       });
 
-      console.log('Método de pago actualizado:', response.data);
+      console.log('MÃ©todo de pago actualizado:', response.data);
       
       const updatedOrder = response.data.order;
       
@@ -137,11 +143,11 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
         totalAmount: updatedOrder.totalAmount
       });
       
-      alert(`Método de pago del pedido #${orderId.slice(-8)} actualizado a ${newMethod === 'cash' ? 'Efectivo' : 'Mercado Pago'}.`);
+      alert(`MÃ©todo de pago del pedido #${orderId.slice(-8)} actualizado a ${newMethod === 'cash' ? 'Efectivo' : 'Mercado Pago'}.`);
       
     } catch (error: any) {
-      console.error('Error al actualizar el método de pago:', error);
-      alert(`Error al actualizar el método de pago: ${error.response?.data?.message || error.message}`);
+      console.error('Error al actualizar el mÃ©todo de pago:', error);
+      alert(`Error al actualizar el mÃ©todo de pago: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsUpdatingPayment(prevState => ({ ...prevState, [orderId]: false }));
     }
@@ -228,7 +234,7 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                           <ul className={styles.addOnsSublist}>
                             {item.addOns.map((addOn, i) => (
                               <li key={i} className={styles.addOnItem}>
-                                └ {addOn.name} - ${addOn.price.toFixed(2)}
+                                â”” {addOn.name} - ${addOn.price.toFixed(2)}
                               </li>
                             ))}
                           </ul>
@@ -239,11 +245,11 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
                 </div>
                 <div className={styles.orderDetails}>
                   <p className={styles.totalAmount}><FaMoneyBillWave /> Total: ${order.totalAmount.toFixed(2)}</p>
-                  <p className={styles.deliveryType}>Tipo de entrega: {order.deliveryType === 'delivery' ? 'Envío a domicilio' : 'Retiro en sucursal'}</p>
+                  <p className={styles.deliveryType}>Tipo de entrega: {getDeliveryTypeLabel(order.deliveryType)}</p>
                   {order.deliveryType === 'delivery' && order.shippingAddress && (
-                    <p className={styles.shippingAddress}>Dirección: {order.shippingAddress.street}, {order.shippingAddress.city}</p>
+                    <p className={styles.shippingAddress}>DirecciÃ³n: {order.shippingAddress.street}, {order.shippingAddress.city}</p>
                   )}
-                  <p className={styles.paymentMethod}>Método de pago:
+                  <p className={styles.paymentMethod}>MÃ©todo de pago:
                     <span className={styles.paymentMethodValue}>
                       {order.paymentMethod === 'cash' ? ' Efectivo' :
                        order.paymentMethod === 'card' ? ' Mercado Pago' :
@@ -312,3 +318,4 @@ const OrderListDisplay: React.FC<OrderListDisplayProps> = ({
 };
 
 export default OrderListDisplay;
+

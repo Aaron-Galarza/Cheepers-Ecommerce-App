@@ -9,6 +9,12 @@ import { OrderDisplay } from "../pages/management/ordersmanagement"; // Importa 
  * @returns Una cadena de texto HTML.
  */
 export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number): string => {
+    const deliveryTypeLabel = order.deliveryType === 'delivery'
+        ? 'Env�o'
+        : order.deliveryType === 'Dine in'
+            ? 'Comer aqui'
+            : 'Retiro';
+
     // Lógica para determinar el texto del método de pago
     let paymentMethodText = '';
     if (order.paymentMethod === 'cash') {
@@ -90,7 +96,7 @@ export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number):
                 <div class="separator"></div>
                 <div class="details">
                     <p><strong>Fecha:</strong> ${orderDate} | <strong>Hora:</strong> ${orderTime} </p>
-                    <p><strong>Tipo:</strong> ${order.deliveryType === 'delivery' ? 'Envío' : 'Retiro'}</p>
+                    <p><strong>Tipo:</strong> ${deliveryTypeLabel}</p>
                     <p><strong>Cliente:</strong> ${order.guestName}</p>
                     <p><strong>Teléfono:</strong> ${order.guestPhone}</p>
                     ${shippingAddressHtml}

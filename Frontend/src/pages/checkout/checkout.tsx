@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../components/layout/checkout/cartcontext';
 import styles from './../css/checkout.module.css';
 import Button from '../../components/layout/design/button';
-import { FaUser, FaPhone, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore } from 'react-icons/fa';
+import { FaUser, FaPhone, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore, FaUtensils } from 'react-icons/fa';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -34,7 +34,7 @@ const CheckoutPage: React.FC = () => {
   // (Estado 'email' eliminado)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
+  const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup' | 'Dine in'>('delivery');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [metodo, setMetodo] = useState<'efectivo' | 'mercadopago'>('efectivo');
@@ -263,6 +263,16 @@ const CheckoutPage: React.FC = () => {
                 className={styles.radioInput}
               />
               <span className={styles.radioText}><FaStore /> Retiro en Sucursal</span>
+            </label>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                value="Dine in"
+                checked={deliveryType === 'Dine in'}
+                onChange={() => setDeliveryType('Dine in')}
+                className={styles.radioInput}
+              />
+              <span className={styles.radioText}><FaUtensils /> Comer aquí</span>
             </label>
           </div>
           {deliveryType === 'delivery' && (

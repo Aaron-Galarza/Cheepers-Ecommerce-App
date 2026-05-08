@@ -17,11 +17,11 @@ export interface SelectedAddOn { _id: string; quantity: number; name: string; pr
 export interface IAddOn { _id: string; name: string; price: number; category: string; isActive: boolean; associatedProductCategories: string[]; }
 export interface OrderProductRaw { productId: string; quantity: number; addOns?: SelectedAddOn[]; }
 export interface OrderProductDisplay { productId: string; quantity: number; name: string; addOns?: SelectedAddOn[]; }
-export interface Order { _id: string; guestEmail?: string; guestName: string; guestPhone: string; totalAmount: number; paymentMethod: 'cash' | 'card' | 'transfer'; deliveryType: 'delivery' | 'pickup'; shippingAddress?: { street: string; city: string }; products: OrderProductRaw[]; createdAt: string; status: 'pending' | 'processing' | 'delivered' | 'cancelled'; notes?: string; }
+export interface Order { _id: string; guestEmail?: string; guestName: string; guestPhone: string; totalAmount: number; paymentMethod: 'cash' | 'card' | 'transfer'; deliveryType: 'delivery' | 'pickup' | 'Dine in'; shippingAddress?: { street: string; city: string }; products: OrderProductRaw[]; createdAt: string; status: 'pending' | 'processing' | 'delivered' | 'cancelled'; notes?: string; }
 export interface OrderDisplay extends Omit<Order, 'products'> { products: OrderProductDisplay[]; }
 export interface Product { _id: string; name: string; price: number; }
 
-interface NewOrderData { guestName: string; guestPhone: string; totalAmount: number; paymentMethod: 'cash' | 'card' | 'transfer'; deliveryType: 'delivery' | 'pickup'; shippingAddress?: { street: string; city: string }; products: Array<{ productId: string; quantity: number; addOns?: Array<{ addOnId: string; quantity: number }> }>; status: 'pending'; }
+interface NewOrderData { guestName: string; guestPhone: string; totalAmount: number; paymentMethod: 'cash' | 'card' | 'transfer'; deliveryType: 'delivery' | 'pickup' | 'Dine in'; shippingAddress?: { street: string; city: string }; products: Array<{ productId: string; quantity: number; addOns?: Array<{ addOnId: string; quantity: number }> }>; status: 'pending'; }
 interface FormProduct { tempId: string; productId: string; quantity: number; selectedAddOns: Array<{ addOnId: string; quantity: number }>; }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL as string;

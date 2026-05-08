@@ -15,7 +15,7 @@ export interface Order {
   totalAmount: number;
   // Asegúrate de que este tipo en el backend coincida con lo que se envía
   paymentMethod: 'cash' | 'card' | 'transfer'; 
-  deliveryType: 'delivery' | 'pickup';
+  deliveryType: 'delivery' | 'pickup' | 'Dine in';
   shippingAddress?: {
     street: string;
     city: string;
