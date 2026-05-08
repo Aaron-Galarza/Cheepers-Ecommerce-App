@@ -78,7 +78,7 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
         }
     } else {
         res.status(400);
-        throw new Error('Tipo de entrega inválido. Debe ser "delivery" o "pickup" o "Dine in".');
+        throw new Error('Tipo de entrega inválido. Debe ser "delivery" , "pickup" o "Dine in".');
     }
 
     let totalAmount = 0;
