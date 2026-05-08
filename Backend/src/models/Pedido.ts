@@ -56,7 +56,7 @@ export interface IOrder extends Document {
     products: IProductItem[];
     totalAmount: number;
     shippingAddress?: IShippingAddress;
-    deliveryType: 'delivery' | 'pickup';
+    deliveryType: 'delivery' | 'pickup' | 'Dine in';
     paymentMethod: 'cash' | 'card' | 'transfer';
     status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     notes?: string;
@@ -87,7 +87,7 @@ const orderSchema: Schema = new Schema({
     },
     deliveryType: {
         type: String,
-        enum: ['delivery', 'pickup'],
+        enum: ['delivery', 'pickup', 'Dine in'],
         required: true,
         default: 'delivery'
     },

@@ -36,7 +36,7 @@ interface CreateOrderRequestBody {
     guestPhone: string;
     guestName: string;
     paymentMethod: 'cash' | 'card' | 'transfer';
-    deliveryType: 'delivery' | 'pickup';
+    deliveryType: 'delivery' | 'pickup' | 'Dine in';
     shippingAddress?: { street: string; city: string };
     notes?: string;
 }
@@ -72,13 +72,13 @@ export const createOrder = asyncHandler(async (req: Request<{}, {}, CreateOrderR
             street: shippingAddress.street,
             city: shippingAddress.city || 'Resistencia',
         };
-    } else if (deliveryType === 'pickup') {
+    } else if (deliveryType === 'pickup' || deliveryType === 'Dine in') {
         if (shippingAddress && (shippingAddress.street || shippingAddress.city)) {
             console.warn('Advertencia: Se recibió información de dirección para un pedido de retiro en sucursal. Se ignorará.');
         }
     } else {
         res.status(400);
-        throw new Error('Tipo de entrega invÃ¡lido. Debe ser "delivery" o "pickup".');
+        throw new Error('Tipo de entrega inválido. Debe ser "delivery" o "pickup" o "Dine in".');
     }
 
     let totalAmount = 0;
