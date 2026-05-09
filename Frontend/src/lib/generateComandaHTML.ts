@@ -10,7 +10,7 @@ import { OrderDisplay } from "../pages/management/ordersmanagement"; // Importa 
  */
 export const generateComandaHTML = (order: OrderDisplay, shippingCost?: number): string => {
     const deliveryTypeLabel = order.deliveryType === 'delivery'
-        ? 'Env�o'
+        ? 'Envio'
         : order.deliveryType === 'Dine in'
             ? 'Comer aqui'
             : 'Retiro';
