@@ -7,7 +7,8 @@ import barbacue from '../../assets/images/con-queso-con-sesamo.webp';
 import cheddar from '../../assets/images/papas fritas bacon.webp';
 import conqueso from '../../assets/images/con-queso.webp'
 import pizzas from '../../assets/images/pizzas.webp';
-import SandwichMilanesa from '../../assets/images/sandwichmilanesa.webp'
+import pizzalibre from '../../assets/images/pizza-libre.webp';
+
 import { FaPhone, FaMapMarkerAlt, FaArrowRight, FaClock } from 'react-icons/fa';
 
 // ======== Duraciones sincronizadas ========
@@ -16,6 +17,7 @@ const AUTOSLIDE_MS = 6000;   // auto-avance
 
 // Definición de los elementos del banner
 const bannerItems = [
+   {image: pizzalibre,   title: 'PIZZA LIBRE', descriptionLine1: 'Pizza libre ', descriptionLine2: 'Miercoles y Jueves.', callToAction: '¡No te lo pierdas!', altText: 'Hamburguesa Con queso', targetRoute: '/menu' },
   { image: barbacue,   title: 'CON QUESO', descriptionLine1: 'Ketchup carne cebollita ', descriptionLine2: 'cheddar y mostaza.', callToAction: '¡Sabor inigualable!', altText: 'Hamburguesa Con queso', targetRoute: '/menu' },
   { image: cheddar,    title: 'PAPAS BACON', descriptionLine1: 'Papas con cheddar ', descriptionLine2: 'y bacon.', callToAction: '¡Bien crocantes!', altText: 'Papas con cheddar y bacon', targetRoute: '/menu' },
   { image: pizzas,     title: 'PIZZAS', descriptionLine1: 'Gran variedad de pizzas ', descriptionLine2: 'No te quedes sin probar.', callToAction: '¡Probalas!', altText: 'Pizzas', targetRoute: '/menu' },
