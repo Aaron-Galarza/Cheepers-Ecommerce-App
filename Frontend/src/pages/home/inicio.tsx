@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './../css/inicio.module.css';
 import { useNavigate } from 'react-router-dom';
 
-import baconcheep from '../../assets/images/hamburguesa-big-tasty.webp';
 import barbacue from '../../assets/images/con-queso-con-sesamo.webp';
 import cheddar from '../../assets/images/papas fritas bacon.webp';
 import conqueso from '../../assets/images/con-queso.webp'
