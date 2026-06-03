@@ -179,7 +179,7 @@ const PromoManagement: React.FC = () => {
             >
               <option value="">Selecciona una etiqueta</option>
               {PROMO_TAGS.map(tag => (
-                <option key={tag} value={tag}>{tag}</option>
+                <option key={tag} value={tag}>{tag.toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -233,7 +233,7 @@ const PromoManagement: React.FC = () => {
           >
             <option value="Todos">Todos</option>
             {PROMO_TAGS.map(tag => (
-              <option key={tag} value={tag}>{tag}</option>
+              <option key={tag} value={tag}>{tag.toUpperCase()}</option>
             ))}
           </select>
         </div>

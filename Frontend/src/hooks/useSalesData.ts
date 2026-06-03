@@ -5,6 +5,7 @@ import axios from 'axios';
 import authService from '../services/authservice';
 import { SelectedAddOn, IAddOn } from '../components/layout/checkout/productlist';
 import { getPaymentMethodDisplayName } from '../lib/paymentMethods'; // Importación añadida
+import { isPromoCategory } from '../lib/promoCategories';
 
 // Interfaces
 export interface Order {
@@ -216,7 +217,7 @@ export const useSalesData = () => {
       order.products.forEach(item => {
         const product = allProducts.find(p => p._id === item.productId);
         if (product) {
-          if (product.category === 'Promos Solo en Efectivo') {
+          if (isPromoCategory(product.category)) {
             calculatedPromosSoldCount += item.quantity;
           } else {
             calculatedSoldProductsCount += item.quantity;

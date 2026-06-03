@@ -7,6 +7,7 @@ import styles from './../css/checkout.module.css';
 import Button from '../../components/layout/design/button';
 import { FaUser, FaPhone, FaMoneyBillWave, FaHome, FaRoad, FaCity, FaStore, FaUtensils } from 'react-icons/fa';
 import axios from 'axios';
+import { isPromoCategory } from '../../lib/promoCategories';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -76,7 +77,7 @@ const CheckoutPage: React.FC = () => {
   // MODIFICADO: useEffect para calcular el total
   useEffect(() => {
     const itemsEligibleForDiscount = cart.filter(item =>
-      item.category !== 'Promos' && item.category !== 'Promos Solo en Efectivo'
+      item.category !== 'Promos' && !isPromoCategory(item.category)
     );
 
     const totalEligible = itemsEligibleForDiscount.reduce((sum, item) => {
