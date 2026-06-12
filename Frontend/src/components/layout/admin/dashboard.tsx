@@ -1,48 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../css/dashboard.module.css';
-import { FaHamburger, FaPizzaSlice, FaImages, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList } from 'react-icons/fa';
+import { FaHamburger, FaPizzaSlice, FaImages, FaChartBar, FaSignOutAlt, FaThLarge, FaClipboardList, FaFire } from 'react-icons/fa'; 
 import { useNavigate } from 'react-router-dom';
 import ProductManagement from '../../../pages/management/productmanagement';
-import OrdersManagement from '../../../pages/management/ordersmanagement'; // Importa el componente OrdersManagement
-import PromoManagement from '../../../pages/management/promomanagement'; // Gestión de promociones
-import VentasManagement from '../../../pages/management/ventasmanagement'; // Importa el componente VentasManagement
-import authService from '../../../services/authservice'; // Servicio de autenticación
-import AdminGallery from '../../../pages/management/galeria/AdminGallery'
+import OrdersManagement from '../../../pages/management/ordersmanagement'; 
+import PromoManagement from '../../../pages/management/promomanagement'; 
+import VentasManagement from '../../../pages/management/ventasmanagement'; 
+import authService from '../../../services/authservice'; 
+import AdminGallery from '../../../pages/management/galeria/AdminGallery';
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('welcome');
 
   useEffect(() => {
-    // Verifica la autenticación al montar el componente
     if (!authService.isAuthenticated()) {
       navigate('/admin/login');
     }
-
-    // Añade la clase 'dashboardPage' al body para estilos específicos
     document.body.classList.add('dashboardPage');
-    // Función de limpieza para remover la clase cuando el componente se desmonte
     return () => {
       document.body.classList.remove('dashboardPage');
     };
-  }, [navigate]); // Dependencia 'navigate' para asegurar que el efecto se ejecute si cambia
+  }, [navigate]);
 
   const handleLogout = () => {
-    authService.logout(); // Usa el servicio de autenticación para cerrar sesión
-    navigate('/admin/login'); // Redirige al login después de cerrar sesión
+    authService.logout(); 
+    navigate('/admin/login'); 
   };
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'products':
-        return <ProductManagement />;
-      case 'promos':
-        return <PromoManagement />; // Renderiza el componente de gestión de promociones
-      case 'sales':
-        return <VentasManagement />; // ¡Aquí se renderiza VentasManagement!
-      case 'orders': // Caso para la gestión de pedidos
-        return <OrdersManagement />; {/* Renderiza el componente OrdersManagement */}
-        case 'gallery': // Caso para la gestión de pedidos
-        return <AdminGallery/>; {/* Renderiza el componente OrdersManagement */}
+      case 'products': return <ProductManagement />;
+      case 'promos': return <PromoManagement />;
+      case 'sales': return <VentasManagement />;
+      case 'orders': return <OrdersManagement />;
+      case 'gallery': return <AdminGallery/>;
       case 'welcome':
       default:
         return (
@@ -77,23 +69,40 @@ const Dashboard: React.FC = () => {
       <aside className={styles.sidebar}>
         <h2 className={styles.logo}>CHEEPERS <span className={styles.admin}>ADMIN</span></h2>
         <nav className={styles.nav}>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('welcome')}>
+          <a href="#" className={styles.navItem} onClick={(e) => { e.preventDefault(); setActiveSection('welcome'); }}>
             <span><FaThLarge /></span> Panel
           </a>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('products')}>
+          <a href="#" className={styles.navItem} onClick={(e) => { e.preventDefault(); setActiveSection('products'); }}>
             <span><FaHamburger /></span> Productos
           </a>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('promos')}>
+          <a href="#" className={styles.navItem} onClick={(e) => { e.preventDefault(); setActiveSection('promos'); }}>
             <span><FaPizzaSlice /></span> Promos
           </a>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('sales')}>
+          <a href="#" className={styles.navItem} onClick={(e) => { e.preventDefault(); setActiveSection('sales'); }}>
             <span><FaChartBar /></span> Ventas
           </a>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('orders')}>
+          <a href="#" className={styles.navItem} onClick={(e) => { e.preventDefault(); setActiveSection('orders'); }}>
             <span><FaClipboardList /></span> Pedidos
           </a>
-          <a href="#" className={styles.navItem} onClick={() => setActiveSection('gallery')}>
-            <span><FaImages /></span> Galeria
+          <a href="#" className={styles.navItem} onClick={(e) => { e.preventDefault(); setActiveSection('gallery'); }}>
+            <span><FaImages /></span> Galería
+          </a>
+
+          {/* BOTÓN PARA IR A LA COCINA CORREGIDO (SIN DIV) */}
+         {/* BOTÓN DE COCINA COMPACTO */}
+          <a 
+            href="#" 
+            className={styles.navItem} 
+            onClick={(e) => { e.preventDefault(); navigate('/kitchen'); }}
+            style={{ 
+              color: '#fca311', 
+              fontWeight: 'bold',
+              marginTop: '5px', /* Le bajamos de 30px a 5px */
+              borderTop: '1px solid rgba(255,255,255,0.1)', 
+              paddingTop: '8px' 
+            }}
+          >
+            <span><FaFire /></span> Vista Cocina
           </a>
         </nav>
       </aside>

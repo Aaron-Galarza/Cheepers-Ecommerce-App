@@ -6,57 +6,58 @@
 }
 
 .sidebar {
-  width: 250px;
+  width: 260px; /* Un poquitito más ancha para que entren los textos cómodos */
   background-color: #243b55;
   color: white;
-  padding: 1rem 1rem;
+  padding: 1.2rem 1rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow-y: fixed; /* Permite scroll en la barra lateral si el contenido es largo */
+  overflow-y: auto; /* Mantenemos el scroll activo por las dudas */
 }
 
 .logo {
   margin-bottom: 2rem;
   text-align: center;
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 1.6rem; /* Agrandamos apenitas el logo */
 }
 
 .admin {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #ffce54;
 }
 
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem; /* Separamos un poco más los botones (estaba en 0.5) */
   margin-bottom: 30px;
 }
 
 .navItem {
   color: white;
   text-decoration: none;
-  font-size: 24px;
+  font-size: 20px; /* El punto dulce: ni 24px (gigante) ni 18px (chico) */
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px; /* Un poquito más de espacio entre el ícono y el texto */
   transition: 0.3s;
-  padding: 9px 0;
+  padding: 10px 12px; /* Botones un poco más "gorditos" y clickeables */
+  border-radius: 8px;
   margin-top: 1px;
 }
 
 .navItem:hover {
-  color: #ffce54;
+  color: #ffce54; /* Solo cambiamos el texto a amarillo, sin fondo para mejor rendimiento */
 }
 
 .mainContent {
   flex: 1;
   padding: 2rem;
   background-color: #dddada;
-  overflow-y: auto; /* Permite scroll en el contenido principal en desktop */
-  max-height: 100vh; /* Limita la altura en desktop para que el scroll sea interno */
+  overflow-y: auto; 
+  max-height: 100vh; 
 }
 
 .cardsContainer {
@@ -87,24 +88,22 @@
 .logoutButton {
   background-color: #e53e3e;
   color: white;
-  padding: 10px 20px;
+  padding: 11px 22px; /* Agrandamos un pelín el botón de salir */
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 600;
 
-  /* CAMBIO CLAVE: Asegura que el botón sea un contenedor flex para el espaciado del ícono y texto */
   display: flex;
-  align-items: center; /* Centra verticalmente el contenido (ícono y texto) */
-  gap: 9px; /* Mantiene la separación entre el ícono y el texto */
+  align-items: center; 
+  gap: 9px; 
 
   transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
 
   margin-left: auto;
 }
-
 
 .logoutButton:hover {
   background-color: #c53030;
@@ -113,86 +112,86 @@
 }
 
 .logoutIcon {
-  font-size: 1.2rem;
+  font-size: 1.3rem; /* Ícono de salir un poco más visible */
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  /* CRUCIAL: Anular las propiedades de altura y desbordamiento del html y body para móvil */
   html, body {
-    height: auto !important; /* Permite que html/body crezcan con el contenido */
-    overflow: auto !important; /* Habilita el scroll en html/body */
+    height: auto !important; 
+    overflow: auto !important; 
   }
 
-  /* Asegurarse de que body.dashboardPage también permita overflow */
   body.dashboardPage {
     overflow: auto !important;
   }
 
   .dashboardContainer {
     flex-direction: column;
-    height: auto; /* Permite que el contenedor crezca con el contenido */
-    overflow: visible; /* Asegura que el contenedor no oculte el desbordamiento */
+    height: auto; 
+    overflow: visible; 
   }
 
   .sidebar {
     width: 100%;
-    padding: 0.8rem 0.3rem; /* Aumentado el padding vertical */
+    padding: 0.8rem 0.3rem; 
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem; /* Ajustado el gap */
+    gap: 0.5rem; 
     height: auto;
-    overflow-y: visible; /* Sidebar content no debe tener scroll independiente en móvil */
+    overflow-y: visible; 
   }
 
   .logo {
     margin-bottom: 0;
-    font-size: 0.8rem; /* Título un poco más chico */
+    font-size: 1rem; /* Logo móvil un poco más grande */
     width: 100%;
     text-align: center;
-    padding-bottom: 3px;
+    padding-bottom: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .admin {
-    font-size: 0.7rem; /* Ajustado el tamaño del texto "Admin" */
+    font-size: 0.8rem; 
   }
 
   .nav {
     flex-direction: row;
     justify-content: space-around;
     width: 100%;
-    margin-top: 0.5rem; /* Un poco más de margen superior */
+    margin-top: 0.8rem; 
     margin-bottom: 0;
+    flex-wrap: wrap; 
+    gap: 12px;
   }
 
   .navItem {
-    font-size: 0.85rem; /* Texto de navegación más chico */
-    padding: 4px; /* Un poco más de padding */
+    font-size: 0.95rem; /* Letra un poco más grande en celu */
+    padding: 6px; 
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
     text-align: center;
-    margin-top: 25px;
+    margin-top: 20px;
   }
 
   .mainContent {
     padding: 0.5rem;
-    height: auto; /* Permite que el contenido principal crezca */
-    overflow-y: visible; /* Deja que el scroll lo maneje el body */
-    max-height: unset; /* Elimina la limitación de altura */
+    height: auto; 
+    overflow-y: visible; 
+    max-height: unset; 
   }
 
   .logoutButton {
-    position: static; /* Quita el posicionamiento absoluto en móvil */
+    position: static; 
     width: 100%;
     margin-bottom: 8px;
     justify-content: center;
     top: auto;
     right: auto;
-    padding: 6px 12px;
-    font-size: 0.8rem;
+    padding: 8px 12px;
+    font-size: 0.9rem;
   }
 
   .cardsContainer {
