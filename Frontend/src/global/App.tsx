@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import React, { FC } from 'react';
 
@@ -72,10 +72,18 @@ const Footer: FC = () => {
 };
 
 function App() {
+  // Obtenemos la ubicación actual de la ruta
+  const location = useLocation();
+  // Verificamos si la ruta es la de la vista de cocina
+  const isKitchenView = location.pathname === '/kitchen';
+
   return (
     <div className="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
     <ScrollToTop /> {/* <-- COLOCA EL COMPONENTE AQUÍ */}
-      <Header />
+      
+      {/* Si NO es la vista de cocina, muestra el Header */}
+      {!isKitchenView && <Header />}
+      
       <main style={{ flexGrow: 1 }}>
         <Routes>
           {/* Rutas Públicas */}
@@ -127,7 +135,9 @@ function App() {
           <Route path="*" element={<h1>404: Página no encontrada</h1>} />
         </Routes>
       </main>
-      <Footer />
+      
+      {/* Si NO es la vista de cocina, muestra el Footer */}
+      {!isKitchenView && <Footer />}
     </div>
   );
 }

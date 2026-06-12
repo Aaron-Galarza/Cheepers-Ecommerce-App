@@ -8,7 +8,6 @@ import authService from '../../services/authservice';
 import ShippingCostModal from '../../components/layout/common/ShippingCostModal';
 import { generateComandaHTML } from '../../lib/generateComandaHTML';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
 
 import styles from './kitchenview.module.css';
 
@@ -89,8 +88,8 @@ const KitchenView: React.FC = () => {
           }),
         }));
 
-      // 2. ORDEN INVERTIDO: Más nuevos primero (b - a)
-      ordersWithDetails.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+      // 2. ORDEN: Más nuevos primero (b.getTime() - a.getTime())
+      ordersWithDetails.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       const currentOrderIds = new Set(ordersWithDetails.map(o => o._id));
       const newOrdersDetected = [...currentOrderIds].some(id => !previousOrderIds.current.has(id));
@@ -193,12 +192,8 @@ const KitchenView: React.FC = () => {
       <ToastContainer />
       
       <header className={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <button className={styles.backBtn} onClick={() => navigate('/admin/dashboard')}>
-            <FaArrowLeft /> Volver al Admin
-          </button>
-          <h1>Vista de Cocina</h1>
-        </div>
+        {/* Solo el título, sin el botón de volver */}
+        <h1>Vista de Cocina</h1>
         <div className={styles.filters}>
           <button className={`${styles.filterBtn} ${filterStatus === 'all' ? styles.active : ''}`} onClick={() => setFilterStatus('all')}>Todos Activos</button>
           <button className={`${styles.filterBtn} ${filterStatus === 'pending' ? styles.active : ''}`} onClick={() => setFilterStatus('pending')}>Pendientes</button>

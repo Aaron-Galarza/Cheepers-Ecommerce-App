@@ -1,15 +1,24 @@
 /* Contenedor principal estilo Cheepers */
+/* Contenedor principal estilo Cheepers (Aislado) */
 .kitchenContainer {
+  /* Forzamos posicionamiento absoluto para tapar cualquier hueco heredado de App.tsx */
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
-  min-height: 100vh;
-  background-color: #f8f9fa; /* Fondo gris clarito */
+  height: 100vh;
+  z-index: 9999; /* Asegura que se dibuje por encima de todo */
+  
+  background-color: #f8f9fa; /* Fondo gris clarito sólido que tapa las hamburguesas */
   color: #333;
   padding: 20px 40px;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+  
+  /* Agregamos overflow-y auto para que la propia cocina tenga scroll interno si se llena de pedidos */
+  overflow-y: auto; 
   overflow-x: hidden;
 }
-
 .header {
   display: flex;
   justify-content: space-between;
